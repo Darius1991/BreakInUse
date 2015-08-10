@@ -20,6 +20,8 @@ import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
+import com.parse.Parse;
+import com.parse.ParseObject;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
                                 GoogleApiClient.OnConnectionFailedListener, View.OnClickListener{
@@ -54,7 +56,16 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+
         FacebookSdk.sdkInitialize(getApplicationContext());
+
+        Parse.enableLocalDatastore(this);
+        Parse.initialize(this, "B2T3AZ1oLq0tpesDf7E1J6rKp1qUdcYyBjikNFQt",
+                "0bVcYoBptnceGHj1voYEm3Xutd4dbsbeR9AqRbXm");
+        ParseObject testObject = new ParseObject("TestObject");
+        testObject.put("foo", "bar");
+        testObject.saveInBackground();
+
 
         setContentView(R.layout.activity_login);
 
