@@ -32,4 +32,5 @@ dependencies {
     compile 'com.parse.bolts:bolts-android:1.+'
     compile 'com.android.support:multidex:1.0.1'
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
+    compile fileTree(dir: 'libs', include: 'ParseCrash*.jar')
 }
