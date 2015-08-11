@@ -10,20 +10,6 @@
     android:orientation="vertical"
     tools:context="com.example.android.breakinuse.LoginActivity">
 
-    <com.google.android.gms.common.SignInButton
-        android:id="@+id/sign_in_button_google"
-        android:layout_gravity="center_horizontal"
-        android:text="@string/sign_in_button_google_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <com.facebook.login.widget.LoginButton
-        android:id="@+id/sign_in_button_facebook"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="30dp"
-        android:layout_marginBottom="30dp" />
 
     <EditText
         android:id="@+id/sign_in_email_emailID"
@@ -31,7 +17,8 @@
         android:hint="@string/sign_in_email_emailID_hint"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"/>
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="30dp"/>
 
     <EditText
         android:id="@+id/sign_in_email_password"
@@ -49,10 +36,43 @@
         android:layout_height="wrap_content" />
 
     <Button
+        android:id="@+id/sign_up_button_email"
+        android:text="@string/sign_up_button_text"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+
+    <Button
         android:id="@+id/sign_out_button"
         android:text="@string/sign_out_button_text"
         android:layout_gravity="center_horizontal"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+        <com.google.android.gms.common.SignInButton
+            android:id="@+id/sign_in_button_google"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/sign_in_button_google_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"/>
+
+        <com.facebook.login.widget.LoginButton
+            android:id="@+id/sign_in_button_facebook"
+            android:text="@string/sign_in_button_facebook_text"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
+
 
 </LinearLayout>
