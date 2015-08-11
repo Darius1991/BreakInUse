@@ -18,8 +18,6 @@ import org.w3c.dom.Text;
 
 public class HomeActivity extends AppCompatActivity{
 
-    GoogleApiClient mGoogleApiClient;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 

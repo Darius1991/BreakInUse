@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="preferences_key">Preferences Key</string>
+    <string name="login_method">Login Method</string>
+</resources>
