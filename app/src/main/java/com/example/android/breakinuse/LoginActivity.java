@@ -58,17 +58,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onCreate(savedInstanceState);
 
         FacebookSdk.sdkInitialize(getApplicationContext());
-
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this, "B2T3AZ1oLq0tpesDf7E1J6rKp1qUdcYyBjikNFQt",
-                "0bVcYoBptnceGHj1voYEm3Xutd4dbsbeR9AqRbXm");
-        ParseObject testObject = new ParseObject("TestObject");
-        testObject.put("foo", "bar");
-        testObject.saveInBackground();
-
-
         setContentView(R.layout.activity_login);
-
         findViewById(R.id.sign_in_button_google).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
 
@@ -94,7 +84,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             @Override
             public void onError(FacebookException exception) {
-                // TODO showSignedOutUI();
+                // TODO showError();
             }
         });
     }
@@ -119,8 +109,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     public void onConnected(Bundle bundle) {
-
-        Log.d(TAG, "onConnected:" + bundle);
         mShouldResolve = false;
         LOGIN_METHOD = LOGGEDIN_GOOGLE;
         // TODO showSignedInUI();
@@ -135,7 +123,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     public void onClick(View v) {
 
         if (v.getId() == R.id.sign_in_button_google) {
-            onSignInClicked();
+            onSignInClicked("Google");
+        }
+
+        if (v.getId() == R.id.sign_in_button_email){
+            onSignInClicked("Email");
         }
 
         if (v.getId() == R.id.sign_out_button) {
@@ -146,15 +138,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
-
         if (!mIsResolving && mShouldResolve) {
             if (connectionResult.hasResolution()) {
                 try {
                     connectionResult.startResolutionForResult(this, RC_SIGN_IN);
                     mIsResolving = true;
                 } catch (IntentSender.SendIntentException e) {
-                    Log.e(TAG, "Could not resolve ConnectionResult.", e);
                     mIsResolving = false;
                     mGoogleApiClient.connect();
                 }
@@ -176,8 +165,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         super.onActivityResult(requestCode, resultCode, data);
         mCallbackManager.onActivityResult(requestCode, resultCode, data);
 
-        Log.d(TAG, "onActivityResult:" + requestCode + ":" + resultCode + ":" + data);
-
         if (requestCode == RC_SIGN_IN) {
 
             if (resultCode != RESULT_OK) {
@@ -188,9 +175,15 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
     }
 
-    private void onSignInClicked() {
-        mShouldResolve = true;
-        mGoogleApiClient.connect();
+    private void onSignInClicked(String signInMethod) {
+
+        if (signInMethod.equals("Google")){
+            mShouldResolve = true;
+            mGoogleApiClient.connect();
+        } else if (signInMethod.equals("Email")){
+            //TODO Sign In Using Parse
+        }
+
     }
 
     private void onSignOutClicked() {

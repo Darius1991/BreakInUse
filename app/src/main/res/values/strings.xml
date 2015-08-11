@@ -8,4 +8,9 @@
     <string name="sign_in_button_google_text">Sign in with Google</string>
     <string name="action_user_accounts">User Accounts</string>
     <string name="facebook_app_id">1478216152476522</string>
+    <string name="parse_app_id">B2T3AZ1oLq0tpesDf7E1J6rKp1qUdcYyBjikNFQt</string>
+    <string name="parse_client_key">0bVcYoBptnceGHj1voYEm3Xutd4dbsbeR9AqRbXm</string>
+    <string name="sign_in_email_emailID_hint">Your Email ID</string>
+    <string name="sign_in_email_pass_hint">Your Password</string>
+    <string name="sign_in_button_text">Sign In</string>
 </resources>

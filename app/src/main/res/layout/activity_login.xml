@@ -25,6 +25,29 @@
         android:layout_marginTop="30dp"
         android:layout_marginBottom="30dp" />
 
+    <EditText
+        android:id="@+id/sign_in_email_emailID"
+        android:inputType="textEmailAddress"
+        android:hint="@string/sign_in_email_emailID_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"/>
+
+    <EditText
+        android:id="@+id/sign_in_email_password"
+        android:inputType="text|textPassword"
+        android:hint="@string/sign_in_email_pass_hint"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"/>
+
+    <Button
+        android:id="@+id/sign_in_button_email"
+        android:text="@string/sign_in_button_text"
+        android:layout_gravity="center_horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
     <Button
         android:id="@+id/sign_out_button"
         android:text="@string/sign_out_button_text"
