@@ -19,4 +19,6 @@
     <string name="logged_in_email">Logged in through Email</string>
     <string name="logged_out">Logged Out</string>
     <string name="sign_up_button_text">Sign Up</string>
+    <string name="new_to_breakInUse_text">New to BreakInUse! ? Click here to Sign Up</string>
+    <string name="existing_user_breakInUse_text">Existing User ? Click here to Login</string>
 </resources>
