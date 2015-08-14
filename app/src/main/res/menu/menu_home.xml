@@ -5,6 +5,12 @@
     tools:context="com.example.android.breakinuse.HomeActivity">
 
     <item
+        android:id="@+id/refresh"
+        android:title="@string/refresh_text"
+        android:orderInCategory="100"
+        app:showAsAction="never"/>
+
+    <item
         android:id="@+id/action_user_accounts"
         android:title="@string/action_user_accounts"
         android:orderInCategory="100"
