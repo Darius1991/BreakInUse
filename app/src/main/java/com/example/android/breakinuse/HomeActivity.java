@@ -6,7 +6,10 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.android.breakinuse.Utilities.GetCompleteNewsTask;
 import com.example.android.breakinuse.Utilities.Utility;
 
 public class HomeActivity extends AppCompatActivity{
@@ -16,14 +19,12 @@ public class HomeActivity extends AppCompatActivity{
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
     }
-
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-
         getMenuInflater().inflate(R.menu.menu_home, menu);
         MenuItem menuItem = menu.findItem(R.id.action_user_accounts);
         String LOGIN_METHOD = (getApplicationContext()
@@ -33,11 +34,6 @@ public class HomeActivity extends AppCompatActivity{
             menuItem.setTitle("Log Out");
         }
         return true;
-    }
-
-    @Override
-    public void onResume(){
-        super.onResume();
     }
 
     @Override
@@ -60,11 +56,18 @@ public class HomeActivity extends AppCompatActivity{
                     item.setTitle("User Accounts");
                 }
             }
+        }else if (id == R.id.refresh){
 
-        }
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+            if (!Utility.isNetworkAvailable(getApplicationContext())){
+                Utility.makeToast(getApplicationContext(),
+                        "We are not able to detect an internet connection.",
+                        Toast.LENGTH_SHORT);
+            }else {
+                new GetCompleteNewsTask(getApplicationContext(),(TextView)findViewById(R.id.home_textView))
+                                .execute();
+                return true;
+            }
+        }else if (id == R.id.action_settings) {
             return true;
         }
 
