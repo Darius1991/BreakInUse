@@ -6,19 +6,53 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.breakinuse.Utilities.GetCompleteNewsTask;
 import com.example.android.breakinuse.Utilities.Utility;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 public class HomeActivity extends AppCompatActivity{
+
+    public static ArrayAdapter<String> mNewsAdapter;
+    public static String[] mHeadlinesArray;
+
+
+    public static void setHeadlinesAdapter(String[] news) {
+        if (news != null){
+            mNewsAdapter.clear();
+        }
+        for (String headline:news){
+            mNewsAdapter.add(headline);
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
+        mHeadlinesArray = new String[2];
+        mHeadlinesArray[0] = "Bllllllllaaa";
+        mHeadlinesArray[1] = "aaaaaaaHHHHH";
+
+        List<String> weekForecast = new ArrayList<String>(Arrays.asList(mHeadlinesArray));
+
+
+        mNewsAdapter = new ArrayAdapter<>(getApplicationContext(),android.R.layout.simple_list_item_1,
+                weekForecast);
+
+        ListView listView = (ListView) findViewById(R.id.home_listView);
+        listView.setAdapter(mNewsAdapter);
+
+
 
     }
 
