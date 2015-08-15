@@ -4,6 +4,8 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.TextView;
 
+import com.example.android.breakinuse.HomeActivity;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,7 +18,7 @@ import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class GetCompleteNewsTask extends AsyncTask<Void,Void,String> {
+public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
 
     private Context mContext;
     private TextView mTextView;
@@ -43,7 +45,7 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String> {
     }
 
     @Override
-    protected String doInBackground(Void... params) {
+    protected String[] doInBackground(Void... params) {
 
         StringBuilder news =  new StringBuilder();
         String holder;
@@ -166,8 +168,7 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String> {
             news.delete(0,news.length());
 
             try {
-                news = getWebTitlefromJSON(responsePage);
-                return news.toString();
+                return getWebTitlefromJSON(responsePage);
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
@@ -176,8 +177,7 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String> {
         } else if (pageCount  == 1){
 
             try {
-                news = getWebTitlefromJSON(responsePage);
-                return news.toString();
+                return getWebTitlefromJSON(responsePage);
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
@@ -211,10 +211,10 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String> {
     }
 
     @Override
-    protected void onPostExecute(String news) {
+    protected void onPostExecute(String[] news) {
         super.onPostExecute(news);
         if (news != null){
-            this.mTextView.setText(news);
+            HomeActivity.setHeadlinesAdapter(news);
         }
     }
 
@@ -226,22 +226,20 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String> {
         return responsePage.getJSONObject("response").getInt("pages");
     }
 
-    private StringBuilder getWebTitlefromJSON (JSONObject[] responsePage) throws JSONException {
+    private String[] getWebTitlefromJSON (JSONObject[] responsePage) throws JSONException {
 
         int pageCount = responsePage[0].getJSONObject("response").getInt("pages");
         int pageIndex = 0, webTitleIndex = 0;
         JSONArray webTitleArray;
-        StringBuilder news = new StringBuilder();
+        String[] news = new String[responsePage[0].getJSONObject("response").getInt("total")];
 
         for (pageIndex = 0; pageIndex <= pageCount-1; ++pageIndex){
             webTitleIndex = 0;
             webTitleArray = responsePage[pageIndex].getJSONObject("response").getJSONArray("results");
             for ( ;webTitleIndex < webTitleArray.length() ; ++webTitleIndex){
-                news.append(webTitleArray.getJSONObject(webTitleIndex).getString("webTitle"));
-                news.append("    ");
+                news[webTitleIndex + (pageIndex)*20] = (webTitleArray.getJSONObject(webTitleIndex).getString("webTitle"));
             }
         }
-
         return news;
     }
 
