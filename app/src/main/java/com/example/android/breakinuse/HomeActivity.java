@@ -4,34 +4,23 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.breakinuse.Utilities.GetCompleteNewsTask;
 import com.example.android.breakinuse.Utilities.Utility;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class HomeActivity extends AppCompatActivity{
 
-    public static ArrayAdapter<String> mNewsAdapter;
+
     public static String[] mHeadlinesArray;
-
-
-    public static void setHeadlinesAdapter(String[] news) {
-        if (news != null){
-            mNewsAdapter.clear();
-        }
-        for (String headline:news){
-            mNewsAdapter.add(headline);
-        }
-    }
+    private static RecyclerView mRecyclerView;
+    private static HeadlinesAdapter mHeadlinesAdapter;
+    private LinearLayoutManager mLayoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,17 +32,12 @@ public class HomeActivity extends AppCompatActivity{
         mHeadlinesArray[0] = "Bllllllllaaa";
         mHeadlinesArray[1] = "aaaaaaaHHHHH";
 
-        List<String> weekForecast = new ArrayList<String>(Arrays.asList(mHeadlinesArray));
-
-
-        mNewsAdapter = new ArrayAdapter<>(getApplicationContext(),android.R.layout.simple_list_item_1,
-                weekForecast);
-
-        ListView listView = (ListView) findViewById(R.id.home_listView);
-        listView.setAdapter(mNewsAdapter);
-
-
-
+        mLayoutManager = new LinearLayoutManager(this);
+        mRecyclerView = (RecyclerView)findViewById(R.id.home_recyclerView);
+        mRecyclerView.setLayoutManager(mLayoutManager);
+        mRecyclerView.setHasFixedSize(true);
+        mHeadlinesAdapter = new HeadlinesAdapter(mHeadlinesArray);
+        mRecyclerView.setAdapter(mHeadlinesAdapter);
     }
 
     @Override
@@ -68,6 +52,11 @@ public class HomeActivity extends AppCompatActivity{
             menuItem.setTitle("Log Out");
         }
         return true;
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -107,4 +96,13 @@ public class HomeActivity extends AppCompatActivity{
 
         return super.onOptionsItemSelected(item);
     }
+
+    public static void notifyDataSetChanged(String[] news) {
+        if (news != null){
+            mHeadlinesAdapter = new HeadlinesAdapter(news);
+            mRecyclerView.setAdapter(mHeadlinesAdapter);
+        }
+
+    }
+
 }

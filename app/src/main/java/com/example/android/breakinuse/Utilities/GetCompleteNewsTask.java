@@ -71,7 +71,7 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
             url = new URL(builder.toString());
             urlConnection = url.openConnection();
             reader = new BufferedReader(new InputStreamReader
-                                        (urlConnection.getInputStream()));
+                    (urlConnection.getInputStream()));
 
 
             while (( holder = reader.readLine()) != null){
@@ -212,10 +212,12 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
 
     @Override
     protected void onPostExecute(String[] news) {
+
         super.onPostExecute(news);
-        if (news != null){
-            HomeActivity.setHeadlinesAdapter(news);
+        if (news!= null){
+            HomeActivity.notifyDataSetChanged(news);
         }
+
     }
 
     private boolean isResponseStatusOk(JSONObject responsePage) throws JSONException{
