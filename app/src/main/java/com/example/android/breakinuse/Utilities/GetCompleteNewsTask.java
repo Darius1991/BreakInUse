@@ -4,7 +4,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.TextView;
 
-import com.example.android.breakinuse.HomeActivity;
+import com.example.android.breakinuse.NewsFeedActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,7 +18,7 @@ import java.net.URLConnection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
+public class GetCompleteNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
 
     private Context mContext;
     private TextView mTextView;
@@ -45,9 +45,9 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
     }
 
     @Override
-    protected String[] doInBackground(Void... params) {
+    protected Utility.NewsFeedItem[] doInBackground(Void... params) {
 
-        StringBuilder news =  new StringBuilder();
+        StringBuilder reponseString =  new StringBuilder();
         String holder;
         Uri.Builder builder = new Uri.Builder();
         URL url;
@@ -63,9 +63,10 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
                     .authority(this.API_AUTHORITY)
                     .appendPath(this.API_CONTENT_END_POINT)
                     .appendQueryParameter(this.API_KEY_QUERY_PARAM, this.API_KEY)
+                    .appendQueryParameter(this.FIELDS_QUERY_PARAM, "trailText")
                     .appendQueryParameter(this.PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
                     .appendQueryParameter(this.ORDER_QUERY_PARAM, "relevance")
-                    .appendQueryParameter(this.FROMDATE_QUERY_PARAM,fromDate)
+                    .appendQueryParameter(this.FROMDATE_QUERY_PARAM, fromDate)
                     .build();
 
             url = new URL(builder.toString());
@@ -75,10 +76,10 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
 
 
             while (( holder = reader.readLine()) != null){
-                news.append(holder);
+                reponseString.append(holder);
             }
 
-            responsePage[0] = new JSONObject(news.toString());
+            responsePage[0] = new JSONObject(reponseString.toString());
             reader.close();
 
         } catch (IOException | JSONException e) {
@@ -94,7 +95,7 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
             }
         }
 
-        if (news.length() != 0){
+        if (reponseString.length() != 0){
 
             try {
                 if (!isResponseStatusOk(responsePage[0])){
@@ -123,7 +124,7 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
 
             for (int index=2; index <= pageCount; ++index){
 
-                news.delete(0,news.length());
+                reponseString.delete(0, reponseString.length());
                 builder = new Uri.Builder();
 
                 // TODO Check if builder.clearQuery() works here instead of allocating a new builder;
@@ -133,6 +134,7 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
                             .authority(this.API_AUTHORITY)
                             .appendPath(this.API_CONTENT_END_POINT)
                             .appendQueryParameter(this.API_KEY_QUERY_PARAM, this.API_KEY)
+                            .appendQueryParameter(this.FIELDS_QUERY_PARAM, "trailText")
                             .appendQueryParameter(this.PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
                             .appendQueryParameter(this.PAGE_QUERY_PARAM, String.valueOf(index))
                             .appendQueryParameter(this.ORDER_QUERY_PARAM, "relevance")
@@ -145,10 +147,10 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
                             (urlConnection.getInputStream()));
 
                     while (( holder = reader.readLine()) != null){
-                        news.append(holder);
+                        reponseString.append(holder);
                     }
 
-                    responsePage[index-1] = new JSONObject(news.toString());
+                    responsePage[index-1] = new JSONObject(reponseString.toString());
                     reader.close();
 
                 } catch (IOException | JSONException e) {
@@ -165,10 +167,10 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
                 }
             }
 
-            news.delete(0,news.length());
+            reponseString.delete(0, reponseString.length());
 
             try {
-                return getWebTitlefromJSON(responsePage);
+                return getNewsFeedItemFromJSON(responsePage);
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
@@ -177,7 +179,7 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
         } else if (pageCount  == 1){
 
             try {
-                return getWebTitlefromJSON(responsePage);
+                return getNewsFeedItemFromJSON(responsePage);
             } catch (JSONException e) {
                 e.printStackTrace();
                 return null;
@@ -211,11 +213,11 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
     }
 
     @Override
-    protected void onPostExecute(String[] news) {
+    protected void onPostExecute(Utility.NewsFeedItem[] newsFeedItemArray) {
 
-        super.onPostExecute(news);
-        if (news!= null){
-            HomeActivity.notifyDataSetChanged(news);
+        super.onPostExecute(newsFeedItemArray);
+        if (newsFeedItemArray!= null){
+            NewsFeedActivity.notifyDataSetChanged(newsFeedItemArray);
         }
 
     }
@@ -228,21 +230,34 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,String[]> {
         return responsePage.getJSONObject("response").getInt("pages");
     }
 
-    private String[] getWebTitlefromJSON (JSONObject[] responsePage) throws JSONException {
+    private Utility.NewsFeedItem[] getNewsFeedItemFromJSON(JSONObject[] responsePage) throws JSONException {
 
         int pageCount = responsePage[0].getJSONObject("response").getInt("pages");
         int pageIndex = 0, webTitleIndex = 0;
-        JSONArray webTitleArray;
-        String[] news = new String[responsePage[0].getJSONObject("response").getInt("total")];
+        JSONArray newsFeedItemJSONArray;
+        Utility.NewsFeedItem[] newsFeedItemArray = new Utility.NewsFeedItem[responsePage[0]
+                .getJSONObject("response")
+                .getInt("total")];
+
+        for (int index = 0; index < responsePage[0].getJSONObject("response").getInt("total"); ++index){
+            newsFeedItemArray[index] = new Utility.NewsFeedItem();
+        }
 
         for (pageIndex = 0; pageIndex <= pageCount-1; ++pageIndex){
             webTitleIndex = 0;
-            webTitleArray = responsePage[pageIndex].getJSONObject("response").getJSONArray("results");
-            for ( ;webTitleIndex < webTitleArray.length() ; ++webTitleIndex){
-                news[webTitleIndex + (pageIndex)*20] = (webTitleArray.getJSONObject(webTitleIndex).getString("webTitle"));
+            newsFeedItemJSONArray = responsePage[pageIndex].getJSONObject("response").getJSONArray("results");
+            for ( ;webTitleIndex < newsFeedItemJSONArray.length() ; ++webTitleIndex){
+                newsFeedItemArray[webTitleIndex + (pageIndex)*20].webTitle = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("webTitle"));
+                newsFeedItemArray[webTitleIndex + (pageIndex)*20].webURL = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("webUrl"));
+                newsFeedItemArray[webTitleIndex + (pageIndex)*20].apiURL = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("apiUrl"));
+                newsFeedItemArray[webTitleIndex + (pageIndex)*20].trailText = (newsFeedItemJSONArray.getJSONObject(webTitleIndex)
+                                                                                    .getJSONObject("fields").getString("trailText"));
+                newsFeedItemArray[webTitleIndex + (pageIndex)*20].articleID = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("id"));
+                newsFeedItemArray[webTitleIndex + (pageIndex)*20].sectionID = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("sectionId"));
+
             }
         }
-        return news;
+        return newsFeedItemArray;
     }
 
 }

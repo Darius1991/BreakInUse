@@ -14,13 +14,13 @@ import android.widget.Toast;
 import com.example.android.breakinuse.Utilities.GetCompleteNewsTask;
 import com.example.android.breakinuse.Utilities.Utility;
 
-public class HomeActivity extends AppCompatActivity{
+public class NewsFeedActivity extends AppCompatActivity{
 
-
-    public static String[] mHeadlinesArray;
+    public static Utility.NewsFeedItem[] mNewsFeedItemArray;
     private static RecyclerView mRecyclerView;
     private static HeadlinesAdapter mHeadlinesAdapter;
     private LinearLayoutManager mLayoutManager;
+    private static Context mContext;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,15 +28,21 @@ public class HomeActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
 
-        mHeadlinesArray = new String[2];
-        mHeadlinesArray[0] = "Bllllllllaaa";
-        mHeadlinesArray[1] = "aaaaaaaHHHHH";
+        mNewsFeedItemArray = new Utility.NewsFeedItem[1];
+        mNewsFeedItemArray[0] = new Utility.NewsFeedItem();
+        mNewsFeedItemArray[0].webURL = "bllaaa";
+        mNewsFeedItemArray[0].apiURL = "blaaa";
+        mNewsFeedItemArray[0].webTitle = "blaaa";
+        mNewsFeedItemArray[0].trailText = "blaa";
+        mNewsFeedItemArray[0].articleID = "blaaa";
+        mNewsFeedItemArray[0].sectionID = "blaaa";
 
+        mContext = getApplicationContext();
         mLayoutManager = new LinearLayoutManager(this);
         mRecyclerView = (RecyclerView)findViewById(R.id.home_recyclerView);
         mRecyclerView.setLayoutManager(mLayoutManager);
         mRecyclerView.setHasFixedSize(true);
-        mHeadlinesAdapter = new HeadlinesAdapter(mHeadlinesArray);
+        mHeadlinesAdapter = new HeadlinesAdapter(mContext,mNewsFeedItemArray);
         mRecyclerView.setAdapter(mHeadlinesAdapter);
     }
 
@@ -97,9 +103,9 @@ public class HomeActivity extends AppCompatActivity{
         return super.onOptionsItemSelected(item);
     }
 
-    public static void notifyDataSetChanged(String[] news) {
-        if (news != null){
-            mHeadlinesAdapter = new HeadlinesAdapter(news);
+    public static void notifyDataSetChanged(Utility.NewsFeedItem[] newsFeedItemArray) {
+        if (newsFeedItemArray != null){
+            mHeadlinesAdapter = new HeadlinesAdapter(mContext,newsFeedItemArray);
             mRecyclerView.setAdapter(mHeadlinesAdapter);
         }
 

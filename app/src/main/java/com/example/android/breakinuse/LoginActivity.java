@@ -317,7 +317,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     }
 
     private void launchHomeActivity(){
-        Intent intent = new Intent(getApplicationContext(),HomeActivity.class);
+        Intent intent = new Intent(getApplicationContext(),NewsFeedActivity.class);
         startActivity(intent);
     }
 
