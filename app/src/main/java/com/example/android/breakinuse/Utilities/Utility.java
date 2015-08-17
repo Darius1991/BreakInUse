@@ -99,4 +99,17 @@ public class Utility {
         return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
+    public static class NewsFeedItem{
+
+        public String webURL = null;
+        public String apiURL = null;
+        public String webTitle = null;
+        public String trailText = null;
+        public String articleID = null;
+        public String sectionID = null;
+
+    }
+
+
+
 }
