@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 
 public class NewsArticleActivity extends AppCompatActivity {
 
@@ -13,6 +14,7 @@ public class NewsArticleActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_article);
         WebView webView = (WebView) findViewById(R.id.news_article);
+        webView.setWebViewClient(new WebViewClient());
         webView.loadUrl(getIntent().getStringExtra("webURL"));
     }
 

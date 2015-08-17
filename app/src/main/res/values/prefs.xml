@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="preferences_key">Preferences Key</string>
-    <string name="login_method">Login Method</string>
+    <string name="login_method_key">Login Method</string>
+    <string name = "preferences_topics_key">Follow Topics</string>
+    <string name = "preferences_notifications_key">Enable Notifications</string>
 </resources>

@@ -1,10 +1,10 @@
 package com.example.android.breakinuse.Utilities;
+import com.example.android.breakinuse.NewsFeedActivity;
+
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.widget.TextView;
-
-import com.example.android.breakinuse.NewsFeedActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -247,7 +247,7 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedIte
             webTitleIndex = 0;
             newsFeedItemJSONArray = responsePage[pageIndex].getJSONObject("response").getJSONArray("results");
             for ( ;webTitleIndex < newsFeedItemJSONArray.length() ; ++webTitleIndex){
-                newsFeedItemArray[webTitleIndex + (pageIndex)*20].webTitle = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("webTitle"));
+                newsFeedItemArray[webTitleIndex + (pageIndex) * 20].webTitle = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("webTitle"));
                 newsFeedItemArray[webTitleIndex + (pageIndex)*20].webURL = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("webUrl"));
                 newsFeedItemArray[webTitleIndex + (pageIndex)*20].apiURL = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("apiUrl"));
                 newsFeedItemArray[webTitleIndex + (pageIndex)*20].trailText = (newsFeedItemJSONArray.getJSONObject(webTitleIndex)
