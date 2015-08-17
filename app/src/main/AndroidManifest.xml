@@ -56,6 +56,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.breakinuse.NewsFeedActivity" />
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".NewsFeedActivity" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.android.breakinuse.NewsFeedActivity" />
+        </activity>
     </application>
 
 </manifest>

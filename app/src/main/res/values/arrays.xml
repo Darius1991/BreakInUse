@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string-array name = "preferences_topics_entries">
+        <item>World News</item>
+        <item>Politics</item>
+        <item>Sports</item>
+        <item>Football</item>
+        <item>Culture</item>
+        <item>Business</item>
+        <item>Lifestyle</item>
+        <item>Fashion</item>
+        <item>Environment</item>
+        <item>Tech</item>
+        <item>Books</item>
+        <item>Movies</item>
+        <item>Travel</item>
+    </string-array>
+
+    <string-array name = "preferences_topics_entryValues">
+        <item>world</item>
+        <item>politics</item>
+        <item>sport</item>
+        <item>football</item>
+        <item>culture</item>
+        <item>business</item>
+        <item>lifeandstyle</item>
+        <item>fashion</item>
+        <item>environment</item>
+        <item>technology</item>
+        <item>books</item>
+        <item>film</item>
+        <item>travel</item>
+    </string-array>
+
+</resources>

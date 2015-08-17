@@ -93,7 +93,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         LOGIN_METHOD = (getApplicationContext()
                 .getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE))
-                .getString(getString(R.string.login_method), getString(R.string.logged_out));
+                .getString(getString(R.string.login_method_key), getString(R.string.logged_out));
 
         LoginButton loginButton = (LoginButton) findViewById(R.id.sign_in_button_facebook);
         loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
@@ -312,7 +312,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         SharedPreferences sharedPreferences = getApplicationContext()
                 .getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(getString(R.string.login_method), LOGIN_METHOD);
+        editor.putString(getString(R.string.login_method_key), LOGIN_METHOD);
         editor.apply();
     }
 

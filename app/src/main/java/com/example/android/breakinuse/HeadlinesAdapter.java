@@ -27,13 +27,14 @@ public class HeadlinesAdapter extends RecyclerView.Adapter<HeadlinesAdapter.View
     public HeadlinesAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
 
         View v = LayoutInflater.from(viewGroup.getContext())
-                .inflate(R.layout.headlines_item,viewGroup,false);
+                .inflate(R.layout.news_feed_item,viewGroup,false);
         return new ViewHolder(v);
     }
 
     @Override
     public void onBindViewHolder(ViewHolder viewHolder, int i) {
-        viewHolder.mTextView.setText(mNewsFeedItemArray[i].webTitle);
+        viewHolder.mTextView_headlines.setText(mNewsFeedItemArray[i].webTitle);
+        viewHolder.mTextView_trailText.setText(mNewsFeedItemArray[i].trailText);
     }
 
     @Override
@@ -43,17 +44,19 @@ public class HeadlinesAdapter extends RecyclerView.Adapter<HeadlinesAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         // each data item is just a string in this case
-        public TextView mTextView;
+        public TextView mTextView_headlines;
+        public TextView mTextView_trailText;
         public ViewHolder(View v) {
             super(v);
             v.setClickable(true);
             v.setOnClickListener(this);
-            mTextView = (TextView) v.findViewById(R.id.card_textView);
+            mTextView_headlines = (TextView) v.findViewById(R.id.newsFeedItem_headlines_textView);
+            mTextView_trailText = (TextView) v.findViewById(R.id.newsFeedItem_trailText_textView);
         }
 
         @Override
         public void onClick(View v) {
-            Log.d(TAG,"11111111"+ getAdapterPosition());
+
             Intent intent = new Intent(mContext,NewsArticleActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.putExtra("webURL", mNewsFeedItemArray[getAdapterPosition()].webURL);

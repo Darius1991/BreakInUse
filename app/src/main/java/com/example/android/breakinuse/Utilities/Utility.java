@@ -30,7 +30,7 @@ public class Utility {
 
         String LOGIN_METHOD = (context
                 .getSharedPreferences(context.getString(R.string.preferences_key), Context.MODE_PRIVATE))
-                .getString(context.getString(R.string.login_method), context.getString(R.string.logged_out));
+                .getString(context.getString(R.string.login_method_key), context.getString(R.string.logged_out));
         final String LOGGEDIN_GOOGLE = "Logged in through Google";
         final String LOGGEDIN_FACEBOOK = "Logged in through FB";
         final String LOGGEDIN_EMAIL = "Logged in through Email";
@@ -84,7 +84,7 @@ public class Utility {
         SharedPreferences sharedPreferences = context
                 .getSharedPreferences(context.getString(R.string.preferences_key), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(context.getString(R.string.login_method), value);
+        editor.putString(context.getString(R.string.login_method_key), value);
         editor.apply();
     }
 

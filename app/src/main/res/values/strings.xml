@@ -23,4 +23,9 @@
     <string name="existing_user_breakInUse_text">Existing User ? Click here to Login</string>
     <string name="refresh_text">Refresh</string>
     <string name="title_activity_news_article">NewsArticle</string>
+    <string name="title_activity_settings">Settings</string>
+    <string name="preferences_notifications_title">Enable Notifications</string>
+    <string name = "preferences_topics_title">Follow Topics</string>
+    <string name="preferences_notifications_summary_off">Notifications Disabled</string>
+    <string name="preferences_notifications_summary_on">Notifications Enabled</string>
 </resources>

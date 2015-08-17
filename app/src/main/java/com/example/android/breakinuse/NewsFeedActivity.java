@@ -26,11 +26,11 @@ public class NewsFeedActivity extends AppCompatActivity{
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
+        setContentView(R.layout.activity_news_feed);
 
         mNewsFeedItemArray = new Utility.NewsFeedItem[1];
         mNewsFeedItemArray[0] = new Utility.NewsFeedItem();
-        mNewsFeedItemArray[0].webURL = "bllaaa";
+        mNewsFeedItemArray[0].webURL = "https://google.com";
         mNewsFeedItemArray[0].apiURL = "blaaa";
         mNewsFeedItemArray[0].webTitle = "blaaa";
         mNewsFeedItemArray[0].trailText = "blaa";
@@ -53,7 +53,7 @@ public class NewsFeedActivity extends AppCompatActivity{
         MenuItem menuItem = menu.findItem(R.id.action_user_accounts);
         String LOGIN_METHOD = (getApplicationContext()
                 .getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE))
-                .getString(getString(R.string.login_method), getString(R.string.logged_out));
+                .getString(getString(R.string.login_method_key), getString(R.string.logged_out));
         if (!LOGIN_METHOD.equals(getString(R.string.logged_out))){
             menuItem.setTitle("Log Out");
         }
@@ -76,7 +76,7 @@ public class NewsFeedActivity extends AppCompatActivity{
 
             String LOGIN_METHOD = (getApplicationContext()
                     .getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE))
-                    .getString(getString(R.string.login_method), getString(R.string.logged_out));
+                    .getString(getString(R.string.login_method_key), getString(R.string.logged_out));
             if (LOGIN_METHOD.equals("Logged Out")){
                 Intent intent = new Intent(this,LoginActivity.class);
                 startActivity(intent);
@@ -97,7 +97,8 @@ public class NewsFeedActivity extends AppCompatActivity{
                 return true;
             }
         }else if (id == R.id.action_settings) {
-            return true;
+            Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+            startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
