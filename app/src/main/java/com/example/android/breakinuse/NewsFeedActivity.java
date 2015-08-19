@@ -3,6 +3,7 @@ package com.example.android.breakinuse;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,6 +28,7 @@ public class NewsFeedActivity extends AppCompatActivity{
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_feed);
+        PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
         mNewsFeedItemArray = new Utility.NewsFeedItem[1];
         mNewsFeedItemArray[0] = new Utility.NewsFeedItem();
@@ -51,10 +53,8 @@ public class NewsFeedActivity extends AppCompatActivity{
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_home, menu);
         MenuItem menuItem = menu.findItem(R.id.action_user_accounts);
-        String LOGIN_METHOD = (getApplicationContext()
-                .getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE))
-                .getString(getString(R.string.login_method_key), getString(R.string.logged_out));
-        if (!LOGIN_METHOD.equals(getString(R.string.logged_out))){
+
+        if (Utility.isUserLoggedIn(getApplicationContext())){
             menuItem.setTitle("Log Out");
         }
         return true;
@@ -74,13 +74,11 @@ public class NewsFeedActivity extends AppCompatActivity{
 
         if (id == R.id.action_user_accounts){
 
-            String LOGIN_METHOD = (getApplicationContext()
-                    .getSharedPreferences(getString(R.string.preferences_key), Context.MODE_PRIVATE))
-                    .getString(getString(R.string.login_method_key), getString(R.string.logged_out));
-            if (LOGIN_METHOD.equals("Logged Out")){
+            if (!Utility.isUserLoggedIn(getApplicationContext())){
                 Intent intent = new Intent(this,LoginActivity.class);
                 startActivity(intent);
             } else {
+
                 if(Utility.logOut(getApplicationContext())){
                     item.setTitle("User Accounts");
                 }

@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 
+import android.util.Log;
 import android.util.Patterns;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -17,11 +18,15 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.breakinuse.Utilities.Parse.SyncSettings;
 import com.example.android.breakinuse.Utilities.Utility;
+import com.facebook.AccessToken;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
 import com.facebook.FacebookSdk;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
 import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.common.ConnectionResult;
@@ -29,10 +34,18 @@ import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
+import com.parse.FindCallback;
 import com.parse.LogInCallback;
 import com.parse.ParseException;
+import com.parse.ParseQuery;
 import com.parse.ParseUser;
 import com.parse.SignUpCallback;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Arrays;
+import java.util.List;
 
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks,
                                 GoogleApiClient.OnConnectionFailedListener, View.OnClickListener{
@@ -40,7 +53,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
     private boolean mIsResolving = false;
     private boolean mShouldResolve = false;
     private static final int RC_SIGN_IN = 0;
-//    private static final String TAG = LoginActivity.class.getName();
+    private static final String TAG = LoginActivity.class.getName();
     private static String LOGIN_METHOD ;
     private static final String LOGGEDIN_GOOGLE = "Logged in through Google";
     private static final String LOGGEDIN_FACEBOOK = "Logged in through FB";
@@ -96,6 +109,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 .getString(getString(R.string.login_method_key), getString(R.string.logged_out));
 
         LoginButton loginButton = (LoginButton) findViewById(R.id.sign_in_button_facebook);
+        loginButton.setReadPermissions(Arrays.asList("email", "public_profile", "user_birthday"));
+
         loginButton.registerCallback(mCallbackManager, new FacebookCallback<LoginResult>() {
 
             @Override
@@ -103,6 +118,34 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 saveSharedPreferences(LOGGEDIN_FACEBOOK);
                 Utility.makeToast(getApplicationContext(),
                         "You have been signed in with Facebook.", Toast.LENGTH_SHORT);
+//
+//                GraphRequest request = GraphRequest.newMeRequest( loginResult.getAccessToken(),
+//                        new GraphRequest.GraphJSONObjectCallback() {
+//
+//                            @Override
+//                            public void onCompleted(JSONObject object,GraphResponse response) {
+//
+//                                String userEmailID = null;
+//                                try {
+//                                    userEmailID = object.getString("email");
+//                                } catch (JSONException e) {
+//                                    e.printStackTrace();
+//                                    try {
+//                                        userEmailID = object.getString("id");
+//                                    } catch (JSONException e1) {
+//                                        e1.printStackTrace();
+//                                    }
+//                                } finally {
+//                                    insertEmailIDinDB(userEmailID);
+//                                }
+//                            }
+//                        });
+//
+//                Bundle parameters = new Bundle();
+//                parameters.putString("fields", "id,name,email,gender,birthday");
+//                request.setParameters(parameters);
+//                request.executeAsync();
+
                 launchHomeActivity();
             }
 
@@ -160,7 +203,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         if (!Utility.isNetworkAvailable(getApplicationContext())){
             Utility.makeToast(getApplicationContext(),
-                    "We are not able to detect an internet connection. Please resolve this begore trying to login again.",
+                    "We are not able to detect an internet connection. Please resolve this before trying to login again.",
                     Toast.LENGTH_LONG);
             return;
         }
@@ -187,6 +230,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             findViewById(R.id.sign_up_button_email).setVisibility(View.GONE);
             findViewById(R.id.existing_user_breakInUse).setVisibility(View.GONE);
             findViewById(R.id.new_to_breakInUse).setVisibility(View.VISIBLE);
+            findViewById(R.id.sign_in_button_email).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_in_button_email).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_in_button_facebook).setVisibility(View.VISIBLE);
             findViewById(R.id.sign_in_button_google).setVisibility(View.VISIBLE);
@@ -237,6 +281,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
             mShouldResolve = true;
             mGoogleApiClient.connect();
+
         } else if (signInMethod.equals("Email")){
 
             EditText editTextPassword = (EditText)findViewById(R.id.sign_in_email_password);
@@ -247,19 +292,23 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
                 return;
             }
             EditText editTextEmail = (EditText)findViewById(R.id.sign_in_email_emailID);
-            String email = editTextEmail.getText().toString().trim();
-            if (email.length() == 0){
+            final String userEmailID = editTextEmail.getText().toString().trim();
+            if (userEmailID.length() == 0){
                 return;
             }
 
-            ParseUser.logInInBackground(email,password, new LogInCallback() {
+            ParseUser.logInInBackground(userEmailID,password, new LogInCallback() {
                 public void done(ParseUser user, ParseException e) {
                     if (user != null) {
 
                         saveSharedPreferences(LOGGEDIN_EMAIL);
                         Utility.makeToast(getApplicationContext(),
                                 "You are signed in.", Toast.LENGTH_SHORT);
-                        launchHomeActivity();
+
+                        SyncSettings preferencesUpdater = new SyncSettings();
+                        preferencesUpdater.downloadSettingsFromCloud(getApplicationContext(),
+                                                                        userEmailID);
+
                     } else {
                         Utility.makeToast(getApplicationContext(),
                                 "We are facing trouble signing in. Please try again later.", Toast.LENGTH_SHORT);
@@ -270,7 +319,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
     }
 
-    public void onSignUpClicked(){
+    private void onSignUpClicked(){
 
         EditText editTextPassword = (EditText)findViewById(R.id.sign_in_email_password);
         String password = editTextPassword.getText().toString();
@@ -281,23 +330,25 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
         }
 
         EditText editTextEmail = (EditText)findViewById(R.id.sign_in_email_emailID);
-        String email = editTextEmail.getText().toString().trim();
-        if (email.length() == 0){
+        final String userEmailID = editTextEmail.getText().toString().trim();
+        if (userEmailID.length() == 0){
             return;
-        } else if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+        } else if (!Patterns.EMAIL_ADDRESS.matcher(userEmailID).matches()){
             return;
         }
 
         ParseUser user = new ParseUser();
-        user.setUsername(email);
+        user.setUsername(userEmailID);
         user.setPassword(password);
-        user.setEmail(email);
+        user.setEmail(userEmailID);
         user.signUpInBackground(new SignUpCallback() {
             public void done(ParseException e) {
                 if (e == null) {
                     saveSharedPreferences(LOGGEDIN_EMAIL);
                     Utility.makeToast(getApplicationContext(), "You are signed in.", Toast.LENGTH_SHORT);
-                    launchHomeActivity();
+
+                    SyncSettings preferencesUpdater = new SyncSettings();
+                    preferencesUpdater.uploadSettingsToCloud(getApplicationContext(), userEmailID);
                 } else {
                     Utility.makeToast(getApplicationContext(),
                             "We are facing trouble signing in. Please try again later.", Toast.LENGTH_SHORT);

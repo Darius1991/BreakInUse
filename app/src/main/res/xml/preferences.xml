@@ -16,6 +16,6 @@
         android:title = "@string/preferences_topics_title"
         android:entries = "@array/preferences_topics_entries"
         android:entryValues = "@array/preferences_topics_entryValues"
-        android:defaultValue = "@array/preferences_topics_entries"/>
+        android:defaultValue = "@array/preferences_topics_entryValues"/>
 
 </PreferenceScreen>
