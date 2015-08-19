@@ -1,31 +1,55 @@
 package com.example.android.breakinuse;
 
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.MultiSelectListPreference;
-import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
+import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class SettingsActivity extends PreferenceActivity implements Preference.OnPreferenceChangeListener {
+import com.example.android.breakinuse.Utilities.Parse.SyncSettings;
+import com.example.android.breakinuse.Utilities.Utility;
+import com.parse.ParseUser;
+
+import java.util.Set;
+
+public class SettingsActivity extends PreferenceActivity implements
+                                                SharedPreferences.OnSharedPreferenceChangeListener {
 
     private AppCompatDelegate mDelegate;
+    private final String TAG = SettingsActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         getDelegate().installViewFactory();
         getDelegate().onCreate(savedInstanceState);
         super.onCreate(savedInstanceState);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         addPreferencesFromResource(R.xml.preferences);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -57,21 +81,17 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
+        if (id == android.R.id.home){
+            NavUtils.navigateUpFromSameTask(this);
+            return true;
+        }
+
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onPreferenceChange(Preference preference, Object newValue) {
-        if (preference instanceof MultiSelectListPreference){
-            // TODO updateSettingsToCloud() if user has logged in;
-            // TODO setTopicsToDefaultSetting if user has logged out;
-        }
-        return false;
     }
 
     @Override
@@ -138,5 +158,41 @@ public class SettingsActivity extends PreferenceActivity implements Preference.O
             mDelegate = AppCompatDelegate.create(this, null);
         }
         return mDelegate;
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+
+        if (key.equals(getString(R.string.preferences_notifications_key))){
+
+            if (Utility.isUserLoggedIn(getApplicationContext())){
+
+                SyncSettings preferencesUpdater = new SyncSettings();
+                ParseUser currentUser = ParseUser.getCurrentUser();
+
+                if (currentUser != null){
+                    preferencesUpdater.modifySettingsInCloud(getApplicationContext(),
+                            currentUser.getEmail());
+                }
+
+            }
+
+        } else if (key.equals(getString(R.string.preferences_topics_key))) {
+
+            MultiSelectListPreference topicsPreference = (MultiSelectListPreference) findPreference(key);
+            Set<String> favouriteTopics = topicsPreference.getValues();
+            topicsPreference.setSummary(favouriteTopics.size() + " topics are currently followed.");
+
+            if (Utility.isUserLoggedIn(getApplicationContext())){
+
+                SyncSettings preferencesUpdater = new SyncSettings();
+                ParseUser currentUser = ParseUser.getCurrentUser();
+
+                if (currentUser != null){
+                    preferencesUpdater.modifySettingsInCloud(getApplicationContext(),
+                            currentUser.getEmail());
+                }
+            }
+        }
     }
 }

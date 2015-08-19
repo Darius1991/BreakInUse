@@ -23,7 +23,7 @@ public class Utility {
 
         if (!isNetworkAvailable(context)){
             makeToast(context,
-                    "We are not able to detect an internet connection. Please resolve this begore trying to signout again.",
+                    "We are not able to detect an internet connection. Please resolve this before trying to signout again.",
                     Toast.LENGTH_LONG);
             return false;
         }
@@ -47,6 +47,9 @@ public class Utility {
                     saveLoginMethodPreference(context, LOGGEDOUT);
                     makeToast(context, "You are now signed out.", Toast.LENGTH_SHORT);
                 } else {
+                    if (ParseUser.getCurrentUser() != null){
+                        ParseUser.logOut();
+                    }
                     saveLoginMethodPreference(context, LOGGEDOUT);
                     makeToast(context,"You are now signed out.",Toast.LENGTH_SHORT);
                 }
@@ -55,9 +58,15 @@ public class Utility {
                 googleApiClient.connect();
                 if (googleApiClient.isConnected()){
                     Plus.AccountApi.clearDefaultAccount(googleApiClient);
+                    if (ParseUser.getCurrentUser() != null){
+                        ParseUser.logOut();
+                    }
                     saveLoginMethodPreference(context, LOGGEDOUT);
                     makeToast(context, "You are now signed out.", Toast.LENGTH_SHORT);
                 } else {
+                    if (ParseUser.getCurrentUser() != null){
+                        ParseUser.logOut();
+                    }
                     saveLoginMethodPreference(context, LOGGEDOUT);
                     makeToast(context,"You are now signed out.",Toast.LENGTH_SHORT);
                 }
@@ -65,9 +74,15 @@ public class Utility {
             case LOGGEDIN_FACEBOOK:
                 if (AccessToken.getCurrentAccessToken() != null){
                     LoginManager.getInstance().logOut();
+                    if (ParseUser.getCurrentUser() != null){
+                        ParseUser.logOut();
+                    }
                     saveLoginMethodPreference(context, LOGGEDOUT);
                     makeToast(context, "You are now signed out.", Toast.LENGTH_SHORT);
                 } else {
+                    if (ParseUser.getCurrentUser() != null){
+                        ParseUser.logOut();
+                    }
                     saveLoginMethodPreference(context, LOGGEDOUT);
                     makeToast(context,"You are now signed out.",Toast.LENGTH_SHORT);
                 }
@@ -107,7 +122,15 @@ public class Utility {
         public String trailText = null;
         public String articleID = null;
         public String sectionID = null;
+    }
 
+    public static Boolean isUserLoggedIn(Context context){
+
+        SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preferences_key),
+                Context.MODE_PRIVATE);
+        String LOGIN_METHOD = sharedPreferences.getString(context.getString(R.string.login_method_key),
+                                context.getString(R.string.logged_out));
+        return (!LOGIN_METHOD.equals(context.getString(R.string.logged_out)));
     }
 
 
