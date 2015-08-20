@@ -1,15 +1,11 @@
 package com.example.android.breakinuse;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.breakinuse.Utilities.GetCompleteNewsTask;
@@ -17,11 +13,7 @@ import com.example.android.breakinuse.Utilities.Utility;
 
 public class NewsFeedActivity extends AppCompatActivity{
 
-    public static Utility.NewsFeedItem[] mNewsFeedItemArray;
-    private static RecyclerView mRecyclerView;
-    private static HeadlinesAdapter mHeadlinesAdapter;
-    private LinearLayoutManager mLayoutManager;
-    private static Context mContext;
+    private final String TAG = NewsFeedActivity.class.getName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,22 +22,12 @@ public class NewsFeedActivity extends AppCompatActivity{
         setContentView(R.layout.activity_news_feed);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        mNewsFeedItemArray = new Utility.NewsFeedItem[1];
-        mNewsFeedItemArray[0] = new Utility.NewsFeedItem();
-        mNewsFeedItemArray[0].webURL = "https://google.com";
-        mNewsFeedItemArray[0].apiURL = "blaaa";
-        mNewsFeedItemArray[0].webTitle = "blaaa";
-        mNewsFeedItemArray[0].trailText = "blaa";
-        mNewsFeedItemArray[0].articleID = "blaaa";
-        mNewsFeedItemArray[0].sectionID = "blaaa";
+        NewsFeedFragment fragment = new NewsFeedFragment();
+        getFragmentManager()
+                .beginTransaction()
+                .add(android.R.id.content,fragment)
+                .commit();
 
-        mContext = getApplicationContext();
-        mLayoutManager = new LinearLayoutManager(this);
-        mRecyclerView = (RecyclerView)findViewById(R.id.home_recyclerView);
-        mRecyclerView.setLayoutManager(mLayoutManager);
-        mRecyclerView.setHasFixedSize(true);
-        mHeadlinesAdapter = new HeadlinesAdapter(mContext,mNewsFeedItemArray);
-        mRecyclerView.setAdapter(mHeadlinesAdapter);
     }
 
     @Override
@@ -54,7 +36,7 @@ public class NewsFeedActivity extends AppCompatActivity{
         getMenuInflater().inflate(R.menu.menu_home, menu);
         MenuItem menuItem = menu.findItem(R.id.action_user_accounts);
 
-        if (Utility.isUserLoggedIn(getApplicationContext())){
+        if (Utility.isUserLoggedIn(this)){
             menuItem.setTitle("Log Out");
         }
         return true;
@@ -74,40 +56,32 @@ public class NewsFeedActivity extends AppCompatActivity{
 
         if (id == R.id.action_user_accounts){
 
-            if (!Utility.isUserLoggedIn(getApplicationContext())){
+            if (!Utility.isUserLoggedIn(this)){
                 Intent intent = new Intent(this,LoginActivity.class);
                 startActivity(intent);
             } else {
 
-                if(Utility.logOut(getApplicationContext())){
+                if(Utility.logOut(this)){
                     item.setTitle("User Accounts");
                 }
             }
         }else if (id == R.id.refresh){
 
-            if (!Utility.isNetworkAvailable(getApplicationContext())){
-                Utility.makeToast(getApplicationContext(),
+            if (!Utility.isNetworkAvailable(this)){
+                Utility.makeToast(this,
                         "We are not able to detect an internet connection.",
                         Toast.LENGTH_SHORT);
             }else {
-                new GetCompleteNewsTask(getApplicationContext(),(TextView)findViewById(R.id.home_textView))
+                new GetCompleteNewsTask(this)
                                 .execute();
                 return true;
             }
         }else if (id == R.id.action_settings) {
-            Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+            Intent intent = new Intent(this, SettingsActivity.class);
             startActivity(intent);
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public static void notifyDataSetChanged(Utility.NewsFeedItem[] newsFeedItemArray) {
-        if (newsFeedItemArray != null){
-            mHeadlinesAdapter = new HeadlinesAdapter(mContext,newsFeedItemArray);
-            mRecyclerView.setAdapter(mHeadlinesAdapter);
-        }
-
     }
 
 }
