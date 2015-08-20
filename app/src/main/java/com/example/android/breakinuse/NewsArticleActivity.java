@@ -4,18 +4,25 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.webkit.WebView;
-import android.webkit.WebViewClient;
 
 public class NewsArticleActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_news_article);
-        WebView webView = (WebView) findViewById(R.id.news_article);
-        webView.setWebViewClient(new WebViewClient());
-        webView.loadUrl(getIntent().getStringExtra("webURL"));
+
+        NewsArticleFragment newsArticleFragment = new NewsArticleFragment();
+        Bundle webURLBundle =  new Bundle();
+        String webURL = getIntent().getStringExtra("webURL");
+        webURLBundle.putString("webURL",webURL);
+        newsArticleFragment.setArguments(webURLBundle);
+        getFragmentManager()
+                .beginTransaction()
+                .add(android.R.id.content,newsArticleFragment)
+                .commit();
+
     }
 
     @Override

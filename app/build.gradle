@@ -33,6 +33,7 @@ dependencies {
     compile 'com.android.support:multidex:1.0.1'
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
     compile fileTree(dir: 'libs', include: 'ParseCrash*.jar')
-    compile 'com.android.support:cardview-v7:22.0.+'
+    compile fileTree(dir: 'libs', include: 'ParseFacebookUtilsV4*.jar')
+    compile 'com.android.support:cardview-v7:23.0.+'
     compile 'com.android.support:recyclerview-v7:22.0.+'
 }

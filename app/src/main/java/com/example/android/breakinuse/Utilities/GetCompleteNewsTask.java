@@ -1,5 +1,6 @@
 package com.example.android.breakinuse.Utilities;
 import com.example.android.breakinuse.NewsFeedActivity;
+import com.example.android.breakinuse.NewsFeedFragment;
 
 import android.content.Context;
 import android.net.Uri;
@@ -21,7 +22,6 @@ import java.util.Date;
 public class GetCompleteNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
 
     private Context mContext;
-    private TextView mTextView;
     private String API_KEY_QUERY_PARAM;
     private String SECTION_QUERY_PARAM;
     private String FIELDS_QUERY_PARAM;
@@ -39,9 +39,8 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedIte
     private String PAGE_QUERY_PARAM;
     private final int PAGE_SIZE = 20;
 
-    public GetCompleteNewsTask(Context tempContext, TextView tempTextView){
+    public GetCompleteNewsTask(Context tempContext){
         this.mContext = tempContext;
-        this.mTextView = tempTextView;
     }
 
     @Override
@@ -217,7 +216,7 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedIte
 
         super.onPostExecute(newsFeedItemArray);
         if (newsFeedItemArray!= null){
-            NewsFeedActivity.notifyDataSetChanged(newsFeedItemArray);
+            NewsFeedFragment.notifyDataSetChanged(newsFeedItemArray);
         }
 
     }
