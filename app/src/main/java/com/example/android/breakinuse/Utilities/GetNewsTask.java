@@ -1,11 +1,14 @@
 package com.example.android.breakinuse.Utilities;
-import com.example.android.breakinuse.NewsFeedActivity;
-import com.example.android.breakinuse.NewsFeedFragment;
-
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.widget.TextView;
+import android.os.Bundle;
+import android.preference.PreferenceManager;
+import android.support.v4.app.Fragment;
+
+import com.example.android.breakinuse.NewsFeedFragment;
+import com.example.android.breakinuse.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -17,10 +20,15 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
-public class GetCompleteNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
+public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
 
+    private NewsFeedFragment mFragment;
     private Context mContext;
     private String API_KEY_QUERY_PARAM;
     private String SECTION_QUERY_PARAM;
@@ -37,15 +45,20 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedIte
     private String ORDER_QUERY_PARAM;
     private String PAGESIZE_QUERY_PARAM;
     private String PAGE_QUERY_PARAM;
-    private final int PAGE_SIZE = 20;
+    private StringBuilder mTopicsQuery;
 
-    public GetCompleteNewsTask(Context tempContext){
+    public GetNewsTask(Context tempContext, Fragment tempFragment){
+
         this.mContext = tempContext;
+        this.mFragment = (NewsFeedFragment) tempFragment;
+        this.mTopicsQuery = new StringBuilder();
+
     }
 
     @Override
     protected Utility.NewsFeedItem[] doInBackground(Void... params) {
 
+        final int PAGE_SIZE = 20;
         StringBuilder reponseString =  new StringBuilder();
         String holder;
         Uri.Builder builder = new Uri.Builder();
@@ -66,13 +79,13 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedIte
                     .appendQueryParameter(this.PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
                     .appendQueryParameter(this.ORDER_QUERY_PARAM, "relevance")
                     .appendQueryParameter(this.FROMDATE_QUERY_PARAM, fromDate)
+                    .appendQueryParameter(this.SECTION_QUERY_PARAM,mTopicsQuery.toString())
                     .build();
 
             url = new URL(builder.toString());
             urlConnection = url.openConnection();
             reader = new BufferedReader(new InputStreamReader
                     (urlConnection.getInputStream()));
-
 
             while (( holder = reader.readLine()) != null){
                 reponseString.append(holder);
@@ -124,20 +137,16 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedIte
             for (int index=2; index <= pageCount; ++index){
 
                 reponseString.delete(0, reponseString.length());
-                builder = new Uri.Builder();
-
-                // TODO Check if builder.clearQuery() works here instead of allocating a new builder;
+                builder.clearQuery();
 
                 try {
-                    builder.scheme(this.API_SCHEME)
-                            .authority(this.API_AUTHORITY)
-                            .appendPath(this.API_CONTENT_END_POINT)
-                            .appendQueryParameter(this.API_KEY_QUERY_PARAM, this.API_KEY)
+                    builder.appendQueryParameter(this.API_KEY_QUERY_PARAM, this.API_KEY)
                             .appendQueryParameter(this.FIELDS_QUERY_PARAM, "trailText")
                             .appendQueryParameter(this.PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
                             .appendQueryParameter(this.PAGE_QUERY_PARAM, String.valueOf(index))
                             .appendQueryParameter(this.ORDER_QUERY_PARAM, "relevance")
                             .appendQueryParameter(this.FROMDATE_QUERY_PARAM,fromDate)
+                            .appendQueryParameter(this.SECTION_QUERY_PARAM,mTopicsQuery.toString())
                             .build();
 
                     url = new URL(builder.toString());
@@ -185,7 +194,9 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedIte
             }
 
         } else {
+
             return null;
+
         }
 
     }
@@ -209,43 +220,116 @@ public class GetCompleteNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedIte
         this.ORDER_QUERY_PARAM = "order-by";
         this.PAGESIZE_QUERY_PARAM = "page-size";
         this.PAGE_QUERY_PARAM = "page";
+
+        Bundle newsTypeBundle = mFragment.getArguments();
+        String newsType = newsTypeBundle.getString("NewsType");
+
+        SharedPreferences sharedPreferences = PreferenceManager
+                .getDefaultSharedPreferences(mContext);
+
+        String[] defaultFavouriteTopicsArray = mContext
+                .getResources().getStringArray(R.array.preferences_topics_entryValues);
+        List<String> defaultFavouriteTopicsList = Arrays.asList(defaultFavouriteTopicsArray);
+        Set<String> defaultFavouriteTopicsSet = new HashSet<>(defaultFavouriteTopicsList);
+
+        if (newsType != null){
+
+            if (newsType.equals("All")){
+
+                for (String iterator : defaultFavouriteTopicsSet) {
+
+                    if (iterator != null){
+
+                        mTopicsQuery.append(iterator);
+                        mTopicsQuery.append("|");
+
+                    }
+
+
+                }
+
+            } else if (newsType.equals("Favourites")) {
+
+                Set<String> favouriteTopicsSet = sharedPreferences.getStringSet(
+                        mContext.getString(R.string.preferences_topics_key), defaultFavouriteTopicsSet);
+
+                for (String iterator : favouriteTopicsSet) {
+
+                    if (iterator != null){
+
+                        mTopicsQuery.append(iterator);
+                        mTopicsQuery.append("|");
+
+                    }
+
+                }
+            }
+            mTopicsQuery = new StringBuilder(mTopicsQuery.substring(0,(mTopicsQuery.length()-1)));
+
+        } else {
+
+            for (String iterator : defaultFavouriteTopicsSet) {
+
+                if (iterator != null){
+
+                    mTopicsQuery.append(iterator);
+                    mTopicsQuery.append("|");
+
+                }
+
+            }
+
+        }
+
+
     }
 
     @Override
     protected void onPostExecute(Utility.NewsFeedItem[] newsFeedItemArray) {
 
         super.onPostExecute(newsFeedItemArray);
-        if (newsFeedItemArray!= null){
-            NewsFeedFragment.notifyDataSetChanged(newsFeedItemArray);
+
+        if (newsFeedItemArray!= null) {
+
+            mFragment.notifyDataSetChanged(newsFeedItemArray);
         }
 
     }
 
     private boolean isResponseStatusOk(JSONObject responsePage) throws JSONException{
+
         return responsePage.getJSONObject("response").getString("status").equals("ok");
+
     }
 
     private int getPageCount(JSONObject responsePage) throws JSONException{
+
         return responsePage.getJSONObject("response").getInt("pages");
+
     }
 
     private Utility.NewsFeedItem[] getNewsFeedItemFromJSON(JSONObject[] responsePage) throws JSONException {
 
         int pageCount = responsePage[0].getJSONObject("response").getInt("pages");
-        int pageIndex = 0, webTitleIndex = 0;
+        int pageIndex, webTitleIndex;
         JSONArray newsFeedItemJSONArray;
         Utility.NewsFeedItem[] newsFeedItemArray = new Utility.NewsFeedItem[responsePage[0]
                 .getJSONObject("response")
                 .getInt("total")];
 
         for (int index = 0; index < responsePage[0].getJSONObject("response").getInt("total"); ++index){
+
             newsFeedItemArray[index] = new Utility.NewsFeedItem();
+
         }
 
         for (pageIndex = 0; pageIndex <= pageCount-1; ++pageIndex){
+
             webTitleIndex = 0;
             newsFeedItemJSONArray = responsePage[pageIndex].getJSONObject("response").getJSONArray("results");
+
             for ( ;webTitleIndex < newsFeedItemJSONArray.length() ; ++webTitleIndex){
+
                 newsFeedItemArray[webTitleIndex + (pageIndex) * 20].webTitle = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("webTitle"));
                 newsFeedItemArray[webTitleIndex + (pageIndex)*20].webURL = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("webUrl"));
                 newsFeedItemArray[webTitleIndex + (pageIndex)*20].apiURL = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("apiUrl"));
