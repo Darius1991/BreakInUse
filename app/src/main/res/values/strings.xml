@@ -28,4 +28,6 @@
     <string name = "preferences_topics_title">Follow Topics</string>
     <string name="preferences_notifications_summary_off">Notifications Disabled</string>
     <string name="preferences_notifications_summary_on">Notifications Enabled</string>
+    <string name="newsFeed_tab1_title">News Feed</string>
+    <string name="newsFeed_tab2_title">Favourite Feed</string>
 </resources>

@@ -38,15 +38,18 @@ public class SyncSettings {
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
                         Boolean isNotificationsEnabled = sharedPreferences.getBoolean(
                                 context.getString(R.string.preferences_notifications_key), true);
-                        Set<String> favouriteTopicsSet = new HashSet<>(Arrays.asList(context
-                                .getResources().getStringArray(R.array.preferences_topics_entryValues)));
-                        Set<String> favouriteTopics = sharedPreferences.getStringSet(
-                                context.getString(R.string.preferences_topics_key),favouriteTopicsSet);
+                        String[] defaultFavouriteTopicsArray = context
+                                .getResources().getStringArray(R.array.preferences_topics_entryValues);
+                        List<String> defaultFavouriteTopicsList = Arrays.asList(defaultFavouriteTopicsArray);
+                        Set<String> defaultFavouriteTopicsSet = new HashSet<>(defaultFavouriteTopicsList);
+                        Set<String> favouriteTopicsSet = sharedPreferences.getStringSet(
+                                context.getString(R.string.preferences_topics_key),defaultFavouriteTopicsSet);
+
                         settings.put("userEmailID", userEmailID);
                         settings.put("isNotificationsEnabled", isNotificationsEnabled);
                         settings.remove("favouriteTopics");
                         settings.saveInBackground();
-                        settings.addAllUnique("favouriteTopics", favouriteTopics);
+                        settings.addAllUnique("favouriteTopics", favouriteTopicsSet);
                         settings.saveInBackground();
                     }
                 } else {
@@ -63,14 +66,16 @@ public class SyncSettings {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
         Boolean isNotificationsEnabled = sharedPreferences.getBoolean(
                 context.getString(R.string.preferences_notifications_key), true);
-        Set<String> favouriteTopicsSet = new HashSet<>(Arrays.asList(context
-                .getResources().getStringArray(R.array.preferences_topics_entryValues)));
-        Set<String> favouriteTopics = sharedPreferences.getStringSet(
-                context.getString(R.string.preferences_topics_key),favouriteTopicsSet);
+        String[] defaultFavouriteTopicsArray = context
+                .getResources().getStringArray(R.array.preferences_topics_entryValues);
+        List<String> defaultFavouriteTopicsList = Arrays.asList(defaultFavouriteTopicsArray);
+        Set<String> defaultFavouriteTopicsSet = new HashSet<>(defaultFavouriteTopicsList);
+        Set<String> favouriteTopicsSet = sharedPreferences.getStringSet(
+                context.getString(R.string.preferences_topics_key),defaultFavouriteTopicsSet);
 
         settings.put("userEmailID", userEmailID);
         settings.put("isNotificationsEnabled", isNotificationsEnabled);
-        settings.addAll("favouriteTopics", favouriteTopics);
+        settings.addAll("favouriteTopics", favouriteTopicsSet);
         settings.saveInBackground();
         launchHomeActivity(context);
     }
@@ -90,14 +95,15 @@ public class SyncSettings {
                         ParseObject settings = list.get(0);
                         Boolean isNotificationsEnabled = settings.getBoolean("isNotificationsEnabled");
                         List<String> favouriteTopicsList = settings.getList("favouriteTopics");
-                        Set<String> favouriteTopics = new HashSet<>(favouriteTopicsList);
+                        Set<String> favouriteTopicsSet = new HashSet<>(favouriteTopicsList);
+
                         SharedPreferences sharedPreferences = PreferenceManager.
                                 getDefaultSharedPreferences(context);
                         SharedPreferences.Editor editor = sharedPreferences.edit();
                         editor.putBoolean(context.getString(R.string.preferences_notifications_key),
                                 isNotificationsEnabled);
                         editor.putStringSet(context.getString(R.string.preferences_topics_key),
-                                favouriteTopics);
+                                favouriteTopicsSet);
                         editor.apply();
                         launchHomeActivity(context);
                     }
