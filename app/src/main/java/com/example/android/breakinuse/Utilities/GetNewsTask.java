@@ -1,14 +1,11 @@
 package com.example.android.breakinuse.Utilities;
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 
 import com.example.android.breakinuse.NewsFeedFragment;
-import com.example.android.breakinuse.R;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -19,11 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
@@ -64,13 +56,13 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
         Uri.Builder builder = new Uri.Builder();
         URL url;
         URLConnection urlConnection;
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String fromDate = simpleDateFormat.format(new Date());
+        String fromDate = Utility.getCurrentDate();
         int pageCount = 0;
         JSONObject[] responsePage = new JSONObject[1];
         BufferedReader reader = null;
 
         try {
+
             builder.scheme(this.API_SCHEME)
                     .authority(this.API_AUTHORITY)
                     .appendPath(this.API_CONTENT_END_POINT)
@@ -88,21 +80,31 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
                     (urlConnection.getInputStream()));
 
             while (( holder = reader.readLine()) != null){
+
                 reponseString.append(holder);
+
             }
 
             responsePage[0] = new JSONObject(reponseString.toString());
             reader.close();
 
         } catch (IOException | JSONException e) {
+
             e.printStackTrace();
+
         } finally {
+
             if (reader !=null){
+
                 try {
+
                     reader.close();
+
                 } catch (IOException e) {
+
                     e.printStackTrace();
                     return null;
+
                 }
             }
         }
@@ -110,22 +112,33 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
         if (reponseString.length() != 0){
 
             try {
+
                 if (!isResponseStatusOk(responsePage[0])){
+
                     return null;
+
                 }
             } catch (JSONException e) {
+
                 e.printStackTrace();
                 return null;
+
             }
             try {
+
                 pageCount = getPageCount(responsePage[0]);
+
             } catch (JSONException e) {
+
                 e.printStackTrace();
                 return null;
+
             }
 
         } else {
+
             return null;
+
         }
 
         if (pageCount > 1){
@@ -140,6 +153,7 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
                 builder.clearQuery();
 
                 try {
+
                     builder.appendQueryParameter(this.API_KEY_QUERY_PARAM, this.API_KEY)
                             .appendQueryParameter(this.FIELDS_QUERY_PARAM, "trailText")
                             .appendQueryParameter(this.PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
@@ -155,21 +169,31 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
                             (urlConnection.getInputStream()));
 
                     while (( holder = reader.readLine()) != null){
+
                         reponseString.append(holder);
+
                     }
 
                     responsePage[index-1] = new JSONObject(reponseString.toString());
                     reader.close();
 
                 } catch (IOException | JSONException e) {
+
                     e.printStackTrace();
+
                 } finally {
+
                     if (reader !=null){
+
                         try {
+
                             reader.close();
+
                         } catch (IOException e) {
+
                             e.printStackTrace();
                             return null;
+
                         }
                     }
                 }
@@ -178,19 +202,27 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
             reponseString.delete(0, reponseString.length());
 
             try {
+
                 return getNewsFeedItemFromJSON(responsePage);
+
             } catch (JSONException e) {
+
                 e.printStackTrace();
                 return null;
+
             }
 
         } else if (pageCount  == 1){
 
             try {
+
                 return getNewsFeedItemFromJSON(responsePage);
+
             } catch (JSONException e) {
+
                 e.printStackTrace();
                 return null;
+
             }
 
         } else {
@@ -223,14 +255,7 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
 
         Bundle newsTypeBundle = mFragment.getArguments();
         String newsType = newsTypeBundle.getString("NewsType");
-
-        SharedPreferences sharedPreferences = PreferenceManager
-                .getDefaultSharedPreferences(mContext);
-
-        String[] defaultFavouriteTopicsArray = mContext
-                .getResources().getStringArray(R.array.preferences_topics_entryValues);
-        List<String> defaultFavouriteTopicsList = Arrays.asList(defaultFavouriteTopicsArray);
-        Set<String> defaultFavouriteTopicsSet = new HashSet<>(defaultFavouriteTopicsList);
+        Set<String> defaultFavouriteTopicsSet = Utility.getDefaultFavouriteTopicsSet(mContext);
 
         if (newsType != null){
 
@@ -250,8 +275,7 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
 
             } else if (newsType.equals("Favourites")) {
 
-                Set<String> favouriteTopicsSet = sharedPreferences.getStringSet(
-                        mContext.getString(R.string.preferences_topics_key), defaultFavouriteTopicsSet);
+                Set<String> favouriteTopicsSet = Utility.getFavouriteTopicsSet(mContext);
 
                 for (String iterator : favouriteTopicsSet) {
 
@@ -278,6 +302,7 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
                 }
 
             }
+            mTopicsQuery = new StringBuilder(mTopicsQuery.substring(0,(mTopicsQuery.length()-1)));
 
         }
 

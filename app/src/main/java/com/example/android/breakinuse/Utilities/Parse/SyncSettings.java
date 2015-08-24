@@ -8,6 +8,7 @@ import android.util.Log;
 
 import com.example.android.breakinuse.NewsFeedActivity;
 import com.example.android.breakinuse.R;
+import com.example.android.breakinuse.Utilities.Utility;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
@@ -35,15 +36,9 @@ public class SyncSettings {
                     if (list.size() > 0) {
 
                         ParseObject settings = list.get(0);
-                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-                        Boolean isNotificationsEnabled = sharedPreferences.getBoolean(
-                                context.getString(R.string.preferences_notifications_key), true);
-                        String[] defaultFavouriteTopicsArray = context
-                                .getResources().getStringArray(R.array.preferences_topics_entryValues);
-                        List<String> defaultFavouriteTopicsList = Arrays.asList(defaultFavouriteTopicsArray);
-                        Set<String> defaultFavouriteTopicsSet = new HashSet<>(defaultFavouriteTopicsList);
-                        Set<String> favouriteTopicsSet = sharedPreferences.getStringSet(
-                                context.getString(R.string.preferences_topics_key),defaultFavouriteTopicsSet);
+
+                        Boolean isNotificationsEnabled = Utility.getIsNotificationsEnabled(context);
+                        Set<String> favouriteTopicsSet = Utility.getFavouriteTopicsSet(context);
 
                         settings.put("userEmailID", userEmailID);
                         settings.put("isNotificationsEnabled", isNotificationsEnabled);
@@ -63,15 +58,8 @@ public class SyncSettings {
     public void uploadSettingsToCloud(Context context, String userEmailID){
 
         ParseObject settings = new ParseObject("Settings");
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
-        Boolean isNotificationsEnabled = sharedPreferences.getBoolean(
-                context.getString(R.string.preferences_notifications_key), true);
-        String[] defaultFavouriteTopicsArray = context
-                .getResources().getStringArray(R.array.preferences_topics_entryValues);
-        List<String> defaultFavouriteTopicsList = Arrays.asList(defaultFavouriteTopicsArray);
-        Set<String> defaultFavouriteTopicsSet = new HashSet<>(defaultFavouriteTopicsList);
-        Set<String> favouriteTopicsSet = sharedPreferences.getStringSet(
-                context.getString(R.string.preferences_topics_key),defaultFavouriteTopicsSet);
+        Boolean isNotificationsEnabled = Utility.getIsNotificationsEnabled(context);
+        Set<String> favouriteTopicsSet = Utility.getFavouriteTopicsSet(context);
 
         settings.put("userEmailID", userEmailID);
         settings.put("isNotificationsEnabled", isNotificationsEnabled);

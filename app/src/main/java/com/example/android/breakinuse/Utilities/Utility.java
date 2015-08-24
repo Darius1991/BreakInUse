@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.example.android.breakinuse.R;
@@ -14,6 +15,13 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 import com.parse.ParseUser;
+
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 public class Utility {
 
@@ -131,6 +139,38 @@ public class Utility {
         String LOGIN_METHOD = sharedPreferences.getString(context.getString(R.string.login_method_key),
                                 context.getString(R.string.logged_out));
         return (!LOGIN_METHOD.equals(context.getString(R.string.logged_out)));
+    }
+
+    public static Set<String> getDefaultFavouriteTopicsSet (Context context){
+
+        String[] defaultFavouriteTopicsArray = context
+                .getResources().getStringArray(R.array.preferences_topics_entryValues);
+        List<String> defaultFavouriteTopicsList = Arrays.asList(defaultFavouriteTopicsArray);
+        Set<String> defaultFavouriteTopicsSet = new HashSet<>(defaultFavouriteTopicsList);
+        return defaultFavouriteTopicsSet;
+    }
+
+    public static Set<String> getFavouriteTopicsSet (Context context){
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Set<String> defaultFavouriteTopicsSet = getDefaultFavouriteTopicsSet(context);
+        Set<String> favouriteTopicsSet = sharedPreferences.getStringSet(
+                context.getString(R.string.preferences_topics_key),defaultFavouriteTopicsSet);
+        return favouriteTopicsSet;
+    }
+
+    public static Boolean getIsNotificationsEnabled(Context context){
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+        Boolean isNotificationsEnabled = sharedPreferences.getBoolean(
+                context.getString(R.string.preferences_notifications_key), true);
+        return isNotificationsEnabled;
+    }
+
+    public static String getCurrentDate(){
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = simpleDateFormat.format(new Date());
+        return currentDate;
     }
 
 

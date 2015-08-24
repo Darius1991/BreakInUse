@@ -1,6 +1,7 @@
 package com.example.android.breakinuse;
 
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.Fragment;
 import android.content.Context;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.android.breakinuse.NewsProvider.NewsDBHelper;
 import com.example.android.breakinuse.Utilities.Utility;
 
 public class NewsFeedFragment extends Fragment {
@@ -20,6 +22,7 @@ public class NewsFeedFragment extends Fragment {
     private RecyclerView mRecyclerView;
     private HeadlinesAdapter mHeadlinesAdapter;
     private Context mContext;
+    private SQLiteDatabase db;
 
     @Nullable
     @Override
