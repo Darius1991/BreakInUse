@@ -67,6 +67,10 @@
                 android:value="com.example.android.breakinuse.NewsFeedActivity" />
         </activity>
 
+        <provider
+            android:name = ".NewsProvider.NewsProvider"
+            android:authorities = "com.example.android.breakinuse" />
+
     </application>
 
 </manifest>
