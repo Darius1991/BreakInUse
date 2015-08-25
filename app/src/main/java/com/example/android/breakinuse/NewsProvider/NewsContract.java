@@ -50,14 +50,15 @@ public class NewsContract {
 
             return CONTENT_URI
                     .buildUpon()
-                    .appendQueryParameter(COLUMN_ARTICLEID,articleID)
+                    .appendPath(COLUMN_ARTICLEID)
+                    .appendPath(articleID)
                     .build();
 
         }
 
         public static String getArticleIDFromURI(Uri uri){
 
-            return uri.getQueryParameter(COLUMN_ARTICLEID);
+            return uri.getPathSegments().get(2);
 
         }
 
@@ -94,14 +95,15 @@ public class NewsContract {
 
             return CONTENT_URI
                     .buildUpon()
-                    .appendQueryParameter(COLUMN_ARTICLEID,articleID)
+                    .appendPath(COLUMN_ARTICLEID)
+                    .appendPath(articleID)
                     .build();
 
         }
 
         public static String getArticleIDFromURI(Uri uri){
 
-            return uri.getQueryParameter(COLUMN_ARTICLEID);
+            return uri.getPathSegments().get(2);
 
         }
 
