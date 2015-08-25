@@ -130,10 +130,7 @@ public class DBTest extends AndroidTestCase {
         for (columnIndex = 1; columnIndex < cursor.getColumnCount(); ++columnIndex ){
 
             columnName = cursor.getColumnName(columnIndex);
-            Log.d(TAG,columnName);
             columnValue = cursor.getString(columnIndex);
-            Log.d(TAG,columnValue);
-            Log.d(TAG,(String)newsFeedTestValues.get(columnName));
             assertTrue("Error: Unable to retrieve the column from contentValueSet", newsFeedTestValues.containsKey(columnName));
             assertTrue("Error: Unable to match the key (" + columnName + ") with value (" + newsFeedTestValues.get(columnName) + ") pair ",
                     ((String) newsFeedTestValues.get(columnName)).equals(columnValue));
