@@ -4,6 +4,7 @@ import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 
@@ -36,22 +37,22 @@ public class NewsProvider extends ContentProvider {
 
             case NEWS_FEED:
 
-                cursor = getNewsFeedCursor(uri, projection, selection, selectionArgs, sortOrder);
+                cursor = getNewsFeedCursor(projection, selection, selectionArgs, sortOrder);
                 break;
 
             case NEWS_FEED_WITH_ARTICLEID:
 
-                cursor = getNewsFeedWithArticleIDCursor(uri, projection, selection, selectionArgs, sortOrder);
+                cursor = getNewsFeedWithArticleIDCursor(uri, projection, sortOrder);
                 break;
 
             case NEWS_ARTICLE:
 
-                cursor = getNewsArticleCursor(uri, projection, selection, selectionArgs, sortOrder);
+                cursor = getNewsArticleCursor(projection, selection, selectionArgs, sortOrder);
                 break;
 
             case NEWS_ARTICLE_WITH_ARTICLEID:
 
-                cursor = getNewsArticleWithArticleIDCursor(uri, projection, selection, selectionArgs, sortOrder);
+                cursor = getNewsArticleWithArticleIDCursor(uri, projection, sortOrder);
                 break;
 
             default:
@@ -67,7 +68,7 @@ public class NewsProvider extends ContentProvider {
 
     }
 
-    private Cursor getNewsFeedCursor(Uri uri, String[] projection, String selection,
+    private Cursor getNewsFeedCursor(String[] projection, String selection,
                                      String[] selectionArgs, String sortOrder){
 
         mQueryBuilder.setTables(NewsContract.NewsFeed.TABLE_NAME);
@@ -76,8 +77,7 @@ public class NewsProvider extends ContentProvider {
 
     }
 
-    private Cursor getNewsFeedWithArticleIDCursor(Uri uri, String[] projection, String selection,
-                                                  String[] selectionArgs, String sortOrder){
+    private Cursor getNewsFeedWithArticleIDCursor(Uri uri, String[] projection, String sortOrder){
 
         String[] articleID = new String[1];
         articleID[0] = NewsContract.NewsFeed.getArticleIDFromURI(uri);
@@ -88,7 +88,7 @@ public class NewsProvider extends ContentProvider {
 
     }
 
-    private Cursor getNewsArticleCursor(Uri uri, String[] projection, String selection,
+    private Cursor getNewsArticleCursor(String[] projection, String selection,
                                         String[] selectionArgs, String sortOrder){
 
         mQueryBuilder.setTables(NewsContract.NewsArticle.TABLE_NAME);
@@ -96,8 +96,7 @@ public class NewsProvider extends ContentProvider {
                                     selectionArgs,null,null,sortOrder);
     }
 
-    private Cursor getNewsArticleWithArticleIDCursor(Uri uri, String[] projection, String selection,
-                                                     String[] selectionArgs, String sortOrder){
+    private Cursor getNewsArticleWithArticleIDCursor(Uri uri, String[] projection, String sortOrder){
 
         String[] articleID = {NewsContract.NewsArticle.getArticleIDFromURI(uri)};
         String filter = NewsContract.NewsArticle.TABLE_NAME + "." + NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ? ";
@@ -146,17 +145,149 @@ public class NewsProvider extends ContentProvider {
 
     @Override
     public Uri insert(Uri uri, ContentValues values) {
-        return null;
+
+        final int matchResult = mUriMatcher.match(uri);
+        final SQLiteDatabase db = mNewsDBHelper.getWritableDatabase();
+        long rowID;
+        Uri returnUri;
+
+        switch(matchResult){
+
+            case NEWS_FEED:
+
+                rowID = db.insert(NewsContract.NewsFeed.TABLE_NAME, null, values);
+                if (rowID > 0){
+
+                    returnUri = NewsContract.NewsFeed.buildNewsFeedUri(rowID);
+
+                } else {
+
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+
+                }
+                break;
+
+            case NEWS_ARTICLE:
+
+                rowID = db.insert(NewsContract.NewsArticle.TABLE_NAME, null, values);
+                if (rowID > 0) {
+
+                    returnUri = NewsContract.NewsArticle.buildNewsArticleUri(rowID);
+
+                } else {
+
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+
+                }
+                break;
+
+            default:
+
+                throw new UnsupportedOperationException("Unkwown URI - " + uri);
+
+        }
+
+        getContext().getContentResolver().notifyChange(uri, null);
+        return returnUri;
     }
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+
+        final int matchResult = mUriMatcher.match(uri);
+        final SQLiteDatabase db = mNewsDBHelper.getWritableDatabase();
+        int rowsDeleted;
+        if (selection == null){
+
+            selection = "1";
+
+        }
+
+        switch(matchResult){
+
+            case NEWS_FEED:
+
+                rowsDeleted = db.delete(NewsContract.NewsFeed.TABLE_NAME, selection, selectionArgs);
+                break;
+
+            case NEWS_FEED_WITH_ARTICLEID:
+
+                String filter = NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ? ";
+                String[] articleID = new String[1];
+                articleID[0] = NewsContract.NewsFeed.getArticleIDFromURI(uri);
+                rowsDeleted = db.delete(NewsContract.NewsFeed.TABLE_NAME, filter, articleID);
+                break;
+
+            case NEWS_ARTICLE:
+
+                rowsDeleted = db.delete(NewsContract.NewsArticle.TABLE_NAME, selection, selectionArgs);
+                break;
+
+            case NEWS_ARTICLE_WITH_ARTICLEID:
+
+                String filter_article = NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ? ";
+                String[] articleID_article = new String[1];
+                articleID_article[0] = NewsContract.NewsArticle.getArticleIDFromURI(uri);
+                rowsDeleted = db.delete(NewsContract.NewsArticle.TABLE_NAME, filter_article, articleID_article);
+                break;
+
+            default:
+
+                throw new UnsupportedOperationException("Unkwown URI - " + uri);
+
+        }
+
+        if (rowsDeleted != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsDeleted;
     }
 
     @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
-        return 0;
+
+        final int matchResult = mUriMatcher.match(uri);
+        final SQLiteDatabase db = mNewsDBHelper.getWritableDatabase();
+        int rowsUpdated;
+
+        switch (matchResult){
+
+            case NEWS_FEED:
+
+                rowsUpdated = db.update(NewsContract.NewsFeed.TABLE_NAME,values,selection,selectionArgs);
+                break;
+
+            case NEWS_FEED_WITH_ARTICLEID:
+
+                String filter = NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ? ";
+                String[] articleID = new String[1];
+                articleID[0] = NewsContract.NewsFeed.getArticleIDFromURI(uri);
+                rowsUpdated = db.update(NewsContract.NewsFeed.TABLE_NAME, values, filter, articleID);
+                break;
+
+            case NEWS_ARTICLE:
+
+                rowsUpdated = db.update(NewsContract.NewsArticle.TABLE_NAME,values,selection,selectionArgs);
+                break;
+
+            case NEWS_ARTICLE_WITH_ARTICLEID:
+
+                String filter_article = NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ? ";
+                String[] articleID_article = new String[1];
+                articleID_article[0] = NewsContract.NewsArticle.getArticleIDFromURI(uri);
+                rowsUpdated = db.update(NewsContract.NewsArticle.TABLE_NAME, values, filter_article, articleID_article);
+                break;
+
+            default:
+
+                throw new UnsupportedOperationException("Unkwown URI - " + uri);
+
+        }
+
+        if (rowsUpdated != 0) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+        return rowsUpdated;
     }
 
     public static UriMatcher buildUriMatcher(){
@@ -171,6 +302,78 @@ public class NewsProvider extends ContentProvider {
                 NewsContract.PATH_NEWSARTICLE + "/" + NewsContract.NewsArticle.COLUMN_ARTICLEID + "/*",
                 NEWS_ARTICLE_WITH_ARTICLEID);
         return uriMatcher;
+
+    }
+
+    @Override
+    public int bulkInsert(Uri uri, ContentValues[] values) {
+
+        final int matchResult = mUriMatcher.match(uri);
+        final SQLiteDatabase db = mNewsDBHelper.getWritableDatabase();
+        int rowsInserted;
+
+        switch (matchResult){
+
+            case NEWS_FEED:
+
+                db.beginTransaction();
+                rowsInserted = 0;
+                try {
+
+                    for (ContentValues value : values) {
+
+                        long _id = db.insert(NewsContract.NewsFeed.TABLE_NAME, null, value);
+                        if (_id != -1) {
+
+                            rowsInserted++;
+
+                        }
+
+                    }
+
+                    db.setTransactionSuccessful();
+
+                } finally {
+
+                    db.endTransaction();
+
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return rowsInserted;
+
+            case NEWS_ARTICLE:
+
+                db.beginTransaction();
+                rowsInserted = 0;
+                try {
+
+                    for (ContentValues value : values) {
+
+                        long _id = db.insert(NewsContract.NewsArticle.TABLE_NAME, null, value);
+                        if (_id != -1) {
+
+                            rowsInserted++;
+
+                        }
+
+                    }
+
+                    db.setTransactionSuccessful();
+
+                } finally {
+
+                    db.endTransaction();
+
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                return rowsInserted;
+
+            default:
+
+                return super.bulkInsert(uri, values);
+
+
+        }
 
     }
 }
