@@ -7,24 +7,26 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
+import android.support.annotation.NonNull;
+import android.util.Log;
 
 public class NewsProvider extends ContentProvider {
 
     private static final String TAG = NewsProvider.class.getName();
-    private static NewsDBHelper mNewsDBHelper;
+    private NewsDBHelper mNewsDBHelper;
     public static final int NEWS_FEED = 100;
     public static final int NEWS_ARTICLE = 101;
     public static final int NEWS_FEED_WITH_ARTICLEID = 102;
     public static final int NEWS_ARTICLE_WITH_ARTICLEID = 103;
-    private static SQLiteQueryBuilder mQueryBuilder;
-    private static UriMatcher mUriMatcher;
+    private SQLiteQueryBuilder mQueryBuilder;
+    private UriMatcher mUriMatcher;
 
     @Override
     public boolean onCreate() {
         mQueryBuilder = new SQLiteQueryBuilder();
         mNewsDBHelper = new NewsDBHelper(getContext());
         mUriMatcher = buildUriMatcher();
-        return false;
+        return true;
     }
 
     @Override
@@ -62,7 +64,9 @@ public class NewsProvider extends ContentProvider {
         }
 
         if (cursor != null) {
+
             cursor.setNotificationUri(getContext().getContentResolver(),uri);
+
         }
         return cursor;
 
@@ -147,7 +151,7 @@ public class NewsProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues values) {
 
         final int matchResult = mUriMatcher.match(uri);
-        final SQLiteDatabase db = mNewsDBHelper.getWritableDatabase();
+        SQLiteDatabase db = mNewsDBHelper.getWritableDatabase();
         long rowID;
         Uri returnUri;
 
@@ -155,8 +159,9 @@ public class NewsProvider extends ContentProvider {
 
             case NEWS_FEED:
 
-                rowID = db.insert(NewsContract.NewsFeed.TABLE_NAME, null, values);
-                if (rowID > 0){
+                Log.d(TAG,String.valueOf(db.isOpen()));
+                rowID = db.insertOrThrow(NewsContract.NewsFeed.TABLE_NAME, null, values);
+                if (rowID != -1){
 
                     returnUri = NewsContract.NewsFeed.buildNewsFeedUri(rowID);
 
@@ -169,8 +174,8 @@ public class NewsProvider extends ContentProvider {
 
             case NEWS_ARTICLE:
 
-                rowID = db.insert(NewsContract.NewsArticle.TABLE_NAME, null, values);
-                if (rowID > 0) {
+                rowID = db.insertOrThrow(NewsContract.NewsArticle.TABLE_NAME, null, values);
+                if (rowID != -1) {
 
                     returnUri = NewsContract.NewsArticle.buildNewsArticleUri(rowID);
 
@@ -195,7 +200,7 @@ public class NewsProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
 
         final int matchResult = mUriMatcher.match(uri);
-        final SQLiteDatabase db = mNewsDBHelper.getWritableDatabase();
+        SQLiteDatabase db = mNewsDBHelper.getWritableDatabase();
         int rowsDeleted;
         if (selection == null){
 
@@ -247,7 +252,7 @@ public class NewsProvider extends ContentProvider {
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
 
         final int matchResult = mUriMatcher.match(uri);
-        final SQLiteDatabase db = mNewsDBHelper.getWritableDatabase();
+        SQLiteDatabase db = mNewsDBHelper.getWritableDatabase();
         int rowsUpdated;
 
         switch (matchResult){
@@ -306,10 +311,10 @@ public class NewsProvider extends ContentProvider {
     }
 
     @Override
-    public int bulkInsert(Uri uri, ContentValues[] values) {
+    public int bulkInsert(Uri uri, @NonNull ContentValues[] values) {
 
         final int matchResult = mUriMatcher.match(uri);
-        final SQLiteDatabase db = mNewsDBHelper.getWritableDatabase();
+        SQLiteDatabase db = mNewsDBHelper.getWritableDatabase();
         int rowsInserted;
 
         switch (matchResult){
