@@ -1,4 +1,5 @@
 package com.example.android.breakinuse.Utilities;
+import android.content.ContentValues;
 import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -6,6 +7,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
 import com.example.android.breakinuse.NewsFeedFragment;
+import com.example.android.breakinuse.NewsProvider.NewsContract;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,7 +20,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Set;
 
-public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
+public class GetNewsTask extends AsyncTask<Void,Void,Integer> {
 
     private NewsFeedFragment mFragment;
     private Context mContext;
@@ -41,14 +43,14 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
 
     public GetNewsTask(Context tempContext, Fragment tempFragment){
 
-        this.mContext = tempContext;
-        this.mFragment = (NewsFeedFragment) tempFragment;
-        this.mTopicsQuery = new StringBuilder();
+        mContext = tempContext;
+        mFragment = (NewsFeedFragment) tempFragment;
+        mTopicsQuery = new StringBuilder();
 
     }
 
     @Override
-    protected Utility.NewsFeedItem[] doInBackground(Void... params) {
+    protected Integer doInBackground(Void... params) {
 
         final int PAGE_SIZE = 20;
         StringBuilder reponseString =  new StringBuilder();
@@ -203,7 +205,7 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
 
             try {
 
-                return getNewsFeedItemFromJSON(responsePage);
+                return insertNewsFeedItemsInDBFromJSON(responsePage);
 
             } catch (JSONException e) {
 
@@ -216,7 +218,7 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
 
             try {
 
-                return getNewsFeedItemFromJSON(responsePage);
+                return insertNewsFeedItemsInDBFromJSON(responsePage);
 
             } catch (JSONException e) {
 
@@ -237,21 +239,21 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
     protected void onPreExecute() {
 
         super.onPreExecute();
-        this.API_KEY_QUERY_PARAM = "api-key";
-        this.SECTION_QUERY_PARAM = "section";
-        this.FIELDS_QUERY_PARAM = "show-fields";
-        this.ID_QUERY_PARAM = "ids";
-        this.API_KEY = "tknk2ue9anxtt3d3zthr4j4b";
-        this.API_SCHEME = "https";
-        this.API_AUTHORITY = "content.guardianapis.com";
-        this.API_CONTENT_END_POINT = "search";
-        this.TAGS_QUERY_PARAM = "show-tags";
-        this.ELEMENTS_QUERY_PARAM = "show-elements";
-        this.FROMDATE_QUERY_PARAM = "from-date";
-        this.TODATE_QUERY_PARAM = "to-date";
-        this.ORDER_QUERY_PARAM = "order-by";
-        this.PAGESIZE_QUERY_PARAM = "page-size";
-        this.PAGE_QUERY_PARAM = "page";
+        API_KEY_QUERY_PARAM = "api-key";
+        SECTION_QUERY_PARAM = "section";
+        FIELDS_QUERY_PARAM = "show-fields";
+        ID_QUERY_PARAM = "ids";
+        API_KEY = "tknk2ue9anxtt3d3zthr4j4b";
+        API_SCHEME = "https";
+        API_AUTHORITY = "content.guardianapis.com";
+        API_CONTENT_END_POINT = "search";
+        TAGS_QUERY_PARAM = "show-tags";
+        ELEMENTS_QUERY_PARAM = "show-elements";
+        FROMDATE_QUERY_PARAM = "from-date";
+        TODATE_QUERY_PARAM = "to-date";
+        ORDER_QUERY_PARAM = "order-by";
+        PAGESIZE_QUERY_PARAM = "page-size";
+        PAGE_QUERY_PARAM = "page";
 
         Bundle newsTypeBundle = mFragment.getArguments();
         String newsType = newsTypeBundle.getString("NewsType");
@@ -310,13 +312,13 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
     }
 
     @Override
-    protected void onPostExecute(Utility.NewsFeedItem[] newsFeedItemArray) {
+    protected void onPostExecute(Integer rowsInserted) {
 
-        super.onPostExecute(newsFeedItemArray);
+        super.onPostExecute(rowsInserted);
+        if (rowsInserted > 0){
 
-        if (newsFeedItemArray!= null) {
 
-            mFragment.notifyDataSetChanged(newsFeedItemArray);
+
         }
 
     }
@@ -333,18 +335,18 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
 
     }
 
-    private Utility.NewsFeedItem[] getNewsFeedItemFromJSON(JSONObject[] responsePage) throws JSONException {
+    private int insertNewsFeedItemsInDBFromJSON(JSONObject[] responsePage) throws JSONException {
 
         int pageCount = responsePage[0].getJSONObject("response").getInt("pages");
-        int pageIndex, webTitleIndex;
+        int pageIndex, webTitleIndex, arrayIndex, responseCount;
+        responseCount = responsePage[0].getJSONObject("response").getInt("total");
+        ContentValues[] newsFeedContentValues = new ContentValues[responseCount];
         JSONArray newsFeedItemJSONArray;
-        Utility.NewsFeedItem[] newsFeedItemArray = new Utility.NewsFeedItem[responsePage[0]
-                .getJSONObject("response")
-                .getInt("total")];
+        JSONObject newsFeedItemJSONObject;
 
-        for (int index = 0; index < responsePage[0].getJSONObject("response").getInt("total"); ++index){
+        for (int index = 0; index < responseCount; ++index){
 
-            newsFeedItemArray[index] = new Utility.NewsFeedItem();
+            newsFeedContentValues[index] = new ContentValues();
 
         }
 
@@ -355,17 +357,27 @@ public class GetNewsTask extends AsyncTask<Void,Void,Utility.NewsFeedItem[]> {
 
             for ( ;webTitleIndex < newsFeedItemJSONArray.length() ; ++webTitleIndex){
 
-                newsFeedItemArray[webTitleIndex + (pageIndex) * 20].webTitle = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("webTitle"));
-                newsFeedItemArray[webTitleIndex + (pageIndex)*20].webURL = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("webUrl"));
-                newsFeedItemArray[webTitleIndex + (pageIndex)*20].apiURL = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("apiUrl"));
-                newsFeedItemArray[webTitleIndex + (pageIndex)*20].trailText = (newsFeedItemJSONArray.getJSONObject(webTitleIndex)
-                                                                                    .getJSONObject("fields").getString("trailText"));
-                newsFeedItemArray[webTitleIndex + (pageIndex)*20].articleID = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("id"));
-                newsFeedItemArray[webTitleIndex + (pageIndex)*20].sectionID = (newsFeedItemJSONArray.getJSONObject(webTitleIndex).getString("sectionId"));
+                newsFeedItemJSONObject = newsFeedItemJSONArray.getJSONObject(webTitleIndex);
+                arrayIndex = webTitleIndex + ((pageIndex) * 20);
+
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_WEBTITLE,
+                        newsFeedItemJSONObject.getString("webTitle"));
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_WEBURL,
+                        newsFeedItemJSONObject.getString("webUrl"));
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_APIURL,
+                        newsFeedItemJSONObject.getString("apiUrl"));
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
+                        newsFeedItemJSONObject.getJSONObject("fields").getString("trailText"));
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_ARTICLEID,
+                        newsFeedItemJSONObject.getString("id"));
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_SECTIONID,
+                        newsFeedItemJSONObject.getString("sectionId"));
 
             }
         }
-        return newsFeedItemArray;
+
+        return mContext.getContentResolver().bulkInsert(NewsContract.NewsFeed.CONTENT_URI,newsFeedContentValues);
+
     }
 
 }
