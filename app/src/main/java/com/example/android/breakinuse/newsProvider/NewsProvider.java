@@ -1,4 +1,4 @@
-package com.example.android.breakinuse.NewsProvider;
+package com.example.android.breakinuse.newsProvider;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;

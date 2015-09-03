@@ -30,4 +30,8 @@
     <string name="preferences_notifications_summary_on">Notifications Enabled</string>
     <string name="newsFeed_tab1_title">News Feed</string>
     <string name="newsFeed_tab2_title">Favourite Feed</string>
+    <!-- SyncAdapter related -->
+    <string name="sync_account_type">breakinuse.example.com</string>
+    <string name="content_authority">com.example.android.breakinuse</string>
+
 </resources>

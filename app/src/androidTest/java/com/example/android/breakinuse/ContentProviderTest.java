@@ -11,9 +11,9 @@ import android.net.Uri;
 import android.test.AndroidTestCase;
 import android.util.Log;
 
-import com.example.android.breakinuse.NewsProvider.NewsContract;
-import com.example.android.breakinuse.NewsProvider.NewsDBHelper;
-import com.example.android.breakinuse.NewsProvider.NewsProvider;
+import com.example.android.breakinuse.newsProvider.NewsContract;
+import com.example.android.breakinuse.newsProvider.NewsDBHelper;
+import com.example.android.breakinuse.newsProvider.NewsProvider;
 
 import java.util.Map;
 import java.util.Set;
@@ -84,7 +84,7 @@ public class ContentProviderTest extends AndroidTestCase {
         try {
 
             ProviderInfo providerInfo = pm.getProviderInfo(componentName, 0);
-            assertEquals("Error: NewsProvider registered with authority: " + providerInfo.authority +
+            assertEquals("Error: newsProvider registered with authority: " + providerInfo.authority +
                             " instead of authority: " + NewsContract.CONTENT_AUTHORITY,
                     providerInfo.authority, NewsContract.CONTENT_AUTHORITY);
 

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <manifest
+
     xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.android.breakinuse" >
 
@@ -8,9 +9,12 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.USE_CREDENTIALS" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
 
     <application
-        android:name=".Utilities.Parse.OnStartApplication"
+        android:name=".utilities.parse.OnStartApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,9 +23,11 @@
         <meta-data
             android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id" />
+
         <meta-data
             android:name="com.parse.APPLICATION_ID"
             android:value="@string/parse_app_id" />
+
         <meta-data
             android:name="com.parse.CLIENT_KEY"
             android:value="@string/parse_client_key" />
@@ -29,19 +35,25 @@
         <activity
             android:name=".NewsFeedActivity"
             android:label="@string/title_activity_home" >
+
             <intent-filter>
+
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+
             </intent-filter>
+
         </activity>
 
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
             android:parentActivityName=".NewsFeedActivity" >
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".NewsFeedActivity" />
+
         </activity>
 
         <activity
@@ -53,23 +65,67 @@
             android:name=".NewsArticleActivity"
             android:label="@string/title_activity_news_article"
             android:parentActivityName=".NewsFeedActivity" >
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.breakinuse.NewsFeedActivity" />
+
         </activity>
 
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".NewsFeedActivity" >
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.android.breakinuse.NewsFeedActivity" />
+
         </activity>
 
         <provider
-            android:name = ".NewsProvider.NewsProvider"
-            android:authorities = "com.example.android.breakinuse" />
+            android:name = ".newsProvider.NewsProvider"
+            android:authorities = "com.example.android.breakinuse"
+            android:syncable = "true"
+            android:exported = "false"/>
+
+        <service
+            android:name=".service.NewsFeedService"/>
+
+        <receiver
+            android:name = ".utilities.Utility$AlarmReceiver"
+            android:enabled = "true"/>
+
+        <service
+            android:name="com.example.android.breakinuse.syncAdapter.BreakInUseAuthenticatorService">
+
+            <intent-filter>
+
+                <action android:name="android.accounts.AccountAuthenticator"/>
+
+            </intent-filter>
+
+            <meta-data
+                android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+
+        </service>
+
+        <service
+            android:name=".syncAdapter.BreakInUseSyncService"
+            android:exported="true" >
+
+            <intent-filter>
+
+                <action android:name="android.content.SyncAdapter" />
+
+            </intent-filter>
+
+            <meta-data
+                android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+
+        </service>
 
     </application>
 

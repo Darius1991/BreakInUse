@@ -11,15 +11,14 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.android.breakinuse.Utilities.Parse.SyncSettings;
-import com.example.android.breakinuse.Utilities.Utility;
+import com.example.android.breakinuse.utilities.parse.SyncSettings;
+import com.example.android.breakinuse.utilities.Utility;
 import com.parse.ParseUser;
 
 import java.util.Set;

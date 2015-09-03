@@ -1,13 +1,14 @@
-package com.example.android.breakinuse.Utilities;
+package com.example.android.breakinuse.service;
+
+import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
 
-import com.example.android.breakinuse.NewsFeedFragment;
-import com.example.android.breakinuse.NewsProvider.NewsContract;
+import com.example.android.breakinuse.newsProvider.NewsContract;
+import com.example.android.breakinuse.utilities.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -20,40 +21,67 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Set;
 
-public class GetNewsTask extends AsyncTask<Void,Void,Integer> {
+public class NewsFeedService extends IntentService {
 
-    private NewsFeedFragment mFragment;
     private Context mContext;
-    private String API_KEY_QUERY_PARAM;
-    private String SECTION_QUERY_PARAM;
-    private String FIELDS_QUERY_PARAM;
-    private String ID_QUERY_PARAM;
-    private String API_KEY;
-    private String API_SCHEME;
-    private String API_AUTHORITY;
-    private String API_CONTENT_END_POINT;
-    private String TAGS_QUERY_PARAM;
-    private String ELEMENTS_QUERY_PARAM;
-    private String FROMDATE_QUERY_PARAM;
-    private String TODATE_QUERY_PARAM;
-    private String ORDER_QUERY_PARAM;
-    private String PAGESIZE_QUERY_PARAM;
-    private String PAGE_QUERY_PARAM;
     private StringBuilder mTopicsQuery;
+    private static final String TAG = NewsFeedService.class.getName();
 
-    public GetNewsTask(Context tempContext, Fragment tempFragment){
+    /**
+     * Creates an IntentService.  Invoked by your subclass's constructor.
+     *
+     * @param name Used to name the worker thread, important only for debugging.
+     */
+    public NewsFeedService(String name) {
 
-        mContext = tempContext;
-        mFragment = (NewsFeedFragment) tempFragment;
+        super(name);
+
+    }
+
+    public NewsFeedService() {
+
+        super("NewsFeedService");
+        mContext = this;
         mTopicsQuery = new StringBuilder();
 
     }
 
     @Override
-    protected Integer doInBackground(Void... params) {
+    protected void onHandleIntent(Intent intent) {
+
+        final String API_KEY_QUERY_PARAM = "api-key";
+        final String SECTION_QUERY_PARAM = "section";
+        final String FIELDS_QUERY_PARAM = "show-fields";
+        final String ID_QUERY_PARAM = "ids";
+        final String API_KEY = "tknk2ue9anxtt3d3zthr4j4b";
+        final String API_SCHEME = "https";
+        final String API_AUTHORITY = "content.guardianapis.com";
+        final String API_CONTENT_END_POINT = "search";
+        final String TAGS_QUERY_PARAM = "show-tags";
+        final String ELEMENTS_QUERY_PARAM = "show-elements";
+        final String FROMDATE_QUERY_PARAM = "from-date";
+        final String TODATE_QUERY_PARAM = "to-date";
+        final String ORDER_QUERY_PARAM = "order-by";
+        final String PAGESIZE_QUERY_PARAM = "page-size";
+        final String PAGE_QUERY_PARAM = "page";
+
+        Set<String> defaultFavouriteTopicsSet = Utility.getDefaultFavouriteTopicsSet(mContext);
+
+        for (String iterator : defaultFavouriteTopicsSet) {
+
+            if (iterator != null){
+
+                mTopicsQuery.append(iterator);
+                mTopicsQuery.append("|");
+
+            }
+
+
+        }
+        mTopicsQuery = new StringBuilder(mTopicsQuery.substring(0,(mTopicsQuery.length()-1)));
 
         final int PAGE_SIZE = 20;
-        StringBuilder reponseString =  new StringBuilder();
+        StringBuilder responseString =  new StringBuilder();
         String holder;
         Uri.Builder builder = new Uri.Builder();
         URL url;
@@ -65,15 +93,15 @@ public class GetNewsTask extends AsyncTask<Void,Void,Integer> {
 
         try {
 
-            builder.scheme(this.API_SCHEME)
-                    .authority(this.API_AUTHORITY)
-                    .appendPath(this.API_CONTENT_END_POINT)
-                    .appendQueryParameter(this.API_KEY_QUERY_PARAM, this.API_KEY)
-                    .appendQueryParameter(this.FIELDS_QUERY_PARAM, "trailText")
-                    .appendQueryParameter(this.PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
-                    .appendQueryParameter(this.ORDER_QUERY_PARAM, "relevance")
-                    .appendQueryParameter(this.FROMDATE_QUERY_PARAM, fromDate)
-                    .appendQueryParameter(this.SECTION_QUERY_PARAM,mTopicsQuery.toString())
+            builder.scheme(API_SCHEME)
+                    .authority(API_AUTHORITY)
+                    .appendPath(API_CONTENT_END_POINT)
+                    .appendQueryParameter(API_KEY_QUERY_PARAM, API_KEY)
+                    .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText")
+                    .appendQueryParameter(PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
+                    .appendQueryParameter(ORDER_QUERY_PARAM, "relevance")
+                    .appendQueryParameter(FROMDATE_QUERY_PARAM, fromDate)
+                    .appendQueryParameter(SECTION_QUERY_PARAM,mTopicsQuery.toString())
                     .build();
 
             url = new URL(builder.toString());
@@ -83,11 +111,11 @@ public class GetNewsTask extends AsyncTask<Void,Void,Integer> {
 
             while (( holder = reader.readLine()) != null){
 
-                reponseString.append(holder);
+                responseString.append(holder);
 
             }
 
-            responsePage[0] = new JSONObject(reponseString.toString());
+            responsePage[0] = new JSONObject(responseString.toString());
             reader.close();
 
         } catch (IOException | JSONException e) {
@@ -105,25 +133,26 @@ public class GetNewsTask extends AsyncTask<Void,Void,Integer> {
                 } catch (IOException e) {
 
                     e.printStackTrace();
-                    return null;
+                    return;
 
                 }
             }
         }
 
-        if (reponseString.length() != 0){
+        if (responseString.length() != 0){
 
             try {
 
                 if (!isResponseStatusOk(responsePage[0])){
 
-                    return null;
+                    return;
 
                 }
+
             } catch (JSONException e) {
 
                 e.printStackTrace();
-                return null;
+                return;
 
             }
             try {
@@ -133,13 +162,13 @@ public class GetNewsTask extends AsyncTask<Void,Void,Integer> {
             } catch (JSONException e) {
 
                 e.printStackTrace();
-                return null;
+                return;
 
             }
 
         } else {
 
-            return null;
+            return;
 
         }
 
@@ -151,18 +180,18 @@ public class GetNewsTask extends AsyncTask<Void,Void,Integer> {
 
             for (int index=2; index <= pageCount; ++index){
 
-                reponseString.delete(0, reponseString.length());
+                responseString.delete(0, responseString.length());
                 builder.clearQuery();
 
                 try {
 
-                    builder.appendQueryParameter(this.API_KEY_QUERY_PARAM, this.API_KEY)
-                            .appendQueryParameter(this.FIELDS_QUERY_PARAM, "trailText")
-                            .appendQueryParameter(this.PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
-                            .appendQueryParameter(this.PAGE_QUERY_PARAM, String.valueOf(index))
-                            .appendQueryParameter(this.ORDER_QUERY_PARAM, "relevance")
-                            .appendQueryParameter(this.FROMDATE_QUERY_PARAM,fromDate)
-                            .appendQueryParameter(this.SECTION_QUERY_PARAM,mTopicsQuery.toString())
+                    builder.appendQueryParameter(API_KEY_QUERY_PARAM, API_KEY)
+                            .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText")
+                            .appendQueryParameter(PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
+                            .appendQueryParameter(PAGE_QUERY_PARAM, String.valueOf(index))
+                            .appendQueryParameter(ORDER_QUERY_PARAM, "relevance")
+                            .appendQueryParameter(FROMDATE_QUERY_PARAM,fromDate)
+                            .appendQueryParameter(SECTION_QUERY_PARAM,mTopicsQuery.toString())
                             .build();
 
                     url = new URL(builder.toString());
@@ -172,11 +201,11 @@ public class GetNewsTask extends AsyncTask<Void,Void,Integer> {
 
                     while (( holder = reader.readLine()) != null){
 
-                        reponseString.append(holder);
+                        responseString.append(holder);
 
                     }
 
-                    responsePage[index-1] = new JSONObject(reponseString.toString());
+                    responsePage[index-1] = new JSONObject(responseString.toString());
                     reader.close();
 
                 } catch (IOException | JSONException e) {
@@ -194,23 +223,23 @@ public class GetNewsTask extends AsyncTask<Void,Void,Integer> {
                         } catch (IOException e) {
 
                             e.printStackTrace();
-                            return null;
+                            return;
 
                         }
                     }
                 }
             }
 
-            reponseString.delete(0, reponseString.length());
+            responseString.delete(0, responseString.length());
 
             try {
 
-                return insertNewsFeedItemsInDBFromJSON(responsePage);
+                insertNewsFeedItemsInDBFromJSON(responsePage);
 
             } catch (JSONException e) {
 
                 e.printStackTrace();
-                return null;
+                return;
 
             }
 
@@ -218,112 +247,25 @@ public class GetNewsTask extends AsyncTask<Void,Void,Integer> {
 
             try {
 
-                return insertNewsFeedItemsInDBFromJSON(responsePage);
+                insertNewsFeedItemsInDBFromJSON(responsePage);
 
             } catch (JSONException e) {
 
                 e.printStackTrace();
-                return null;
+                return;
 
             }
 
         } else {
 
-            return null;
-
-        }
-
-    }
-
-    @Override
-    protected void onPreExecute() {
-
-        super.onPreExecute();
-        API_KEY_QUERY_PARAM = "api-key";
-        SECTION_QUERY_PARAM = "section";
-        FIELDS_QUERY_PARAM = "show-fields";
-        ID_QUERY_PARAM = "ids";
-        API_KEY = "tknk2ue9anxtt3d3zthr4j4b";
-        API_SCHEME = "https";
-        API_AUTHORITY = "content.guardianapis.com";
-        API_CONTENT_END_POINT = "search";
-        TAGS_QUERY_PARAM = "show-tags";
-        ELEMENTS_QUERY_PARAM = "show-elements";
-        FROMDATE_QUERY_PARAM = "from-date";
-        TODATE_QUERY_PARAM = "to-date";
-        ORDER_QUERY_PARAM = "order-by";
-        PAGESIZE_QUERY_PARAM = "page-size";
-        PAGE_QUERY_PARAM = "page";
-
-        Bundle newsTypeBundle = mFragment.getArguments();
-        String newsType = newsTypeBundle.getString("NewsType");
-        Set<String> defaultFavouriteTopicsSet = Utility.getDefaultFavouriteTopicsSet(mContext);
-
-        if (newsType != null){
-
-            if (newsType.equals("All")){
-
-                for (String iterator : defaultFavouriteTopicsSet) {
-
-                    if (iterator != null){
-
-                        mTopicsQuery.append(iterator);
-                        mTopicsQuery.append("|");
-
-                    }
-
-
-                }
-
-            } else if (newsType.equals("Favourites")) {
-
-                Set<String> favouriteTopicsSet = Utility.getFavouriteTopicsSet(mContext);
-
-                for (String iterator : favouriteTopicsSet) {
-
-                    if (iterator != null){
-
-                        mTopicsQuery.append(iterator);
-                        mTopicsQuery.append("|");
-
-                    }
-
-                }
-            }
-            mTopicsQuery = new StringBuilder(mTopicsQuery.substring(0,(mTopicsQuery.length()-1)));
-
-        } else {
-
-            for (String iterator : defaultFavouriteTopicsSet) {
-
-                if (iterator != null){
-
-                    mTopicsQuery.append(iterator);
-                    mTopicsQuery.append("|");
-
-                }
-
-            }
-            mTopicsQuery = new StringBuilder(mTopicsQuery.substring(0,(mTopicsQuery.length()-1)));
+            return;
 
         }
 
 
     }
 
-    @Override
-    protected void onPostExecute(Integer rowsInserted) {
-
-        super.onPostExecute(rowsInserted);
-        if (rowsInserted > 0){
-
-
-
-        }
-
-    }
-
-    private boolean isResponseStatusOk(JSONObject responsePage) throws JSONException{
+    private boolean isResponseStatusOk(JSONObject responsePage) throws JSONException {
 
         return responsePage.getJSONObject("response").getString("status").equals("ok");
 
@@ -381,4 +323,3 @@ public class GetNewsTask extends AsyncTask<Void,Void,Integer> {
     }
 
 }
-

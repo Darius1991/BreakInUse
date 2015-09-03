@@ -1,6 +1,10 @@
-package com.example.android.breakinuse.Utilities;
+package com.example.android.breakinuse.utilities;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -8,6 +12,8 @@ import android.preference.PreferenceManager;
 import android.widget.Toast;
 
 import com.example.android.breakinuse.R;
+import com.example.android.breakinuse.service.NewsFeedService;
+import com.example.android.breakinuse.syncAdapter.BreakInUseSyncAdapter;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.common.Scopes;
@@ -215,6 +221,29 @@ public class Utility {
         String currentDate = simpleDateFormat.format(new Date());
         return currentDate;
 
+    }
+
+    public static void updateNewsFeed(Context context){
+
+//        Intent alarmIntent = new Intent(context,Utility.AlarmReceiver.class);
+//        PendingIntent pendingIntent = PendingIntent.getBroadcast(context,
+//                                        0, alarmIntent, PendingIntent.FLAG_ONE_SHOT);
+//        AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
+//        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 5000, pendingIntent);
+
+        BreakInUseSyncAdapter.syncImmediately(context);
+
+    }
+
+    public static class AlarmReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            Intent sendIntent = new Intent(context, NewsFeedService.class);
+            context.startService(sendIntent);
+
+        }
     }
 
 

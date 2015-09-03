@@ -16,8 +16,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.android.breakinuse.Utilities.Parse.SyncSettings;
-import com.example.android.breakinuse.Utilities.Utility;
+import com.example.android.breakinuse.utilities.parse.SyncSettings;
+import com.example.android.breakinuse.utilities.Utility;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;

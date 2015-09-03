@@ -1,20 +1,18 @@
-package com.example.android.breakinuse.Utilities.Parse;
+package com.example.android.breakinuse.utilities.parse;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.util.Log;
 
 import com.example.android.breakinuse.NewsFeedActivity;
 import com.example.android.breakinuse.R;
-import com.example.android.breakinuse.Utilities.Utility;
+import com.example.android.breakinuse.utilities.Utility;
 import com.parse.FindCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
