@@ -1,4 +1,4 @@
-package com.example.android.breakinuse.Utilities.Parse;
+package com.example.android.breakinuse.utilities.parse;
 
 import android.app.Application;
 

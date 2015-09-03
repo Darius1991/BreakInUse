@@ -1,12 +1,11 @@
 package com.example.android.breakinuse;
-import com.example.android.breakinuse.NewsProvider.NewsContract;
-import com.example.android.breakinuse.NewsProvider.NewsDBHelper;
+import com.example.android.breakinuse.newsProvider.NewsContract;
+import com.example.android.breakinuse.newsProvider.NewsDBHelper;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.test.AndroidTestCase;
-import android.util.Log;
 
 import java.util.HashSet;
 import java.util.Map;

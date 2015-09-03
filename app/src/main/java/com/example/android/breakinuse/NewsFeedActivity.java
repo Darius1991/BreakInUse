@@ -15,8 +15,8 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.android.breakinuse.Utilities.GetNewsTask;
-import com.example.android.breakinuse.Utilities.Utility;
+//import com.example.android.breakinuse.utilities.GetNewsTask;
+import com.example.android.breakinuse.utilities.Utility;
 
 public class NewsFeedActivity extends AppCompatActivity {
 
@@ -82,7 +82,9 @@ public class NewsFeedActivity extends AppCompatActivity {
 
                     item.setTitle("User Accounts");
                 }
+
             }
+
         } else if (id == R.id.refresh){
 
             if (!Utility.isNetworkAvailable(this)){
@@ -93,11 +95,13 @@ public class NewsFeedActivity extends AppCompatActivity {
 
             } else {
 
-                int currentTab = mViewPager.getCurrentItem();
-                NewsFeedFragment currentFragment = (NewsFeedFragment) NewsFeedPagerAdapter
-                                                        .getRegisteredFragment(currentTab);
-                GetNewsTask fetchNewsTask = new GetNewsTask(this,currentFragment);
-                fetchNewsTask.execute();
+//                int currentTab = mViewPager.getCurrentItem();
+//                NewsFeedFragment currentFragment = (NewsFeedFragment) NewsFeedPagerAdapter
+//                                                        .getRegisteredFragment(currentTab);
+                Utility.updateNewsFeed(this);
+
+//                GetNewsTask fetchNewsTask = new GetNewsTask(this,currentFragment);
+//                fetchNewsTask.execute();
 
             }
 

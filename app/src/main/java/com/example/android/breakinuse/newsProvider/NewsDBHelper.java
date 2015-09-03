@@ -1,9 +1,8 @@
-package com.example.android.breakinuse.NewsProvider;
+package com.example.android.breakinuse.newsProvider;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 public class NewsDBHelper extends SQLiteOpenHelper {
 
