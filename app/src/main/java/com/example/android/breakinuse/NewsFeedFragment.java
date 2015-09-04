@@ -110,17 +110,6 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
 
     }
 
-//    public void notifyDataSetChanged(Utility.NewsFeedItem[] newsFeedItemArray) {
-//
-//        if (newsFeedItemArray != null){
-//
-//            mHeadlinesAdapter = new HeadlinesAdapter(mContext,newsFeedItemArray);
-//            mRecyclerView.setAdapter(mHeadlinesAdapter);
-//
-//        }
-//
-//    }
-
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
 
@@ -168,6 +157,8 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
+        Uri uri = NewsContract.NewsFeed.buildNewsFeedUri("news/1825/jan/31/mainsection.fromthearchive");
+        getActivity().getContentResolver().delete(uri, null, null);
         mNewsFeedAdapter = new NewsFeedAdapter(getActivity(),data);
         mRecyclerView.setAdapter(mNewsFeedAdapter);
 

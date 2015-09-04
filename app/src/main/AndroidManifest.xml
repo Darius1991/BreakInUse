@@ -90,13 +90,6 @@
             android:exported = "false"/>
 
         <service
-            android:name=".service.NewsFeedService"/>
-
-        <receiver
-            android:name = ".utilities.Utility$AlarmReceiver"
-            android:enabled = "true"/>
-
-        <service
             android:name="com.example.android.breakinuse.syncAdapter.BreakInUseAuthenticatorService">
 
             <intent-filter>

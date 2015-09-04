@@ -16,11 +16,10 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 //import com.example.android.breakinuse.utilities.GetNewsTask;
+import com.example.android.breakinuse.syncAdapter.BreakInUseSyncAdapter;
 import com.example.android.breakinuse.utilities.Utility;
 
 public class NewsFeedActivity extends AppCompatActivity {
-
-    private ViewPager mViewPager;
 
     private static final String TAG = NewsFeedActivity.class.getName();
 
@@ -33,11 +32,13 @@ public class NewsFeedActivity extends AppCompatActivity {
 
         NewsFeedPagerAdapter newsFeedPagerAdapter = new NewsFeedPagerAdapter(getSupportFragmentManager());
 
-        mViewPager = (ViewPager) findViewById(R.id.newsFeed_viewPager);
-        mViewPager.setAdapter(newsFeedPagerAdapter);
+        ViewPager viewPager = (ViewPager) findViewById(R.id.newsFeed_viewPager);
+        viewPager.setAdapter(newsFeedPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        tabLayout.setupWithViewPager(viewPager);
+
+        BreakInUseSyncAdapter.initializeSyncAdapter(this);
 
     }
 
@@ -95,13 +96,7 @@ public class NewsFeedActivity extends AppCompatActivity {
 
             } else {
 
-//                int currentTab = mViewPager.getCurrentItem();
-//                NewsFeedFragment currentFragment = (NewsFeedFragment) NewsFeedPagerAdapter
-//                                                        .getRegisteredFragment(currentTab);
                 Utility.updateNewsFeed(this);
-
-//                GetNewsTask fetchNewsTask = new GetNewsTask(this,currentFragment);
-//                fetchNewsTask.execute();
 
             }
 
@@ -117,7 +112,7 @@ public class NewsFeedActivity extends AppCompatActivity {
 
     public static class NewsFeedPagerAdapter extends FragmentPagerAdapter {
 
-        private String tabTitles[] = new String[] { "News Feed", "Favourite Feed" };
+        private String tabTitles[] = new String[] { "All", "Favourites" };
         private static SparseArray<Fragment> mRegisteredArray = new SparseArray<>();
 
         public NewsFeedPagerAdapter(FragmentManager fm) {

@@ -37,24 +37,31 @@ public class SettingsActivity extends PreferenceActivity implements
         super.onCreate(savedInstanceState);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         addPreferencesFromResource(R.xml.preferences);
+
     }
 
     @Override
     protected void onResume() {
+
         super.onResume();
         getPreferenceScreen().getSharedPreferences().registerOnSharedPreferenceChangeListener(this);
+
     }
 
     @Override
     protected void onPause() {
+
         super.onPause();
         getPreferenceScreen().getSharedPreferences().unregisterOnSharedPreferenceChangeListener(this);
+
     }
 
     @Override
     protected void onPostCreate(Bundle savedInstanceState) {
+
         super.onPostCreate(savedInstanceState);
         getDelegate().onPostCreate(savedInstanceState);
+
     }
 
     public ActionBar getSupportActionBar() {
@@ -62,7 +69,9 @@ public class SettingsActivity extends PreferenceActivity implements
     }
 
     public void setSupportActionBar(@Nullable Toolbar toolbar) {
+
         getDelegate().setSupportActionBar(toolbar);
+
     }
 
 
@@ -71,6 +80,7 @@ public class SettingsActivity extends PreferenceActivity implements
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_settings, menu);
         return true;
+
     }
 
     @Override
@@ -81,13 +91,17 @@ public class SettingsActivity extends PreferenceActivity implements
         int id = item.getItemId();
 
         if (id == android.R.id.home){
+
             NavUtils.navigateUpFromSameTask(this);
             return true;
+
         }
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
             return true;
+
         }
 
         return super.onOptionsItemSelected(item);
@@ -100,7 +114,9 @@ public class SettingsActivity extends PreferenceActivity implements
 
     @Override
     public void setContentView(@LayoutRes int layoutResID) {
+
         getDelegate().setContentView(layoutResID);
+
     }
 
     @Override
@@ -110,42 +126,56 @@ public class SettingsActivity extends PreferenceActivity implements
 
     @Override
     public void setContentView(View view, ViewGroup.LayoutParams params) {
+
         getDelegate().setContentView(view, params);
+
     }
 
     @Override
     public void addContentView(View view, ViewGroup.LayoutParams params) {
+
         getDelegate().addContentView(view, params);
+
     }
 
     @Override
     protected void onPostResume() {
+
         super.onPostResume();
         getDelegate().onPostResume();
+
     }
 
     @Override
     protected void onTitleChanged(CharSequence title, int color) {
+
         super.onTitleChanged(title, color);
         getDelegate().setTitle(title);
+
     }
 
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
+
         super.onConfigurationChanged(newConfig);
         getDelegate().onConfigurationChanged(newConfig);
+
     }
 
     @Override
     protected void onStop() {
+
         super.onStop();
         getDelegate().onStop();
+
     }
 
     @Override
     protected void onDestroy() {
+
         super.onDestroy();
         getDelegate().onDestroy();
+
     }
 
     public void invalidateOptionsMenu() {
@@ -153,8 +183,11 @@ public class SettingsActivity extends PreferenceActivity implements
     }
 
     private AppCompatDelegate getDelegate() {
+
         if (mDelegate == null) {
+
             mDelegate = AppCompatDelegate.create(this, null);
+
         }
         return mDelegate;
     }
@@ -164,17 +197,18 @@ public class SettingsActivity extends PreferenceActivity implements
 
         if (key.equals(getString(R.string.preferences_notifications_key))){
 
-            if (Utility.isUserLoggedIn(getApplicationContext())){
+            if (Utility.isUserLoggedIn(this)){
 
                 SyncSettings preferencesUpdater = new SyncSettings();
                 ParseUser currentUser = ParseUser.getCurrentUser();
 
                 if (currentUser != null){
-                    preferencesUpdater.modifySettingsInCloud(getApplicationContext(),
-                            currentUser.getEmail());
+                    preferencesUpdater.modifySettingsInCloud(this,currentUser.getEmail());
                 }
 
             }
+
+            Utility.updateNewsFeed(this);
 
         } else if (key.equals(getString(R.string.preferences_topics_key))) {
 
@@ -182,16 +216,17 @@ public class SettingsActivity extends PreferenceActivity implements
             Set<String> favouriteTopics = topicsPreference.getValues();
             topicsPreference.setSummary(favouriteTopics.size() + " topics are currently followed.");
 
-            if (Utility.isUserLoggedIn(getApplicationContext())){
+            if (Utility.isUserLoggedIn(this)){
 
                 SyncSettings preferencesUpdater = new SyncSettings();
                 ParseUser currentUser = ParseUser.getCurrentUser();
 
                 if (currentUser != null){
-                    preferencesUpdater.modifySettingsInCloud(getApplicationContext(),
-                            currentUser.getEmail());
+                    preferencesUpdater.modifySettingsInCloud(this,currentUser.getEmail());
                 }
             }
+
+            Utility.updateNewsFeed(this);
         }
     }
 }
