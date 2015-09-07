@@ -45,7 +45,7 @@ public class NewsFeedActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_home, menu);
+        getMenuInflater().inflate(R.menu.menu_news_feed_activity, menu);
         MenuItem menuItem = menu.findItem(R.id.action_user_accounts);
 
         if (Utility.isUserLoggedIn(this)){

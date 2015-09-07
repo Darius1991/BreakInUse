@@ -33,5 +33,6 @@
     <!-- SyncAdapter related -->
     <string name="sync_account_type">breakinuse.example.com</string>
     <string name="content_authority">com.example.android.breakinuse</string>
+    <string name="share_action_title">Share</string>
 
 </resources>
