@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -93,29 +94,44 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
 
         public TextView mTextView_headlines;
         public TextView mTextView_trailText;
+        public TextView mTextView_saveText;
 
         public ViewHolder(View itemView) {
 
             super(itemView);
-            itemView.setClickable(true);
-            itemView.setOnClickListener(this);
             mTextView_headlines = (TextView) itemView.findViewById(R.id.newsFeedItem_headlines_textView);
             mTextView_trailText = (TextView) itemView.findViewById(R.id.newsFeedItem_trailText_textView);
+            mTextView_saveText = (TextView) itemView.findViewById(R.id.newsFeedItem_save_textView);;
+            mTextView_headlines.setClickable(true);
+            mTextView_headlines.setOnClickListener(this);
+            mTextView_trailText.setClickable(true);
+            mTextView_trailText.setOnClickListener(this);
+            mTextView_saveText.setClickable(true);
+            mTextView_saveText.setOnClickListener(this);
 
         }
 
         @Override
         public void onClick(View v) {
 
-            Intent intent = new Intent(mContext, NewsArticleActivity.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            Cursor tempCursor = mOriginalCursor;
-            tempCursor.moveToPosition(getAdapterPosition());
-            int columnIndex = tempCursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_WEBURL);
-            intent.putExtra("webURL", tempCursor.getString(columnIndex));
-            mContext.startActivity(intent);
+            if (v != mTextView_saveText){
+
+                Intent intent = new Intent(mContext, NewsArticleActivity.class);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                Cursor tempCursor = mOriginalCursor;
+                tempCursor.moveToPosition(getAdapterPosition());
+                int columnIndex = tempCursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_WEBURL);
+                intent.putExtra("webURL", tempCursor.getString(columnIndex));
+                mContext.startActivity(intent);
+
+            } else {
+
+                mTextView_saveText.setText(mContext.getString(R.string.newsFeedItem_saved_textView_text));
+
+            }
 
         }
+
     }
 
 

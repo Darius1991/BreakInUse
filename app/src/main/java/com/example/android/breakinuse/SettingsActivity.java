@@ -1,5 +1,6 @@
 package com.example.android.breakinuse;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -92,7 +93,9 @@ public class SettingsActivity extends PreferenceActivity implements
 
         if (id == android.R.id.home){
 
-            NavUtils.navigateUpFromSameTask(this);
+            Intent intent = NavUtils.getParentActivityIntent(this);
+            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            NavUtils.navigateUpTo(this, intent);
             return true;
 
         }
