@@ -15,7 +15,6 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-//import com.example.android.breakinuse.utilities.GetNewsTask;
 import com.example.android.breakinuse.syncAdapter.BreakInUseSyncAdapter;
 import com.example.android.breakinuse.utilities.Utility;
 

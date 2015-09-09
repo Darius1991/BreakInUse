@@ -60,8 +60,6 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
 
-        Log.d(TAG,"Sync Adapter Working qqqqqqqqqqqqqqqqq");
-
         final String API_KEY_QUERY_PARAM = "api-key";
         final String SECTION_QUERY_PARAM = "section";
         final String FIELDS_QUERY_PARAM = "show-fields";

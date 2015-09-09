@@ -159,7 +159,6 @@ public class NewsProvider extends ContentProvider {
 
             case NEWS_FEED:
 
-                Log.d(TAG,String.valueOf(db.isOpen()));
                 rowID = db.insertOrThrow(NewsContract.NewsFeed.TABLE_NAME, null, values);
                 if (rowID != -1){
 
