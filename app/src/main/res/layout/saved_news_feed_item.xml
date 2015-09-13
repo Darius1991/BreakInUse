@@ -14,40 +14,22 @@
         android:paddingBottom = "15dp" >
 
         <LinearLayout
-            android:id = "@+id/newsFeedItem_linearLayout"
+            android:id = "@+id/savedNewsFeedItem_linearLayout"
             android:layout_width = "match_parent"
             android:layout_height = "wrap_content"
             android:orientation = "vertical" >
 
             <TextView
-                android:id="@+id/newsFeedItem_headlines_textView"
+                android:id="@+id/savedNewsFeedItem_headlines_textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize = "18sp" />
 
             <TextView
-                android:id="@+id/newsFeedItem_trailText_textView"
+                android:id="@+id/savedNewsFeedItem_trailText_textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textSize = "14sp" />
-
-            <ImageView
-                android:src="@android:drawable/divider_horizontal_dark"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp" />
-
-            <TextView
-                android:id="@+id/newsFeedItem_save_textView"
-                android:text = "@string/newsFeedItem_textView_saveText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize = "14sp"
-                android:gravity = "center" />
 
         </LinearLayout>
 

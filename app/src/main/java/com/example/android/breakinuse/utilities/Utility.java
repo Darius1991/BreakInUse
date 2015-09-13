@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.android.breakinuse.R;
@@ -17,8 +18,12 @@ import com.google.android.gms.common.api.Scope;
 import com.google.android.gms.plus.Plus;
 import com.parse.ParseUser;
 
+import org.json.JSONObject;
+
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -165,7 +170,7 @@ public class Utility {
         SharedPreferences sharedPreferences = context.getSharedPreferences(context.getString(R.string.preferences_key),
                 Context.MODE_PRIVATE);
         String LOGIN_METHOD = sharedPreferences.getString(context.getString(R.string.login_method_key),
-                                context.getString(R.string.logged_out));
+                context.getString(R.string.logged_out));
         return (!LOGIN_METHOD.equals(context.getString(R.string.logged_out)));
 
     }
@@ -207,9 +212,46 @@ public class Utility {
 
     }
 
+    public static String getYesterdayDate(){
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String currentDate = simpleDateFormat.format(new Date());
+        String yesterdayDate = null;
+        Calendar calendar = Calendar.getInstance();
+
+        try {
+
+            calendar.setTime(simpleDateFormat.parse(currentDate));
+            calendar.add(Calendar.DATE, -1);
+            yesterdayDate = simpleDateFormat.format(calendar.getTime());
+
+        } catch (ParseException e) {
+
+            Log.d(TAG, "Yesterday's date being returned as null.");
+            e.printStackTrace();
+
+        }
+
+        return yesterdayDate;
+    }
+
     public static void updateNewsFeed(Context context){
 
         BreakInUseSyncAdapter.syncImmediately(context);
+
+    }
+
+    public static class NewsArticleWithNewsFeedID{
+
+        public JSONObject newsArticle;
+        public int newsFeedID;
+
+        public NewsArticleWithNewsFeedID(JSONObject tempNewsArticle, int tempNewsFeedID){
+
+            this.newsArticle = tempNewsArticle;
+            this.newsFeedID = tempNewsFeedID;
+
+        }
 
     }
 

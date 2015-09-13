@@ -111,7 +111,7 @@ public class NewsFeedActivity extends AppCompatActivity {
 
     public static class NewsFeedPagerAdapter extends FragmentPagerAdapter {
 
-        private String tabTitles[] = new String[] { "All", "Favourites" };
+        private String tabTitles[] = new String[] { "All", "Favourites", "Saved" };
         private static SparseArray<Fragment> mRegisteredArray = new SparseArray<>();
 
         public NewsFeedPagerAdapter(FragmentManager fm) {
@@ -141,6 +141,11 @@ public class NewsFeedActivity extends AppCompatActivity {
                     favouriteNewsFragment.setArguments(newsTypeBundle);
                     return favouriteNewsFragment;
 
+                case 2:
+
+                    SavedNewsFeedFragment savedNewsFragment = new SavedNewsFeedFragment();
+                    return savedNewsFragment;
+
             }
 
             return null;
@@ -150,7 +155,7 @@ public class NewsFeedActivity extends AppCompatActivity {
         @Override
         public int getCount() {
 
-            return 2;
+            return 3;
 
         }
 

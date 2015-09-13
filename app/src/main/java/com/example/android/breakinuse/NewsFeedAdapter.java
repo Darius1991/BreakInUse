@@ -1,5 +1,6 @@
 package com.example.android.breakinuse;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
@@ -43,6 +44,17 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
                 viewHolder.mTextView_headlines.setText(cursor.getString(columnIndex));
                 columnIndex = cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_TRAILTEXT);
                 viewHolder.mTextView_trailText.setText(cursor.getString(columnIndex));
+                columnIndex = cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_SAVEDFLAG);
+                String savedFlag = cursor.getString(columnIndex);
+                if (savedFlag.equals("0")){
+
+                    viewHolder.mTextView_saveText.setText(viewHolder.mTextView_saveText_saveButtonText);
+
+                } else {
+
+                    viewHolder.mTextView_saveText.setText(viewHolder.mTextView_saveText_deleteButtonText);
+
+                }
 
             }
 
@@ -95,6 +107,8 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
         public TextView mTextView_headlines;
         public TextView mTextView_trailText;
         public TextView mTextView_saveText;
+        public String mTextView_saveText_saveButtonText;
+        public String mTextView_saveText_deleteButtonText;
 
         public ViewHolder(View itemView) {
 
@@ -108,6 +122,8 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
             mTextView_trailText.setOnClickListener(this);
             mTextView_saveText.setClickable(true);
             mTextView_saveText.setOnClickListener(this);
+            mTextView_saveText_saveButtonText =  mContext.getString(R.string.newsFeedItem_textView_saveText);
+            mTextView_saveText_deleteButtonText = mContext.getString(R.string.newsFeedItem_textView_deleteText);
 
         }
 
@@ -126,14 +142,106 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
 
             } else {
 
-                mTextView_saveText.setText(mContext.getString(R.string.newsFeedItem_saved_textView_text));
+                if((mTextView_saveText.getText()).equals(mTextView_saveText_deleteButtonText)){
+
+                    Cursor cursor = mOriginalCursor;
+                    if (cursor != null){
+
+                        if(cursor.moveToPosition(getAdapterPosition())){
+
+                            String articleID = cursor.getString(
+                                    cursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID));
+                            mContext.getContentResolver()
+                                    .delete(NewsContract.NewsArticle.CONTENT_URI,
+                                            NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ?",
+                                            new String[]{articleID});
+
+                            ContentValues contentValues = new ContentValues();
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_ARTICLEID,articleID);
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_SECTIONID,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_SECTIONID)));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_APIURL,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_APIURL)));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBURL,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_WEBURL)));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBTITLE,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_WEBTITLE)));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_TRAILTEXT)));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG,"0");
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_PUBLISHDATE)));
+                            mContext.getContentResolver().update(NewsContract.NewsFeed.CONTENT_URI,
+                                    contentValues,
+                                    NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
+                                    new String[]{articleID});
+                            mTextView_saveText.setText(mTextView_saveText_saveButtonText);
+
+                        }
+
+                    }
+
+                } else {
+
+                    Cursor cursor = mOriginalCursor;
+                    if (cursor != null){
+
+                        if(cursor.moveToPosition(getAdapterPosition())){
+
+                            String articleID = cursor.getString(
+                                    cursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID));
+
+                            ContentValues contentValues = new ContentValues();
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,
+                                    cursor.getInt(cursor.getColumnIndex(NewsContract.NewsFeed._ID)));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_WEBURL,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_WEBURL)));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_ARTICLEID,articleID);
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_SECTIONID,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_SECTIONID)));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_HEADLINE,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_WEBTITLE)));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG, "0");
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_TRAILTEXT)));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_HTML_BODY, "0");
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_BYLINE, "0");
+                            mContext.getContentResolver().insert(NewsContract.NewsArticle.CONTENT_URI, contentValues);
+
+                            contentValues.clear();
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_ARTICLEID, articleID);
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_SECTIONID,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_SECTIONID)));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_APIURL,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_APIURL)));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBURL,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_WEBURL)));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBTITLE,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_WEBTITLE)));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_TRAILTEXT)));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "1");
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,
+                                    cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_PUBLISHDATE)));
+
+                            mContext.getContentResolver().update(NewsContract.NewsFeed.CONTENT_URI,
+                                    contentValues,
+                                    NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
+                                    new String[]{articleID});
+
+                            mTextView_saveText.setText(mTextView_saveText_deleteButtonText);
+
+                        }
+
+                    }
+
+                }
 
             }
 
         }
 
     }
-
 
 }
 

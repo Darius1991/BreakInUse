@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Set;
 
 public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
@@ -59,6 +61,11 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+
+        /*----FETCHING newsFeedItems FROM GUARDIAN API & INSERTING IN NewsFeed TABLE----*/
+        /*----FETCHING newsFeedItems FROM GUARDIAN API & INSERTING IN NewsFeed TABLE----*/
+        /*----FETCHING newsFeedItems FROM GUARDIAN API & INSERTING IN NewsFeed TABLE----*/
+        /*----FETCHING newsFeedItems FROM GUARDIAN API & INSERTING IN NewsFeed TABLE----*/
 
         final String API_KEY_QUERY_PARAM = "api-key";
         final String SECTION_QUERY_PARAM = "section";
@@ -245,7 +252,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
             try {
 
-                insertNewsFeedItemsInDBFromJSON(responsePage);
+                insertNewsFeedItemsInNewsFeedTableFromJSON(responsePage);
 
             } catch (JSONException e) {
 
@@ -258,7 +265,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
             try {
 
-                insertNewsFeedItemsInDBFromJSON(responsePage);
+                insertNewsFeedItemsInNewsFeedTableFromJSON(responsePage);
 
             } catch (JSONException e) {
 
@@ -270,6 +277,107 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
         } else {
 
             return;
+
+        }
+
+        /*----DELETING OLD ARTICLES FROM NewsFeed TABLE----*/
+        /*----DELETING OLD ARTICLES FROM NewsFeed TABLE----*/
+        /*----DELETING OLD ARTICLES FROM NewsFeed TABLE----*/
+        /*----DELETING OLD ARTICLES FROM NewsFeed TABLE----*/
+
+        mContentResolver.delete(NewsContract.NewsFeed.CONTENT_URI,
+                NewsContract.NewsFeed.COLUMN_PUBLISHDATE + " != ?",
+                new String[]{Utility.getCurrentDate()});
+
+        /*----FETCHING DATA FOR TO-BE-SAVED ARTICLES & INSERTING IN NewsArticle TABLE----*/
+        /*----FETCHING DATA FOR TO-BE-SAVED ARTICLES & INSERTING IN NewsArticle TABLE----*/
+        /*----FETCHING DATA FOR TO-BE-SAVED ARTICLES & INSERTING IN NewsArticle TABLE----*/
+        /*----FETCHING DATA FOR TO-BE-SAVED ARTICLES & INSERTING IN NewsArticle TABLE----*/
+
+        Cursor cursor = mContentResolver.query(NewsContract.NewsArticle.CONTENT_URI,
+                            null,
+                            NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG + " = ?",
+                            new String[]{"0"},
+                            null);
+
+        responseString =  new StringBuilder();
+        reader = null;
+        int index = 0;
+        int downloadCount = 0;
+        int articleIDColumnIndex = cursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID);
+        int newsFeedIDColumnIndex = cursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY);
+        ArrayList<Utility.NewsArticleWithNewsFeedID> newsArticleArrayList = new ArrayList<>();
+
+        if ((cursor != null) && (cursor.moveToFirst())){
+
+            downloadCount = cursor.getCount();
+
+            for (index = 0; index < downloadCount; ++index){
+
+                builder.clearQuery();
+
+                try {
+
+                    builder.appendQueryParameter(API_KEY_QUERY_PARAM, API_KEY)
+                            .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline")
+                            .appendQueryParameter(PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
+                            .appendQueryParameter(ORDER_QUERY_PARAM, "relevance")
+                            .appendQueryParameter(ID_QUERY_PARAM, cursor.getString(articleIDColumnIndex))
+                            .build();
+
+                    url = new URL(builder.toString());
+                    urlConnection = url.openConnection();
+                    reader = new BufferedReader(new InputStreamReader
+                            (urlConnection.getInputStream()));
+
+                    while (( holder = reader.readLine()) != null){
+
+                        responseString.append(holder);
+
+                    }
+
+                    newsArticleArrayList.add(
+                            new Utility.NewsArticleWithNewsFeedID(
+                                    new JSONObject(responseString.toString()),
+                                            cursor.getInt(newsFeedIDColumnIndex)));
+                    reader.close();
+                    responseString.delete(0, responseString.length());
+
+                } catch (IOException | JSONException e) {
+
+                    e.printStackTrace();
+
+                } finally {
+
+                    if (reader !=null){
+
+                        try {
+
+                            reader.close();
+
+                        } catch (IOException e) {
+
+                            e.printStackTrace();
+                            return;
+
+                        }
+                    }
+                }
+
+                cursor.moveToNext();
+
+            }
+
+            try {
+
+                updateSavedNewsArticlesFromJSON(newsArticleArrayList);
+
+            } catch (JSONException e) {
+
+                e.printStackTrace();
+                return;
+
+            }
 
         }
 
@@ -287,12 +395,13 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
     }
 
-    private int insertNewsFeedItemsInDBFromJSON(JSONObject[] responsePage) throws JSONException {
+    private int insertNewsFeedItemsInNewsFeedTableFromJSON(JSONObject[] responsePage) throws JSONException {
 
         int pageCount = responsePage[0].getJSONObject("response").getInt("pages");
         int pageIndex, webTitleIndex, arrayIndex, responseCount;
         responseCount = responsePage[0].getJSONObject("response").getInt("total");
         ContentValues[] newsFeedContentValues = new ContentValues[responseCount];
+        String currentDate = Utility.getCurrentDate();
         JSONArray newsFeedItemJSONArray;
         JSONObject newsFeedItemJSONObject;
 
@@ -324,11 +433,58 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                         newsFeedItemJSONObject.getString("id"));
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_SECTIONID,
                         newsFeedItemJSONObject.getString("sectionId"));
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE, currentDate);
 
             }
         }
 
         return mContentResolver.bulkInsert(NewsContract.NewsFeed.CONTENT_URI, newsFeedContentValues);
+
+    }
+
+    private int updateSavedNewsArticlesFromJSON(ArrayList<Utility.NewsArticleWithNewsFeedID> newsArticleArrayList) throws JSONException{
+
+        int index = 0;
+        int articleCount = newsArticleArrayList.size();
+        int rowsUpdated = 0, rowUpdateFlag = 0;
+        ContentValues[] contentValues = new ContentValues[articleCount];
+        JSONObject responsePage,newsArticle;
+
+        for (index = 0; index < articleCount; ++index){
+
+            contentValues[index] = new ContentValues();
+
+        }
+
+        for (index = 0; index < articleCount; ++index){
+
+            responsePage = (newsArticleArrayList.get(index)).newsArticle;
+            newsArticle = responsePage.getJSONObject("response").getJSONArray("results").getJSONObject(0);
+
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,(newsArticleArrayList.get(index)).newsFeedID);
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_WEBURL,newsArticle.getString("webUrl"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_ARTICLEID,newsArticle.getString("id"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_SECTIONID,newsArticle.getString("sectionId"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_HEADLINE,newsArticle.getJSONObject("fields").getString("headline"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,newsArticle.getJSONObject("fields").getString("trailText"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_HTML_BODY,newsArticle.getJSONObject("fields").getString("body"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,newsArticle.getJSONObject("fields").getString("byline"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"1");
+
+            rowUpdateFlag = mContentResolver.update(NewsContract.NewsArticle.CONTENT_URI,
+                                                        contentValues[index],
+                                                        NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ?",
+                                                        new String[]{newsArticle.getString("id")});
+            if (rowUpdateFlag > 0){
+
+                ++rowsUpdated;
+
+            }
+
+        }
+
+        return rowsUpdated;
 
     }
 

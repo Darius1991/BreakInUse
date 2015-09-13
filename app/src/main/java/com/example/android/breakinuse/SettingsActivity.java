@@ -18,6 +18,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.utilities.parse.SyncSettings;
 import com.example.android.breakinuse.utilities.Utility;
 import com.parse.ParseUser;
@@ -206,7 +207,9 @@ public class SettingsActivity extends PreferenceActivity implements
                 ParseUser currentUser = ParseUser.getCurrentUser();
 
                 if (currentUser != null){
+
                     preferencesUpdater.modifySettingsInCloud(this,currentUser.getEmail());
+
                 }
 
             }
@@ -225,11 +228,15 @@ public class SettingsActivity extends PreferenceActivity implements
                 ParseUser currentUser = ParseUser.getCurrentUser();
 
                 if (currentUser != null){
+
                     preferencesUpdater.modifySettingsInCloud(this,currentUser.getEmail());
+
                 }
+
             }
 
-            Utility.updateNewsFeed(this);
         }
+
     }
+
 }

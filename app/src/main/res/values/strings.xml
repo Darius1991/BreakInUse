@@ -30,11 +30,10 @@
     <string name="preferences_notifications_summary_on">Notifications Enabled</string>
     <string name="newsFeed_tab1_title">News Feed</string>
     <string name="newsFeed_tab2_title">Favourite Feed</string>
-    <!-- SyncAdapter related -->
     <string name="sync_account_type">breakinuse.example.com</string>
     <string name="content_authority">com.example.android.breakinuse</string>
     <string name="share_action_title">Share</string>
-    <string name="newsFeedItem_save_textView_text">Read Later</string>
-    <string name="newsFeedItem_saved_textView_text">Saved for Reading Later</string>
+    <string name="newsFeedItem_textView_saveText">Tap to save</string>
+    <string name="newsFeedItem_textView_deleteText">Saved - Tap to delete</string>
 
 </resources>
