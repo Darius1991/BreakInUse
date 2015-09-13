@@ -98,6 +98,7 @@ public class NewsProvider extends ContentProvider {
         mQueryBuilder.setTables(NewsContract.NewsArticle.TABLE_NAME);
         return mQueryBuilder.query(mNewsDBHelper.getReadableDatabase(),projection,selection,
                                     selectionArgs,null,null,sortOrder);
+
     }
 
     private Cursor getNewsArticleWithArticleIDCursor(Uri uri, String[] projection, String sortOrder){
@@ -242,7 +243,9 @@ public class NewsProvider extends ContentProvider {
         }
 
         if (rowsDeleted != 0) {
+
             getContext().getContentResolver().notifyChange(uri, null);
+
         }
         return rowsDeleted;
     }
@@ -289,7 +292,9 @@ public class NewsProvider extends ContentProvider {
         }
 
         if (rowsUpdated != 0) {
+
             getContext().getContentResolver().notifyChange(uri, null);
+
         }
         return rowsUpdated;
     }

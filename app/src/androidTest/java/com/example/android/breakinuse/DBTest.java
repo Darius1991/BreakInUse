@@ -1,6 +1,7 @@
 package com.example.android.breakinuse;
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.newsProvider.NewsDBHelper;
+import com.example.android.breakinuse.utilities.Utility;
 
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -55,6 +56,8 @@ public class DBTest extends AndroidTestCase {
         newsFeedColumnSet.add(NewsContract.NewsFeed.COLUMN_APIURL);
         newsFeedColumnSet.add(NewsContract.NewsFeed.COLUMN_WEBTITLE);
         newsFeedColumnSet.add(NewsContract.NewsFeed.COLUMN_TRAILTEXT);
+        newsFeedColumnSet.add(NewsContract.NewsFeed.COLUMN_SAVEDFLAG);
+        newsFeedColumnSet.add(NewsContract.NewsFeed.COLUMN_PUBLISHDATE);
 
         int columnNameIndex = cursor.getColumnIndex("name");
         String columnName;
@@ -76,9 +79,7 @@ public class DBTest extends AndroidTestCase {
         newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_ARTICLEID);
         newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_SECTIONID);
         newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_HEADLINE);
-        newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_IMAGESOURCE_HTML);
-        newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_ARTICLEIMAGE);
-        newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_ARTICLEIMAGE_URL);
+        newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG);
         newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_TRAILTEXT);
         newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_HTML_BODY);
         newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_BYLINE);
@@ -113,6 +114,8 @@ public class DBTest extends AndroidTestCase {
                 "Arsène Wenger: Arsenal must ‘play with good pace’ to beat Liverpool");
         newsFeedTestValues.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
                 "Liverpool have shown greater resilience this season but on their last visit to Arsenal they were whacked 4-1");
+        newsFeedTestValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE, Utility.getYesterdayDate());
+        newsFeedTestValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG,"0");
 
         long newsFeedRowID = db.insert(NewsContract.NewsFeed.TABLE_NAME, null, newsFeedTestValues);
         assertTrue(newsFeedRowID != -1);
@@ -149,11 +152,7 @@ public class DBTest extends AndroidTestCase {
                 "football/2015/aug/23/arsene-wenger-arsenal-liverpool");
         newsArticleTestValues.put(NewsContract.NewsArticle.COLUMN_HEADLINE,
                 "Arsène Wenger: Arsenal must ‘play with good pace’ to beat Liverpool");
-        newsArticleTestValues.put(NewsContract.NewsArticle.COLUMN_IMAGESOURCE_HTML,
-                "<figure class=\\\"element element-image\\\" data-media-id=\\\"e52f4a05ed8b91febd6bc8e4c8a12cf12138888b\\\"> <img src=\\\"http://media.guim.co.uk/e52f4a05ed8b91febd6bc8e4c8a12cf12138888b/0_47_3000_1800/1000.jpg\\\" alt=\\\"Arsène Wenger knows that Liverpool are unlikely to be as obliging as they were last April against Arsenal.\\\" width=\\\"1000\\\" height=\\\"600\\\" class=\\\"gu-image\\\" /> <figcaption> <span class=\\\"element-image__caption\\\">Arsène Wenger knows that Liverpool are unlikely to be as obliging as they were last April against Arsenal.</span> <span class=\\\"element-image__credit\\\">Photograph: David Price/Arsenal FC via Getty Images</span> </figcaption> </figure>");
-        newsArticleTestValues.put(NewsContract.NewsArticle.COLUMN_ARTICLEIMAGE_URL,
-                "http://media.guim.co.uk/e52f4a05ed8b91febd6bc8e4c8a12cf12138888b/0_47_3000_1800/1000.jpg\\");
-        newsArticleTestValues.put(NewsContract.NewsArticle.COLUMN_ARTICLEIMAGE, 101010);
+        newsArticleTestValues.put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"0");
         newsArticleTestValues.put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,
                 "Liverpool have shown greater resilience this season but on their last visit to Arsenal they were whacked 4-1");
         newsArticleTestValues.put(NewsContract.NewsArticle.COLUMN_HTML_BODY,

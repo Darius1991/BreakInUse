@@ -28,50 +28,68 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
     private static final int LOADER_ID_FAVOURITES = 1;
     private static final String TAG = NewsFeedFragment.class.getName();
     private RecyclerView mRecyclerView;
+    private Context mContext;
+    private Cursor mCursor;
+
+    public NewsFeedFragment(){
+
+        super();
+        mContext = getActivity();
+        mCursor = null;
+
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_news_feed, container, false);
-        Context context = getActivity();
 
         Bundle newsTypeBundle = getArguments();
         String newsType = newsTypeBundle.getString("NewsType");
-        Cursor cursor = null;
+        mContext = getActivity();
 
         if (newsType != null){
 
             if (newsType.equals("All")){
 
-                context.getContentResolver().query(NewsContract.NewsFeed.CONTENT_URI, null, null, null, null);
+                mCursor = mContext.getContentResolver().query(NewsContract.NewsFeed.CONTENT_URI, null, null, null, null);
+
+                if ((mCursor != null) && (mCursor.moveToFirst())){
+
+                    if (mCursor.getCount() >= 2){
+
+                        Uri uri = NewsContract.NewsFeed.buildNewsFeedUri("DummyArticleID");
+                        mContext.getContentResolver().delete(uri, null, null);
+
+                    }
+
+                } else {
+
+                    ContentValues newsFeedTestValues_set1 = new ContentValues();
+                    newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_ARTICLEID, "DummyArticleID");
+                    newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_SECTIONID, "DummySectionID");
+                    newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_APIURL, "DummyAPIURL");
+                    newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_WEBURL,"http://www.theguardian.com/");
+                    newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_WEBTITLE, "No NewsFeed to display");
+                    newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
+                            "No NewsFeed to display. Please check your internet connection and refresh after connecting.");
+                    newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG,"0");
+                    newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,Utility.getYesterdayDate());
+
+                    mContext.getContentResolver().insert(NewsContract.NewsFeed.CONTENT_URI, newsFeedTestValues_set1);
+                    mCursor =  mContext.getContentResolver().query(NewsContract.NewsFeed.CONTENT_URI,null,null,null,null);
+
+                }
+
                 getLoaderManager().initLoader(LOADER_ID_ALL, null, this);
-
-                Uri uri = NewsContract.NewsFeed.buildNewsFeedUri("news/1825/jan/31/mainsection.fromthearchive");
-                context.getContentResolver().delete(uri, null, null);
-
-                ContentValues newsFeedTestValues_set1 = new ContentValues();
-                newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_ARTICLEID,
-                        "news/1825/jan/31/mainsection.fromthearchive");
-                newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_SECTIONID, "football");
-                newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_APIURL,
-                        "http://content.guardianapis.com/news/1825/jan/31/mainsection.fromthearchive");
-                newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_WEBURL,
-                        "http://www.theguardian.com/news/1825/jan/31/mainsection.fromthearchive");
-                newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_WEBTITLE,
-                        "Seven years for a pound of butter");
-                newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
-                        "<b>January 31 1825:</b> On this day in 1825 a selection of British criminals were sentenced. This is how the Guardian reported the news");
-
-                context.getContentResolver().insert(NewsContract.NewsFeed.CONTENT_URI, newsFeedTestValues_set1);
-                cursor =  context.getContentResolver().query(NewsContract.NewsFeed.CONTENT_URI,null,null,null,null);
 
             }else if (newsType.equals("Favourites")){
 
-                context.getContentResolver().query(NewsContract.NewsFeed.CONTENT_URI,null,null,null,null);
-                getLoaderManager().initLoader(LOADER_ID_FAVOURITES, null, this);
+                mContext.getContentResolver().query(NewsContract.NewsFeed.CONTENT_URI, null, null, null, null);
 
                 Set<String> favouriteTopicsSet = Utility.getFavouriteTopicsSet(getActivity());
+
                 String[] selectionArgs = new String[favouriteTopicsSet.size()];
                 StringBuilder selection = new StringBuilder();
 
@@ -85,28 +103,48 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
                 }
                 selection = new StringBuilder(selection.substring(0,selection.length()-1));
 
-                cursor =  context.getContentResolver().query(NewsContract.NewsFeed.CONTENT_URI,
+                mCursor =  mContext.getContentResolver().query(NewsContract.NewsFeed.CONTENT_URI,
                             null,
                             NewsContract.NewsFeed.COLUMN_SECTIONID + " IN (" + selection.toString() +")",
                             selectionArgs,
                             null);
 
+                getLoaderManager().initLoader(LOADER_ID_FAVOURITES, null, this);
+
             }
 
         }
 
-        if (cursor != null) {
-            cursor.moveToFirst();
+        if (mCursor != null) {
+            mCursor.moveToFirst();
         }
-        mNewsFeedAdapter = new NewsFeedAdapter(getActivity(),cursor);
+        mNewsFeedAdapter = new NewsFeedAdapter(getActivity(),mCursor);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(context);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.newsFeed_recyclerView);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mNewsFeedAdapter);
 
         return rootView;
+
+    }
+
+    @Override
+    public void onResume() {
+
+        super.onResume();
+        Bundle newsTypeBundle = getArguments();
+        String newsType = newsTypeBundle.getString("NewsType");
+        if (newsType != null){
+
+            if (newsType.equals("Favourites")){
+
+                getLoaderManager().restartLoader(LOADER_ID_FAVOURITES, null, this);
+
+            }
+
+        }
 
     }
 
@@ -124,7 +162,14 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
 
             case LOADER_ID_FAVOURITES:
 
+
+
                 Set<String> favouriteTopicsSet = Utility.getFavouriteTopicsSet(getActivity());
+                if (favouriteTopicsSet.isEmpty()){
+
+                    //TODO handle app crash when no favourite topic is selected
+
+                }
                 String[] selectionArgs = new String[favouriteTopicsSet.size()];
                 StringBuilder selection = new StringBuilder();
 
@@ -157,8 +202,16 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
 
-        Uri uri = NewsContract.NewsFeed.buildNewsFeedUri("news/1825/jan/31/mainsection.fromthearchive");
-        getActivity().getContentResolver().delete(uri, null, null);
+        if ((data != null) && (data.moveToFirst())){
+
+            if (data.getCount() >= 2 ){
+
+                Uri uri = NewsContract.NewsFeed.buildNewsFeedUri("DummyArticleID");
+                getActivity().getContentResolver().delete(uri, null, null);
+
+            }
+
+        }
         mNewsFeedAdapter = new NewsFeedAdapter(getActivity(),data);
         mRecyclerView.setAdapter(mNewsFeedAdapter);
 
@@ -168,6 +221,14 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
     public void onLoaderReset(Loader<Cursor> loader) {
 
         mNewsFeedAdapter.swapCursor(null);
+
+    }
+
+    @Override
+    public void onDetach() {
+
+        mCursor.close();
+        super.onDetach();
 
     }
 

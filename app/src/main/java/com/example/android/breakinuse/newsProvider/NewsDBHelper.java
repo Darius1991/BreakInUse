@@ -26,6 +26,8 @@ public class NewsDBHelper extends SQLiteOpenHelper {
                                                     + NewsContract.NewsFeed.COLUMN_WEBURL + " TEXT NOT NULL,"
                                                     + NewsContract.NewsFeed.COLUMN_WEBTITLE + " TEXT NOT NULL,"
                                                     + NewsContract.NewsFeed.COLUMN_TRAILTEXT + " TEXT NOT NULL,"
+                                                    + NewsContract.NewsFeed.COLUMN_SAVEDFLAG + " TEXT NOT NULL,"
+                                                    + NewsContract.NewsFeed.COLUMN_PUBLISHDATE + " TEXT NOT NULL,"
                                                     + "UNIQUE (" + NewsContract.NewsFeed.COLUMN_ARTICLEID
                                                     + ") ON CONFLICT IGNORE);";
 
@@ -37,12 +39,10 @@ public class NewsDBHelper extends SQLiteOpenHelper {
                                                         + NewsContract.NewsArticle.COLUMN_ARTICLEID + " TEXT NOT NULL,"
                                                         + NewsContract.NewsArticle.COLUMN_SECTIONID + " TEXT NOT NULL,"
                                                         + NewsContract.NewsArticle.COLUMN_HEADLINE + " TEXT NOT NULL,"
-                                                        + NewsContract.NewsArticle.COLUMN_IMAGESOURCE_HTML + " TEXT NOT NULL,"
-                                                        + NewsContract.NewsArticle.COLUMN_ARTICLEIMAGE_URL + " TEXT NOT NULL,"
-                                                        + NewsContract.NewsArticle.COLUMN_ARTICLEIMAGE + " BLOB NOT NULL,"
                                                         + NewsContract.NewsArticle.COLUMN_TRAILTEXT + " TEXT NOT NULL,"
                                                         + NewsContract.NewsArticle.COLUMN_HTML_BODY + " TEXT NOT NULL,"
                                                         + NewsContract.NewsArticle.COLUMN_BYLINE + " TEXT NOT NULL,"
+                                                        + NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG + " TEXT NOT NULL,"
                                                         + "FOREIGN KEY (" + NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY
                                                         + ") REFERENCES "
                                                         + NewsContract.NewsFeed.TABLE_NAME + " ("
