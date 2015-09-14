@@ -4,7 +4,7 @@ apply plugin: 'com.google.gms.google-services'
 android {
 
     compileSdkVersion 23
-    buildToolsVersion '23.0.0'
+    buildToolsVersion '23.0.1'
 
     defaultConfig {
         applicationId "com.example.android.breakinuse"
@@ -34,15 +34,15 @@ repositories {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:23.0.0'
+    compile 'com.android.support:appcompat-v7:23.0.1'
     compile 'com.google.android.gms:play-services:7.8.0'
     compile 'com.facebook.android:facebook-android-sdk:4.1.0'
     compile 'com.parse.bolts:bolts-android:1.2.0'
     compile 'com.android.support:multidex:1.0.1'
     compile fileTree(dir: 'libs', include: 'Parse-*.jar')
     compile fileTree(dir: 'libs', include: 'ParseCrash*.jar')
-    compile 'com.android.support:cardview-v7:23.0.0'
-    compile 'com.android.support:recyclerview-v7:23.0.0'
-    compile 'com.android.support:design:23.0.0'
-    compile 'com.android.support:percent:23.0.0'
+    compile 'com.android.support:cardview-v7:23.0.1'
+    compile 'com.android.support:recyclerview-v7:23.0.1'
+    compile 'com.android.support:design:23.0.1'
+    compile 'com.android.support:percent:23.0.1'
 }
