@@ -130,15 +130,11 @@ public class NewsFeedActivity extends AppCompatActivity {
                 case 0:
 
                     NewsFeedFragment allNewsFragment = new NewsFeedFragment();
-                    newsTypeBundle.putString("NewsType", "All");
-                    allNewsFragment.setArguments(newsTypeBundle);
                     return allNewsFragment;
 
                 case 1:
 
-                    NewsFeedFragment favouriteNewsFragment = new NewsFeedFragment();
-                    newsTypeBundle.putString("NewsType", "Favourites");
-                    favouriteNewsFragment.setArguments(newsTypeBundle);
+                    FavouriteNewsFeedFragment favouriteNewsFragment = new FavouriteNewsFeedFragment();
                     return favouriteNewsFragment;
 
                 case 2:
