@@ -1,7 +1,12 @@
 package com.example.android.breakinuse;
 
 import android.app.Fragment;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
@@ -16,14 +21,31 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.example.android.breakinuse.newsProvider.NewsContract;
+import com.example.android.breakinuse.utilities.Utility;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
+import java.util.ArrayList;
+
 
 public class NewsArticleFragment extends Fragment {
 
     private final static String TAG = NewsArticleFragment.class.getName();
+    private Context mContext;
+    private WebView mWebView;
+    private Cursor mCursor;
 
     public NewsArticleFragment(){
 
         setHasOptionsMenu(true);
+        mContext = getActivity();
 
     }
 
@@ -32,10 +54,55 @@ public class NewsArticleFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View rootView = inflater.inflate(R.layout.fragment_news_article,container,false);
-        WebView webView = (WebView)rootView.findViewById(R.id.news_article_webView);
-        Bundle webURLBundle = getArguments();
-        webView.setWebViewClient(new WebViewClient());
-        webView.loadUrl(webURLBundle.getString("webURL"));
+        mWebView = (WebView)rootView.findViewById(R.id.news_article_webView);
+        mContext = getActivity();
+
+        Bundle bundle = getArguments();
+        String articleLoadMethod = bundle.getString("ArticleLoadMethod");
+        if (articleLoadMethod != null) {
+
+            if (articleLoadMethod.equals("webURL")){
+
+                mWebView.setWebViewClient(new WebViewClient());
+                mWebView.loadUrl(bundle.getString("webURL"));
+
+            } else if (articleLoadMethod.equals("HTMLBody")){
+
+                String articleID = bundle.getString("articleID");
+                mCursor = mContext.getContentResolver().query(NewsContract.NewsArticle.CONTENT_URI,
+                        null,
+                        NewsContract.NewsArticle.COLUMN_ARTICLEID + " =? ",
+                        new String[]{articleID},
+                        null);
+
+                if ((mCursor != null) && (mCursor.moveToFirst())){
+
+                    if (mCursor.getString(mCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG)).equals("0")){
+
+                        new DownloadNewsArticleTask().execute(articleID);
+
+                    } else {
+
+                        StringBuilder htmlBody = new StringBuilder();
+                        htmlBody.append("<html>");
+                        htmlBody.append("<h1>");
+                        htmlBody.append(mCursor.getString(mCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_HEADLINE)));
+                        htmlBody.append("</h1>");
+                        htmlBody.append("<body>");
+                        htmlBody.append(mCursor.getString(mCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_HTML_BODY)));
+                        htmlBody.append("</body>");
+                        htmlBody.append("</html>");
+                        mWebView.getSettings().setJavaScriptEnabled(true);
+                        mWebView.loadDataWithBaseURL("", htmlBody.toString(), "text/html", "UTF-8", "");
+
+                    }
+
+                }
+
+            }
+
+        }
+
         return rootView;
 
     }
@@ -71,4 +138,210 @@ public class NewsArticleFragment extends Fragment {
         return shareActionIntent;
 
     }
+
+    public class DownloadNewsArticleTask extends AsyncTask<String,Void,String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            final String articleID = params[0];
+            final String API_KEY_QUERY_PARAM = "api-key";
+            final String FIELDS_QUERY_PARAM = "show-fields";
+            final String ID_QUERY_PARAM = "ids";
+            final String API_KEY = "tknk2ue9anxtt3d3zthr4j4b";
+            final String API_SCHEME = "https";
+            final String API_AUTHORITY = "content.guardianapis.com";
+            final String API_CONTENT_END_POINT = "search";
+            final String ORDER_QUERY_PARAM = "order-by";
+            int newsFeedIDColumnIndex = -1;
+
+
+            mCursor = mContext.getContentResolver().query(NewsContract.NewsArticle.CONTENT_URI,
+                                null,
+                                NewsContract.NewsArticle.COLUMN_ARTICLEID + " =? ",
+                                new String[]{articleID},
+                                null);
+
+            if ((mCursor != null) && (mCursor.moveToFirst())){
+
+                newsFeedIDColumnIndex = mCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY);
+
+            }
+
+            StringBuilder responseString =  new StringBuilder();
+            String holder;
+            Uri.Builder builder = new Uri.Builder();
+            URL url;
+            URLConnection urlConnection;
+            ArrayList<Utility.NewsArticleWithNewsFeedID> newsArticleArrayList = new ArrayList<>();
+            BufferedReader reader = null;
+
+            try {
+
+                builder.scheme(API_SCHEME)
+                        .authority(API_AUTHORITY)
+                        .appendPath(API_CONTENT_END_POINT)
+                        .appendQueryParameter(API_KEY_QUERY_PARAM, API_KEY)
+                        .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline")
+                        .appendQueryParameter(ORDER_QUERY_PARAM, "relevance")
+                        .appendQueryParameter(ID_QUERY_PARAM, articleID)
+                        .build();
+
+                url = new URL(builder.toString());
+                urlConnection = url.openConnection();
+                reader = new BufferedReader(new InputStreamReader
+                        (urlConnection.getInputStream()));
+
+                while (( holder = reader.readLine()) != null){
+
+                    responseString.append(holder);
+
+                }
+
+                newsArticleArrayList.add(
+                        new Utility.NewsArticleWithNewsFeedID(
+                                new JSONObject(responseString.toString()),
+                                mCursor.getInt(newsFeedIDColumnIndex)));
+                reader.close();
+
+            } catch (IOException | JSONException e) {
+
+                e.printStackTrace();
+
+            } finally {
+
+                if (reader !=null){
+
+                    try {
+
+                        reader.close();
+
+                    } catch (IOException e) {
+
+                        e.printStackTrace();
+                        return null;
+
+                    }
+                }
+            }
+
+            try {
+
+                if( updateSavedNewsArticlesFromJSON(newsArticleArrayList) == 1){
+
+                    mCursor = mContext.getContentResolver().query(NewsContract.NewsArticle.CONTENT_URI,
+                                    null,
+                                    NewsContract.NewsArticle.COLUMN_ARTICLEID + " =? ",
+                                    new String[]{articleID},
+                                    null);
+
+                    if ((mCursor != null) && (mCursor.moveToFirst())){
+
+                        StringBuilder htmlBody = new StringBuilder();
+                        htmlBody.append("<html>");
+                        htmlBody.append("<h1>");
+                        htmlBody.append(mCursor.getString(mCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_HEADLINE)));
+                        htmlBody.append("</h1>");
+                        htmlBody.append("<body>");
+                        htmlBody.append(mCursor.getString(mCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_HTML_BODY)));
+                        htmlBody.append("</body>");
+                        htmlBody.append("</html>");
+                        return htmlBody.toString();
+
+                    } else {
+
+                        return null;
+
+                    }
+
+
+
+                } else {
+
+                    return null;
+
+                }
+
+            } catch (JSONException | NullPointerException e) {
+
+                e.printStackTrace();
+                return null;
+
+            }
+
+        }
+
+        private int updateSavedNewsArticlesFromJSON(ArrayList<Utility.NewsArticleWithNewsFeedID> newsArticleArrayList)
+                throws JSONException, NullPointerException{
+
+            int index = 0;
+            int articleCount = newsArticleArrayList.size();
+            int rowsUpdated = 0, rowUpdateFlag = 0;
+            ContentValues[] contentValues = new ContentValues[articleCount];
+            JSONObject responsePage,newsArticle;
+
+            for (index = 0; index < articleCount; ++index){
+
+                contentValues[index] = new ContentValues();
+
+            }
+
+            for (index = 0; index < articleCount; ++index){
+
+                responsePage = (newsArticleArrayList.get(index)).newsArticle;
+                newsArticle = responsePage.getJSONObject("response").getJSONArray("results").getJSONObject(0);
+
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,(newsArticleArrayList.get(index)).newsFeedID);
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_WEBURL,newsArticle.getString("webUrl"));
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_ARTICLEID,newsArticle.getString("id"));
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_SECTIONID,newsArticle.getString("sectionId"));
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_HEADLINE,newsArticle.getJSONObject("fields").getString("headline"));
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,newsArticle.getJSONObject("fields").getString("trailText"));
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_HTML_BODY,newsArticle.getJSONObject("fields").getString("body"));
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,newsArticle.getJSONObject("fields").getString("byline"));
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"1");
+
+                rowUpdateFlag = mContext.getContentResolver().update(NewsContract.NewsArticle.CONTENT_URI,
+                        contentValues[index],
+                        NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ?",
+                        new String[]{newsArticle.getString("id")});
+                if (rowUpdateFlag > 0){
+
+                    ++rowsUpdated;
+
+                }
+
+            }
+
+            return rowsUpdated;
+
+        }
+
+        @Override
+        protected void onPostExecute(String htmlBody) {
+
+            super.onPostExecute(htmlBody);
+            if (htmlBody != null){
+
+                mWebView.getSettings().setJavaScriptEnabled(true);
+                mWebView.loadDataWithBaseURL("", htmlBody, "text/html", "UTF-8", "");
+
+            } else {
+
+                //TODO handle error
+
+            }
+
+        }
+
+    }
+
+    @Override
+    public void onDetach() {
+
+        super.onDetach();
+        mCursor.close();
+
+    }
+
 }

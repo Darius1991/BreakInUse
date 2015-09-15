@@ -1,6 +1,7 @@
 package com.example.android.breakinuse;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.RecyclerView;
@@ -8,8 +9,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.breakinuse.newsProvider.NewsContract;
+import com.example.android.breakinuse.utilities.Utility;
 
 public class SavedNewsFeedAdapter extends RecyclerView.Adapter<SavedNewsFeedAdapter.ViewHolder> {
 
@@ -109,8 +112,30 @@ public class SavedNewsFeedAdapter extends RecyclerView.Adapter<SavedNewsFeedAdap
 
                 tempCursor.moveToPosition(getAdapterPosition());
 
-                //TODO handle clicks
+                if (!tempCursor.getString(tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID))
+                        .equals("DummySavedNewsArticleID")){
 
+                    if((!Utility.isNetworkAvailable(mContext))){
+
+                        if(tempCursor.getString(tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG)).equals("0")){
+
+                            Utility.makeToast(mContext,
+                                    "The article was not downloaded due to absence of internet connection. Please resolve this before trying again.",
+                                    Toast.LENGTH_SHORT);
+                            return;
+
+                        }
+
+                    }
+
+                    Intent intent = new Intent(mContext, NewsArticleActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    int columnIndex = tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID);
+                    intent.putExtra("articleID", tempCursor.getString(columnIndex));
+                    intent.putExtra("ArticleLoadMethod","HTMLBody");
+                    mContext.startActivity(intent);
+
+                }
 
             }
 
