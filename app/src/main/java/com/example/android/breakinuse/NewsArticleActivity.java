@@ -16,14 +16,35 @@ public class NewsArticleActivity extends AppCompatActivity {
         setContentView(R.layout.activity_news_article);
 
         NewsArticleFragment newsArticleFragment = new NewsArticleFragment();
-        Bundle webURLBundle =  new Bundle();
-        String webURL = getIntent().getStringExtra("webURL");
-        webURLBundle.putString("webURL",webURL);
-        newsArticleFragment.setArguments(webURLBundle);
-        getFragmentManager()
-                .beginTransaction()
-                .add(android.R.id.content,newsArticleFragment)
-                .commit();
+
+        String articleLoadMethod = getIntent().getStringExtra("ArticleLoadMethod");
+
+        if (articleLoadMethod.equals("HTMLBody")){
+
+            Bundle articleIDBundle =  new Bundle();
+            String articleID = getIntent().getStringExtra("articleID");
+            articleIDBundle.putString("articleID",articleID);
+            articleIDBundle.putString("ArticleLoadMethod",articleLoadMethod);
+            newsArticleFragment.setArguments(articleIDBundle);
+            getFragmentManager()
+                    .beginTransaction()
+                    .add(android.R.id.content,newsArticleFragment)
+                    .commit();
+
+        } else if (articleLoadMethod.equals("webURL")){
+
+            Bundle webURLBundle =  new Bundle();
+            String webURL = getIntent().getStringExtra("webURL");
+            webURLBundle.putString("webURL",webURL);
+            webURLBundle.putString("ArticleLoadMethod",articleLoadMethod);
+            newsArticleFragment.setArguments(webURLBundle);
+            getFragmentManager()
+                    .beginTransaction()
+                    .add(android.R.id.content,newsArticleFragment)
+                    .commit();
+
+        }
+
 
     }
 
@@ -32,6 +53,7 @@ public class NewsArticleActivity extends AppCompatActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_news_article_activity, menu);
         return true;
+
     }
 
     @Override
@@ -57,4 +79,5 @@ public class NewsArticleActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
 }

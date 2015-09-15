@@ -11,8 +11,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.breakinuse.newsProvider.NewsContract;
+import com.example.android.breakinuse.utilities.DownloadNewsArticleTask;
+import com.example.android.breakinuse.utilities.Utility;
 
 public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHolder> {
 
@@ -53,6 +56,14 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
                 } else {
 
                     viewHolder.mTextView_saveText.setText(viewHolder.mTextView_saveText_deleteButtonText);
+
+                }
+                if (((cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_ARTICLEID))
+                        .equals("DummyFavouriteNewsFeedArticleID"))
+                        ||(cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_ARTICLEID))
+                        .equals("DummyNewsFeedArticleID")))){
+
+                    viewHolder.mTextView_saveText.setVisibility(View.GONE);
 
                 }
 
@@ -132,13 +143,36 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
 
             if (v != mTextView_saveText){
 
-                Intent intent = new Intent(mContext, NewsArticleActivity.class);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 Cursor tempCursor = mOriginalCursor;
-                tempCursor.moveToPosition(getAdapterPosition());
-                int columnIndex = tempCursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_WEBURL);
-                intent.putExtra("webURL", tempCursor.getString(columnIndex));
-                mContext.startActivity(intent);
+                if ((tempCursor != null ) && (tempCursor.moveToFirst())){
+
+                    tempCursor.moveToPosition(getAdapterPosition());
+
+                    if (!((tempCursor.getString(tempCursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_ARTICLEID))
+                            .equals("DummyFavouriteNewsFeedArticleID"))
+                            ||(tempCursor.getString(tempCursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_ARTICLEID))
+                            .equals("DummyNewsFeedArticleID")))){
+
+                        if (!Utility.isNetworkAvailable(mContext)){
+
+                            Utility.makeToast(mContext,
+                                    "We are not able to detect an internet connection. Please resolve this before trying to view the article again.",
+                                    Toast.LENGTH_SHORT);
+                            return;
+
+                        }
+
+                        Intent intent = new Intent(mContext, NewsArticleActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
+                        int columnIndex = tempCursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_WEBURL);;
+                        intent.putExtra("ArticleLoadMethod","webURL");
+                        intent.putExtra("webURL", tempCursor.getString(columnIndex));
+                        mContext.startActivity(intent);
+
+                    }
+
+                }
 
             } else {
 
@@ -168,7 +202,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
                                     cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_WEBTITLE)));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
                                     cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_TRAILTEXT)));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG,"0");
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
                             contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,
                                     cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_PUBLISHDATE)));
                             mContext.getContentResolver().update(NewsContract.NewsFeed.CONTENT_URI,
@@ -207,6 +241,12 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
                             contentValues.put(NewsContract.NewsArticle.COLUMN_HTML_BODY, "0");
                             contentValues.put(NewsContract.NewsArticle.COLUMN_BYLINE, "0");
                             mContext.getContentResolver().insert(NewsContract.NewsArticle.CONTENT_URI, contentValues);
+
+                            if (Utility.isNetworkAvailable(mContext)){
+
+                                new DownloadNewsArticleTask(mContext).execute(articleID);
+
+                            }
 
                             contentValues.clear();
                             contentValues.put(NewsContract.NewsFeed.COLUMN_ARTICLEID, articleID);

@@ -46,12 +46,12 @@ public class SavedNewsFeedFragment extends Fragment implements LoaderManager.Loa
             ContentValues contentValues = new ContentValues();
             contentValues.put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,1000);
             contentValues.put(NewsContract.NewsArticle.COLUMN_WEBURL,"https://www.guardian.com/");
-            contentValues.put(NewsContract.NewsArticle.COLUMN_ARTICLEID,"DummyArticleID");
-            contentValues.put(NewsContract.NewsArticle.COLUMN_SECTIONID,"DummySectionID");
+            contentValues.put(NewsContract.NewsArticle.COLUMN_ARTICLEID,"DummySavedNewsArticleID");
+            contentValues.put(NewsContract.NewsArticle.COLUMN_SECTIONID,"DummySavedNewsSectionID");
             contentValues.put(NewsContract.NewsArticle.COLUMN_HEADLINE,"No Article saved currently");
             contentValues.put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,"There is no article saved currently. Save an article to read later.");
             contentValues.put(NewsContract.NewsArticle.COLUMN_HTML_BODY,"DummyHTMLBody");
-            contentValues.put(NewsContract.NewsArticle.COLUMN_BYLINE,"DummyBody");
+            contentValues.put(NewsContract.NewsArticle.COLUMN_BYLINE,"DummyByline");
             contentValues.put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"1");
             mContext.getContentResolver().insert(NewsContract.NewsArticle.CONTENT_URI, contentValues);
 
@@ -89,13 +89,13 @@ public class SavedNewsFeedFragment extends Fragment implements LoaderManager.Loa
             ContentValues contentValues = new ContentValues();
             contentValues.put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,1000);
             contentValues.put(NewsContract.NewsArticle.COLUMN_WEBURL,"https://www.guardian.com/");
-            contentValues.put(NewsContract.NewsArticle.COLUMN_ARTICLEID,"DummyArticleID");
-            contentValues.put(NewsContract.NewsArticle.COLUMN_SECTIONID,"DummySectionID");
+            contentValues.put(NewsContract.NewsArticle.COLUMN_ARTICLEID,"DummySavedNewsArticleID");
+            contentValues.put(NewsContract.NewsArticle.COLUMN_SECTIONID,"DummySavedNewsSectionID");
             contentValues.put(NewsContract.NewsArticle.COLUMN_HEADLINE,"No Article saved currently");
             contentValues.put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,"There is no article saved currently. Save an article to read later.");
             contentValues.put(NewsContract.NewsArticle.COLUMN_HTML_BODY,"DummyHTMLBody");
-            contentValues.put(NewsContract.NewsArticle.COLUMN_BYLINE,"DummyBody");
-            contentValues.put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG, "1");
+            contentValues.put(NewsContract.NewsArticle.COLUMN_BYLINE,"DummyByline");
+            contentValues.put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"1");
             mContext.getContentResolver().insert(NewsContract.NewsArticle.CONTENT_URI, contentValues);
 
         }
@@ -129,8 +129,8 @@ public class SavedNewsFeedFragment extends Fragment implements LoaderManager.Loa
         if (data.getCount() >= 2){
 
             mContext.getContentResolver().delete(NewsContract.NewsArticle.CONTENT_URI,
-                    NewsContract.NewsArticle.COLUMN_SECTIONID + " = ?",
-                    new String[]{"DummySectionID"});
+                    NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ?",
+                    new String[]{"DummySavedNewsArticleID"});
 
         }
         mSavedNewsFeedAdapter = new SavedNewsFeedAdapter(mContext,data);

@@ -254,7 +254,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 insertNewsFeedItemsInNewsFeedTableFromJSON(responsePage);
 
-            } catch (JSONException e) {
+            } catch (JSONException | NullPointerException e) {
 
                 e.printStackTrace();
                 return;
@@ -267,7 +267,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 insertNewsFeedItemsInNewsFeedTableFromJSON(responsePage);
 
-            } catch (JSONException e) {
+            } catch (JSONException | NullPointerException e) {
 
                 e.printStackTrace();
                 return;
@@ -372,7 +372,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 updateSavedNewsArticlesFromJSON(newsArticleArrayList);
 
-            } catch (JSONException e) {
+            } catch (JSONException | NullPointerException e) {
 
                 e.printStackTrace();
                 return;
@@ -395,7 +395,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
     }
 
-    private int insertNewsFeedItemsInNewsFeedTableFromJSON(JSONObject[] responsePage) throws JSONException {
+    private int insertNewsFeedItemsInNewsFeedTableFromJSON(JSONObject[] responsePage) throws JSONException, NullPointerException {
 
         int pageCount = responsePage[0].getJSONObject("response").getInt("pages");
         int pageIndex, webTitleIndex, arrayIndex, responseCount;
@@ -443,7 +443,8 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
     }
 
-    private int updateSavedNewsArticlesFromJSON(ArrayList<Utility.NewsArticleWithNewsFeedID> newsArticleArrayList) throws JSONException{
+    private int updateSavedNewsArticlesFromJSON(ArrayList<Utility.NewsArticleWithNewsFeedID> newsArticleArrayList)
+                                throws JSONException, NullPointerException{
 
         int index = 0;
         int articleCount = newsArticleArrayList.size();
