@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.breakinuse.newsProvider.NewsContract;
+import com.example.android.breakinuse.recyclerViewAdapter.SavedNewsFeedAdapter;
 
 public class SavedNewsFeedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -79,8 +80,6 @@ public class SavedNewsFeedFragment extends Fragment implements LoaderManager.Loa
 
         if ((data != null) && (data.moveToFirst())){
 
-            mSavedNewsFeedAdapter = new SavedNewsFeedAdapter(mContext,data);
-            mRecyclerView.setAdapter(mSavedNewsFeedAdapter);
             mSavedNewsFeedTextView.setVisibility(View.GONE);
             mRecyclerView.setVisibility(View.VISIBLE);
 
@@ -91,12 +90,19 @@ public class SavedNewsFeedFragment extends Fragment implements LoaderManager.Loa
 
         }
 
+        mSavedNewsFeedAdapter = new SavedNewsFeedAdapter(mContext,data);
+        mRecyclerView.setAdapter(mSavedNewsFeedAdapter);
+
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-        mSavedNewsFeedAdapter.swapCursor(null);
+        if (mSavedNewsFeedAdapter != null){
+
+            mSavedNewsFeedAdapter.swapCursor(null);
+
+        }
 
     }
 

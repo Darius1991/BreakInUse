@@ -1,7 +1,6 @@
 package com.example.android.breakinuse.utilities.parse;
 
 import android.app.Application;
-
 import com.parse.Parse;
 import com.parse.ParseCrashReporting;
 
