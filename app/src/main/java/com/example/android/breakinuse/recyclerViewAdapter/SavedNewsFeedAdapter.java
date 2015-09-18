@@ -1,4 +1,4 @@
-package com.example.android.breakinuse;
+package com.example.android.breakinuse.recyclerViewAdapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -11,81 +11,44 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.breakinuse.NewsArticleActivity;
+import com.example.android.breakinuse.R;
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.utilities.Utility;
 
-public class SavedNewsFeedAdapter extends RecyclerView.Adapter<SavedNewsFeedAdapter.ViewHolder> {
+public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFeedAdapter.ViewHolder> {
 
     private Context mContext;
     private Cursor mOriginalCursor;
-    private CursorAdapter mCursorAdapter;
 
     public SavedNewsFeedAdapter(Context tempContext, Cursor tempCursor) {
 
+        super(tempContext, tempCursor);
         mContext = tempContext;
         mOriginalCursor = tempCursor;
-
-        mCursorAdapter = new CursorAdapter(mContext, mOriginalCursor, 0) {
-
-            @Override
-            public View newView(Context context, Cursor cursor, ViewGroup parent) {
-
-                return LayoutInflater.from(parent.getContext())
-                        .inflate(R.layout.saved_news_feed_item, parent, false);
-
-            }
-
-            @Override
-            public void bindView(View view, Context context, Cursor cursor) {
-
-                ViewHolder viewHolder = (ViewHolder) view.getTag();
-
-                int columnIndex = cursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_HEADLINE);
-                viewHolder.mTextView_headlines.setText(cursor.getString(columnIndex));
-                columnIndex = cursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_TRAILTEXT);
-                viewHolder.mTextView_trailText.setText(cursor.getString(columnIndex));
-
-            }
-
-        };
-
 
     }
 
     @Override
     public SavedNewsFeedAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 
-        View view = mCursorAdapter.newView(mContext, mCursorAdapter.getCursor(), parent);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.saved_news_feed_item, parent, false);
         ViewHolder viewHolder = new ViewHolder(view);
-        view.setTag(viewHolder);
         return viewHolder;
 
     }
 
     @Override
-    public void onBindViewHolder(SavedNewsFeedAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(SavedNewsFeedAdapter.ViewHolder viewholder, Cursor cursor) {
 
-        Cursor cursor = mOriginalCursor;
+        if ((cursor != null) && ( cursor.getCount() > 0 ) && (cursor.getPosition() < cursor.getCount())){
 
-        if (cursor.moveToPosition(position)) {
-
-            mCursorAdapter.bindView(holder.itemView, mContext, cursor);
-
-        } else {
-
-            mCursorAdapter.bindView(holder.itemView, mContext, mCursorAdapter.getCursor());
+            viewholder.mTextView_headlines.setText(cursor.getString(5));
+            viewholder.mTextView_trailText.setText(cursor.getString(6));
 
         }
 
     }
-
-    @Override
-    public int getItemCount() {
-
-        return mOriginalCursor.getCount();
-
-    }
-
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -133,8 +96,8 @@ public class SavedNewsFeedAdapter extends RecyclerView.Adapter<SavedNewsFeedAdap
 
                         Intent intent = new Intent(mContext, NewsArticleActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        int columnIndex = tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID);
-                        intent.putExtra("articleID", tempCursor.getString(columnIndex));
+                        intent.putExtra("articleID", tempCursor.getString(3));
+                        intent.putExtra("webURL",tempCursor.getString(2));
                         intent.putExtra("ArticleLoadMethod","HTMLBody");
                         mContext.startActivity(intent);
 
@@ -160,12 +123,6 @@ public class SavedNewsFeedAdapter extends RecyclerView.Adapter<SavedNewsFeedAdap
             }
 
         }
-
-    }
-
-    public void swapCursor(Cursor cursor) {
-
-        mCursorAdapter.swapCursor(cursor);
 
     }
 

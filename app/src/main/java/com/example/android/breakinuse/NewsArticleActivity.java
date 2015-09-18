@@ -24,6 +24,7 @@ public class NewsArticleActivity extends AppCompatActivity {
             Bundle articleIDBundle =  new Bundle();
             String articleID = getIntent().getStringExtra("articleID");
             articleIDBundle.putString("articleID",articleID);
+            articleIDBundle.putString("webURL",getIntent().getStringExtra("webURL"));
             articleIDBundle.putString("ArticleLoadMethod",articleLoadMethod);
             newsArticleFragment.setArguments(articleIDBundle);
             getFragmentManager()

@@ -16,6 +16,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.android.breakinuse.newsProvider.NewsContract;
+import com.example.android.breakinuse.recyclerViewAdapter.FavouriteNewsFeedAdapter;
 import com.example.android.breakinuse.utilities.Utility;
 
 import java.util.Set;
@@ -109,8 +110,6 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
         if ((data != null) && (data.moveToFirst())){
 
-            mFavouriteNewsFeedAdapter = new FavouriteNewsFeedAdapter(getActivity(),data);
-            mRecyclerView.setAdapter(mFavouriteNewsFeedAdapter);
             mFavouriteNewsFeedTextView.setVisibility(View.GONE);
             mRecyclerView.setVisibility(View.VISIBLE);
 
@@ -121,12 +120,19 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
         }
 
+        mFavouriteNewsFeedAdapter = new FavouriteNewsFeedAdapter(getActivity(),data);
+        mRecyclerView.setAdapter(mFavouriteNewsFeedAdapter);
+
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-        mFavouriteNewsFeedAdapter.swapCursor(null);
+        if (mFavouriteNewsFeedAdapter != null){
+
+            mFavouriteNewsFeedAdapter.swapCursor(null);
+
+        }
 
     }
 
