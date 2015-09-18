@@ -1,4 +1,5 @@
 <resources>
+
     <string name="app_name">BreakInUse</string>
     <string name="title_activity_home">BreakInUse!</string>
     <string name="hello_world">Hello world!</string>
@@ -33,7 +34,11 @@
     <string name="sync_account_type">breakinuse.example.com</string>
     <string name="content_authority">com.example.android.breakinuse</string>
     <string name="share_action_title">Share</string>
-    <string name="newsFeedItem_textView_saveText">Tap to save</string>
-    <string name="newsFeedItem_textView_deleteText">Saved - Tap to delete</string>
+    <string name="newsFeedItem_textView_saveText">Tap here to save</string>
+    <string name="newsFeedItem_textView_deleteText">Saved - Tap here to delete</string>
+    <string name="newsFeed_textView_text">No NewsFeed to display. Please check your internet connection and refresh after connecting.</string>
+    <string name="savedNewsFeed_textView_text">There is no article saved currently. Save an article to read later.</string>
+    <string name="favouriteNewsFeed_textView_text">No FavouriteFeed to display. No matching articles may be available or you need to refresh after connecting to internet.</string>
+    <string name="savedNewsFeedItem_textView_deleteText">Saved - Tap here to delete</string>
 
 </resources>

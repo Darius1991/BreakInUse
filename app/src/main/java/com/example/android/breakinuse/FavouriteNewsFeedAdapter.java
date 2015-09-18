@@ -16,14 +16,14 @@ import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.utilities.DownloadNewsArticleTask;
 import com.example.android.breakinuse.utilities.Utility;
 
-public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHolder> {
+public class FavouriteNewsFeedAdapter extends RecyclerView.Adapter<FavouriteNewsFeedAdapter.ViewHolder>{
 
     private CursorAdapter mCursorAdapter;
     private Context mContext;
     private Cursor mOriginalCursor;
     private static final String TAG = NewsFeedAdapter.class.getName();
 
-    public NewsFeedAdapter(Context context, Cursor cursor) {
+    public FavouriteNewsFeedAdapter(Context context, Cursor cursor) {
 
         mContext = context;
         mOriginalCursor = cursor;
@@ -189,7 +189,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
                             contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
                             contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,
                                     cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_PUBLISHDATE)));
-                            mContext.getContentResolver().update(NewsContract.NewsFeed.NEWSFEED_WRITEURI,
+                            mContext.getContentResolver().update(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_WRITEURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
                                     new String[]{articleID});
@@ -248,7 +248,7 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
                             contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,
                                     cursor.getString(cursor.getColumnIndex(NewsContract.NewsFeed.COLUMN_PUBLISHDATE)));
 
-                            mContext.getContentResolver().update(NewsContract.NewsFeed.NEWSFEED_WRITEURI,
+                            mContext.getContentResolver().update(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_WRITEURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
                                     new String[]{articleID});
@@ -267,5 +267,5 @@ public class NewsFeedAdapter extends RecyclerView.Adapter<NewsFeedAdapter.ViewHo
 
     }
 
-}
 
+}

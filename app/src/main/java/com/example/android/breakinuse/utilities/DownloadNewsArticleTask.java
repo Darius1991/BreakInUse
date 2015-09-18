@@ -8,11 +8,9 @@ import android.os.AsyncTask;
 
 import com.example.android.breakinuse.newsProvider.NewsContract;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -46,7 +44,7 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
         int newsFeedIDColumnIndex = -1;
 
 
-        mCursor = mContext.getContentResolver().query(NewsContract.NewsArticle.CONTENT_URI,
+        mCursor = mContext.getContentResolver().query(NewsContract.NewsArticle.NEWSARTICLE_URI,
                 null,
                 NewsContract.NewsArticle.COLUMN_ARTICLEID + " =? ",
                 new String[]{articleID},
@@ -94,7 +92,7 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
                             mCursor.getInt(newsFeedIDColumnIndex)));
             reader.close();
 
-        } catch (IOException | JSONException e) {
+        } catch (Exception e) {
 
             e.printStackTrace();
 
@@ -106,7 +104,7 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
 
                     reader.close();
 
-                } catch (IOException e) {
+                } catch (Exception e) {
 
                     e.printStackTrace();
                     return null;
@@ -119,7 +117,7 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
 
             updateSavedNewsArticlesFromJSON(newsArticleArrayList);
 
-        } catch (JSONException | NullPointerException e) {
+        } catch (Exception e) {
 
             e.printStackTrace();
             return null;
@@ -130,13 +128,13 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
     }
 
     private int updateSavedNewsArticlesFromJSON(ArrayList<Utility.NewsArticleWithNewsFeedID> newsArticleArrayList)
-            throws JSONException, NullPointerException{
+            throws Exception{
 
-        int index = 0;
         int articleCount = newsArticleArrayList.size();
-        int rowsUpdated = 0, rowUpdateFlag = 0;
+        int index = 0,rowsUpdated = 0, rowUpdateFlag = 0, tagStartPos = 0, tagEndPos = 0;
         ContentValues[] contentValues = new ContentValues[articleCount];
         JSONObject responsePage,newsArticle;
+        StringBuilder htmlBody = new StringBuilder();
 
         for (index = 0; index < articleCount; ++index){
 
@@ -155,11 +153,18 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_SECTIONID,newsArticle.getString("sectionId"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_HEADLINE,newsArticle.getJSONObject("fields").getString("headline"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,newsArticle.getJSONObject("fields").getString("trailText"));
-            contentValues[index].put(NewsContract.NewsArticle.COLUMN_HTML_BODY,newsArticle.getJSONObject("fields").getString("body"));
+            htmlBody = new StringBuilder(newsArticle.getJSONObject("fields").getString("body"));
+            while ((tagStartPos = htmlBody.indexOf("<figure")) != -1){
+
+                tagEndPos = htmlBody.indexOf("</figure>");
+                htmlBody.delete(tagStartPos,tagEndPos+9);
+
+            }
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_HTML_BODY,htmlBody.toString());
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,newsArticle.getJSONObject("fields").getString("byline"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"1");
 
-            rowUpdateFlag = mContext.getContentResolver().update(NewsContract.NewsArticle.CONTENT_URI,
+            rowUpdateFlag = mContext.getContentResolver().update(NewsContract.NewsArticle.NEWSARTICLE_URI,
                     contentValues[index],
                     NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ?",
                     new String[]{newsArticle.getString("id")});
@@ -179,7 +184,12 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
     protected void onPostExecute(Void aVoid) {
 
         super.onPostExecute(aVoid);
-        mCursor.close();
+        if (mCursor != null){
+
+            mCursor.close();
+
+        }
 
     }
+
 }
