@@ -8,19 +8,23 @@ import android.provider.BaseColumns;
 public class NewsContract {
 
     public static final String CONTENT_AUTHORITY = "com.example.android.breakinuse";
-    public static final String PATH_NEWSFEED = "newsFeed";
+    public static final String PATH_NEWSFEED_READ = "readNewsFeed";
     public static final String PATH_NEWSARTICLE = "newsArticle";
-    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
+    public static final String PATH_NEWSFEED_WRITE = "writeNewsFeed";
+    public static final String PATH_FAVOURITE_NEWSFEED_READ = "readFavouriteNewsFeed";
+    public static final String PATH_FAVOURITE_NEWSFEED_WRITE = "writeFavouriteNewsFeed";
 
+    public static final Uri BASE_CONTENT_URI = Uri.parse("content://" + CONTENT_AUTHORITY);
 
 
     public static final class NewsArticle implements BaseColumns{
 
 
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI
-                .buildUpon()
-                .appendPath(PATH_NEWSARTICLE)
-                .build();
+        public static final Uri NEWSARTICLE_URI = BASE_CONTENT_URI
+                                                        .buildUpon()
+                                                        .appendPath(PATH_NEWSARTICLE)
+                                                        .build();
+
         public static final String TABLE_NAME = "NewsArticle";
         public static final String COLUMN_NEWSFEED_KEY = "NewsFeedItem_Key";
         public static final String COLUMN_WEBURL = "WebURL";
@@ -40,13 +44,13 @@ public class NewsContract {
 
         public static Uri buildNewsArticleUri(long id){
 
-            return ContentUris.withAppendedId(CONTENT_URI, id);
+            return ContentUris.withAppendedId(NEWSARTICLE_URI, id);
 
         }
 
         public static Uri buildNewsArticleUri(String articleID){
 
-            return CONTENT_URI
+            return NEWSARTICLE_URI
                     .buildUpon()
                     .appendPath(COLUMN_ARTICLEID)
                     .appendPath(articleID)
@@ -65,10 +69,23 @@ public class NewsContract {
     public static final class NewsFeed implements BaseColumns{
 
 
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI
-                                                .buildUpon()
-                                                .appendPath(PATH_NEWSFEED)
-                                                .build();
+        public static final Uri NEWSFEED_READURI = BASE_CONTENT_URI
+                                                    .buildUpon()
+                                                    .appendPath(PATH_NEWSFEED_READ)
+                                                    .build();
+        public static final Uri NEWSFEED_WRITEURI = BASE_CONTENT_URI
+                                                        .buildUpon()
+                                                        .appendPath(PATH_NEWSFEED_WRITE)
+                                                        .build();
+        public static final Uri FAVOURITE_NEWSFEED_READURI = BASE_CONTENT_URI
+                                                                .buildUpon()
+                                                                .appendPath(PATH_FAVOURITE_NEWSFEED_READ)
+                                                                .build();
+        public static final Uri FAVOURITE_NEWSFEED_WRITEURI = BASE_CONTENT_URI
+                                                                .buildUpon()
+                                                                .appendPath(PATH_FAVOURITE_NEWSFEED_WRITE)
+                                                                .build();
+
         public static final String TABLE_NAME = "NewsFeed";
         public static final String COLUMN_ARTICLEID = "ArticleID";
         public static final String COLUMN_SECTIONID = "SectionID";
@@ -80,20 +97,20 @@ public class NewsContract {
         public final static String COLUMN_PUBLISHDATE = "articlePublishDate";
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
                                                     + "/" + CONTENT_AUTHORITY
-                                                    + "/" + PATH_NEWSFEED ;
+                                                    + "/" + PATH_NEWSFEED_READ;
         public static final String CONTENT_ITEM_TYPE = ContentResolver.CURSOR_ITEM_BASE_TYPE
                                                         + "/" + CONTENT_AUTHORITY
-                                                        + "/" + PATH_NEWSFEED ;
+                                                        + "/" + PATH_NEWSFEED_READ;
 
         public static Uri buildNewsFeedUri(long id){
 
-            return ContentUris.withAppendedId(CONTENT_URI, id);
+            return ContentUris.withAppendedId(NEWSFEED_READURI, id);
 
         }
 
         public static Uri buildNewsFeedUri(String articleID){
 
-            return CONTENT_URI
+            return NEWSFEED_READURI
                     .buildUpon()
                     .appendPath(COLUMN_ARTICLEID)
                     .appendPath(articleID)

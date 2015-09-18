@@ -31,6 +31,24 @@
                 android:layout_height="wrap_content"
                 android:textSize = "14sp" />
 
+            <ImageView
+                android:src="@android:drawable/divider_horizontal_dark"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:paddingBottom="2dp"
+                android:paddingTop="2dp" />
+
+            <TextView
+                android:id="@+id/savedNewsFeedItem_delete_textView"
+                android:text = "@string/savedNewsFeedItem_textView_deleteText"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize = "14sp"
+                android:gravity = "center" />
+
         </LinearLayout>
 
     </android.support.v7.widget.CardView>

@@ -24,11 +24,9 @@ import android.webkit.WebViewClient;
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.utilities.Utility;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -69,7 +67,7 @@ public class NewsArticleFragment extends Fragment {
             } else if (articleLoadMethod.equals("HTMLBody")){
 
                 String articleID = bundle.getString("articleID");
-                mCursor = mContext.getContentResolver().query(NewsContract.NewsArticle.CONTENT_URI,
+                mCursor = mContext.getContentResolver().query(NewsContract.NewsArticle.NEWSARTICLE_URI,
                         null,
                         NewsContract.NewsArticle.COLUMN_ARTICLEID + " =? ",
                         new String[]{articleID},
@@ -156,7 +154,7 @@ public class NewsArticleFragment extends Fragment {
             int newsFeedIDColumnIndex = -1;
 
 
-            mCursor = mContext.getContentResolver().query(NewsContract.NewsArticle.CONTENT_URI,
+            mCursor = mContext.getContentResolver().query(NewsContract.NewsArticle.NEWSARTICLE_URI,
                                 null,
                                 NewsContract.NewsArticle.COLUMN_ARTICLEID + " =? ",
                                 new String[]{articleID},
@@ -204,7 +202,7 @@ public class NewsArticleFragment extends Fragment {
                                 mCursor.getInt(newsFeedIDColumnIndex)));
                 reader.close();
 
-            } catch (IOException | JSONException e) {
+            } catch (Exception e) {
 
                 e.printStackTrace();
 
@@ -216,7 +214,7 @@ public class NewsArticleFragment extends Fragment {
 
                         reader.close();
 
-                    } catch (IOException e) {
+                    } catch (Exception e) {
 
                         e.printStackTrace();
                         return null;
@@ -229,7 +227,7 @@ public class NewsArticleFragment extends Fragment {
 
                 if( updateSavedNewsArticlesFromJSON(newsArticleArrayList) == 1){
 
-                    mCursor = mContext.getContentResolver().query(NewsContract.NewsArticle.CONTENT_URI,
+                    mCursor = mContext.getContentResolver().query(NewsContract.NewsArticle.NEWSARTICLE_URI,
                                     null,
                                     NewsContract.NewsArticle.COLUMN_ARTICLEID + " =? ",
                                     new String[]{articleID},
@@ -254,15 +252,13 @@ public class NewsArticleFragment extends Fragment {
 
                     }
 
-
-
                 } else {
-
+                        
                     return null;
 
                 }
 
-            } catch (JSONException | NullPointerException e) {
+            } catch (Exception                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           e) {
 
                 e.printStackTrace();
                 return null;
@@ -272,13 +268,13 @@ public class NewsArticleFragment extends Fragment {
         }
 
         private int updateSavedNewsArticlesFromJSON(ArrayList<Utility.NewsArticleWithNewsFeedID> newsArticleArrayList)
-                throws JSONException, NullPointerException{
+                throws Exception{
 
-            int index = 0;
             int articleCount = newsArticleArrayList.size();
-            int rowsUpdated = 0, rowUpdateFlag = 0;
+            int index = 0,rowsUpdated = 0, rowUpdateFlag = 0, tagStartPos = 0, tagEndPos = 0;
             ContentValues[] contentValues = new ContentValues[articleCount];
             JSONObject responsePage,newsArticle;
+            StringBuilder htmlBody = new StringBuilder();
 
             for (index = 0; index < articleCount; ++index){
 
@@ -297,11 +293,18 @@ public class NewsArticleFragment extends Fragment {
                 contentValues[index].put(NewsContract.NewsArticle.COLUMN_SECTIONID,newsArticle.getString("sectionId"));
                 contentValues[index].put(NewsContract.NewsArticle.COLUMN_HEADLINE,newsArticle.getJSONObject("fields").getString("headline"));
                 contentValues[index].put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,newsArticle.getJSONObject("fields").getString("trailText"));
-                contentValues[index].put(NewsContract.NewsArticle.COLUMN_HTML_BODY,newsArticle.getJSONObject("fields").getString("body"));
+                htmlBody = new StringBuilder(newsArticle.getJSONObject("fields").getString("body"));
+                while ((tagStartPos = htmlBody.indexOf("<figure")) != -1){
+
+                    tagEndPos = htmlBody.indexOf("</figure>");
+                    htmlBody.delete(tagStartPos,tagEndPos+9);
+
+                }
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_HTML_BODY,htmlBody.toString());
                 contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,newsArticle.getJSONObject("fields").getString("byline"));
                 contentValues[index].put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"1");
 
-                rowUpdateFlag = mContext.getContentResolver().update(NewsContract.NewsArticle.CONTENT_URI,
+                rowUpdateFlag = mContext.getContentResolver().update(NewsContract.NewsArticle.NEWSARTICLE_URI,
                         contentValues[index],
                         NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ?",
                         new String[]{newsArticle.getString("id")});
@@ -314,7 +317,6 @@ public class NewsArticleFragment extends Fragment {
             }
 
             return rowsUpdated;
-
         }
 
         @Override
@@ -340,7 +342,12 @@ public class NewsArticleFragment extends Fragment {
     public void onDetach() {
 
         super.onDetach();
-        mCursor.close();
+        if (mCursor != null){
+
+            mCursor.close();
+
+        }
+
 
     }
 

@@ -91,16 +91,20 @@ public class SavedNewsFeedAdapter extends RecyclerView.Adapter<SavedNewsFeedAdap
 
         public TextView mTextView_headlines;
         public TextView mTextView_trailText;
+        public TextView mTextView_deleteButton;
 
         public ViewHolder(View itemView) {
 
             super(itemView);
             mTextView_headlines = (TextView)itemView.findViewById(R.id.savedNewsFeedItem_headlines_textView);
             mTextView_trailText = (TextView)itemView.findViewById(R.id.savedNewsFeedItem_trailText_textView);
+            mTextView_deleteButton = (TextView)itemView.findViewById(R.id.savedNewsFeedItem_delete_textView);
             mTextView_headlines.setClickable(true);
             mTextView_headlines.setOnClickListener(this);
             mTextView_trailText.setClickable(true);
             mTextView_trailText.setOnClickListener(this);
+            mTextView_deleteButton.setClickable(true);
+            mTextView_deleteButton.setOnClickListener(this);
 
         }
 
@@ -108,32 +112,48 @@ public class SavedNewsFeedAdapter extends RecyclerView.Adapter<SavedNewsFeedAdap
         public void onClick(View v) {
 
             Cursor tempCursor = mOriginalCursor;
-            if ((tempCursor != null ) && (tempCursor.moveToFirst())){
+            if (v != mTextView_deleteButton){
 
-                tempCursor.moveToPosition(getAdapterPosition());
+                if ((tempCursor != null ) && (tempCursor.moveToFirst())){
 
-                if (!tempCursor.getString(tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID))
-                        .equals("DummySavedNewsArticleID")){
+                    if (tempCursor.moveToPosition(getAdapterPosition())){
 
-                    if((!Utility.isNetworkAvailable(mContext))){
+                        if((!Utility.isNetworkAvailable(mContext))){
 
-                        if(tempCursor.getString(tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG)).equals("0")){
+                            if(tempCursor.getString(tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG)).equals("0")){
 
-                            Utility.makeToast(mContext,
-                                    "The article was not downloaded due to absence of internet connection. Please resolve this before trying again.",
-                                    Toast.LENGTH_SHORT);
-                            return;
+                                Utility.makeToast(mContext,
+                                        "The article was not downloaded due to absence of internet connection. Please resolve this before trying again.",
+                                        Toast.LENGTH_SHORT);
+                                return;
+
+                            }
 
                         }
 
+                        Intent intent = new Intent(mContext, NewsArticleActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        int columnIndex = tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID);
+                        intent.putExtra("articleID", tempCursor.getString(columnIndex));
+                        intent.putExtra("ArticleLoadMethod","HTMLBody");
+                        mContext.startActivity(intent);
+
                     }
 
-                    Intent intent = new Intent(mContext, NewsArticleActivity.class);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    int columnIndex = tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID);
-                    intent.putExtra("articleID", tempCursor.getString(columnIndex));
-                    intent.putExtra("ArticleLoadMethod","HTMLBody");
-                    mContext.startActivity(intent);
+                }
+
+            } else {
+
+                if ((tempCursor != null ) && (tempCursor.moveToFirst())){
+
+                    if (tempCursor.moveToPosition(getAdapterPosition())){
+
+                        mContext.getContentResolver().delete(NewsContract.NewsArticle.NEWSARTICLE_URI,
+                                                                NewsContract.NewsArticle.COLUMN_ARTICLEID + " =? ",
+                                                                new String[]{tempCursor.getString(tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID))});
+
+
+                    }
 
                 }
 

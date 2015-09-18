@@ -8,16 +8,18 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 public class NewsProvider extends ContentProvider {
 
     private static final String TAG = NewsProvider.class.getName();
     private NewsDBHelper mNewsDBHelper;
-    public static final int NEWS_FEED = 100;
-    public static final int NEWS_ARTICLE = 101;
-    public static final int NEWS_FEED_WITH_ARTICLEID = 102;
-    public static final int NEWS_ARTICLE_WITH_ARTICLEID = 103;
+    public static final int NEWSFEED_READ = 100;
+    public static final int NEWSFEED_WRITE = 101;
+    public static final int FAVOURITE_NEWSFEED_READ = 102;
+    public static final int FAVOURITE_NEWSFEED_WRITE = 103;
+    public static final int NEWSARTICLE = 104;
+    public static final int NEWSFEED_WITH_ARTICLEID = 105;
+    public static final int NEWSARTICLE_WITH_ARTICLEID = 106;
     private SQLiteQueryBuilder mQueryBuilder;
     private UriMatcher mUriMatcher;
 
@@ -37,22 +39,57 @@ public class NewsProvider extends ContentProvider {
 
         switch (uriMatchResult){
 
-            case NEWS_FEED:
+            case NEWSFEED_READ:
 
                 cursor = getNewsFeedCursor(projection, selection, selectionArgs, sortOrder);
+                if (cursor != null) {
+
+                    cursor.setNotificationUri(getContext().getContentResolver(), NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI);
+
+                }
                 break;
 
-            case NEWS_FEED_WITH_ARTICLEID:
+            case NEWSFEED_WRITE:
+
+                cursor = getNewsFeedCursor(projection, selection, selectionArgs, sortOrder);
+                if (cursor != null) {
+
+                    cursor.setNotificationUri(getContext().getContentResolver(), NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI);
+
+                }
+                break;
+
+            case FAVOURITE_NEWSFEED_READ:
+
+                cursor = getNewsFeedCursor(projection, selection, selectionArgs, sortOrder);
+                if (cursor != null) {
+
+                    cursor.setNotificationUri(getContext().getContentResolver(), NewsContract.NewsFeed.NEWSFEED_READURI);
+
+                }
+                break;
+
+            case FAVOURITE_NEWSFEED_WRITE:
+
+                cursor = getNewsFeedCursor(projection, selection, selectionArgs, sortOrder);
+                if (cursor != null) {
+
+                    cursor.setNotificationUri(getContext().getContentResolver(), NewsContract.NewsFeed.NEWSFEED_READURI);
+
+                }
+                break;
+
+            case NEWSFEED_WITH_ARTICLEID:
 
                 cursor = getNewsFeedWithArticleIDCursor(uri, projection, sortOrder);
                 break;
 
-            case NEWS_ARTICLE:
+            case NEWSARTICLE:
 
                 cursor = getNewsArticleCursor(projection, selection, selectionArgs, sortOrder);
                 break;
 
-            case NEWS_ARTICLE_WITH_ARTICLEID:
+            case NEWSARTICLE_WITH_ARTICLEID:
 
                 cursor = getNewsArticleWithArticleIDCursor(uri, projection, sortOrder);
                 break;
@@ -119,22 +156,38 @@ public class NewsProvider extends ContentProvider {
 
         switch (matchResult){
 
-            case NEWS_FEED:
+            case NEWSFEED_READ:
 
                 contentType = NewsContract.NewsFeed.CONTENT_TYPE;
                 break;
 
-            case NEWS_FEED_WITH_ARTICLEID:
+            case NEWSFEED_WRITE:
+
+                contentType = NewsContract.NewsFeed.CONTENT_TYPE;
+                break;
+
+            case FAVOURITE_NEWSFEED_READ:
+
+                contentType = NewsContract.NewsFeed.CONTENT_TYPE;
+                break;
+
+            case FAVOURITE_NEWSFEED_WRITE:
+
+                contentType = NewsContract.NewsFeed.CONTENT_TYPE;
+                break;
+
+
+            case NEWSFEED_WITH_ARTICLEID:
 
                 contentType = NewsContract.NewsFeed.CONTENT_ITEM_TYPE;
                 break;
 
-            case NEWS_ARTICLE:
+            case NEWSARTICLE:
 
                 contentType = NewsContract.NewsArticle.CONTENT_TYPE;
                 break;
 
-            case NEWS_ARTICLE_WITH_ARTICLEID:
+            case NEWSARTICLE_WITH_ARTICLEID:
 
                 contentType = NewsContract.NewsArticle.CONTENT_ITEM_TYPE;
                 break;
@@ -158,12 +211,13 @@ public class NewsProvider extends ContentProvider {
 
         switch(matchResult){
 
-            case NEWS_FEED:
+            case NEWSFEED_READ:
 
                 rowID = db.insertOrThrow(NewsContract.NewsFeed.TABLE_NAME, null, values);
                 if (rowID != -1){
 
                     returnUri = NewsContract.NewsFeed.buildNewsFeedUri(rowID);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
 
                 } else {
 
@@ -172,7 +226,52 @@ public class NewsProvider extends ContentProvider {
                 }
                 break;
 
-            case NEWS_ARTICLE:
+            case NEWSFEED_WRITE:
+
+                rowID = db.insertOrThrow(NewsContract.NewsFeed.TABLE_NAME, null, values);
+                if (rowID != -1){
+
+                    returnUri = NewsContract.NewsFeed.buildNewsFeedUri(rowID);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+
+                } else {
+
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+
+                }
+                break;
+
+            case FAVOURITE_NEWSFEED_READ:
+
+                rowID = db.insertOrThrow(NewsContract.NewsFeed.TABLE_NAME, null, values);
+                if (rowID != -1){
+
+                    returnUri = NewsContract.NewsFeed.buildNewsFeedUri(rowID);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+
+                } else {
+
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+
+                }
+                break;
+
+            case FAVOURITE_NEWSFEED_WRITE:
+
+                rowID = db.insertOrThrow(NewsContract.NewsFeed.TABLE_NAME, null, values);
+                if (rowID != -1){
+
+                    returnUri = NewsContract.NewsFeed.buildNewsFeedUri(rowID);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+
+                } else {
+
+                    throw new android.database.SQLException("Failed to insert row into " + uri);
+
+                }
+                break;
+
+            case NEWSARTICLE:
 
                 rowID = db.insertOrThrow(NewsContract.NewsArticle.TABLE_NAME, null, values);
                 if (rowID != -1) {
@@ -210,12 +309,47 @@ public class NewsProvider extends ContentProvider {
 
         switch(matchResult){
 
-            case NEWS_FEED:
+            case NEWSFEED_READ:
 
                 rowsDeleted = db.delete(NewsContract.NewsFeed.TABLE_NAME, selection, selectionArgs);
+                if (rowsDeleted != 0) {
+
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+
+                }
                 break;
 
-            case NEWS_FEED_WITH_ARTICLEID:
+            case NEWSFEED_WRITE:
+
+                rowsDeleted = db.delete(NewsContract.NewsFeed.TABLE_NAME, selection, selectionArgs);
+                if (rowsDeleted != 0) {
+
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+
+                }
+                break;
+
+            case FAVOURITE_NEWSFEED_READ:
+
+                rowsDeleted = db.delete(NewsContract.NewsFeed.TABLE_NAME, selection, selectionArgs);
+                if (rowsDeleted != 0) {
+
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+
+                }
+                break;
+
+            case FAVOURITE_NEWSFEED_WRITE:
+
+                rowsDeleted = db.delete(NewsContract.NewsFeed.TABLE_NAME, selection, selectionArgs);
+                if (rowsDeleted != 0) {
+
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+
+                }
+                break;
+
+            case NEWSFEED_WITH_ARTICLEID:
 
                 String filter = NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ? ";
                 String[] articleID = new String[1];
@@ -223,12 +357,12 @@ public class NewsProvider extends ContentProvider {
                 rowsDeleted = db.delete(NewsContract.NewsFeed.TABLE_NAME, filter, articleID);
                 break;
 
-            case NEWS_ARTICLE:
+            case NEWSARTICLE:
 
                 rowsDeleted = db.delete(NewsContract.NewsArticle.TABLE_NAME, selection, selectionArgs);
                 break;
 
-            case NEWS_ARTICLE_WITH_ARTICLEID:
+            case NEWSARTICLE_WITH_ARTICLEID:
 
                 String filter_article = NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ? ";
                 String[] articleID_article = new String[1];
@@ -259,12 +393,47 @@ public class NewsProvider extends ContentProvider {
 
         switch (matchResult){
 
-            case NEWS_FEED:
+            case NEWSFEED_READ:
 
                 rowsUpdated = db.update(NewsContract.NewsFeed.TABLE_NAME,values,selection,selectionArgs);
+                if (rowsUpdated != 0) {
+
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+
+                }
                 break;
 
-            case NEWS_FEED_WITH_ARTICLEID:
+            case NEWSFEED_WRITE:
+
+                rowsUpdated = db.update(NewsContract.NewsFeed.TABLE_NAME,values,selection,selectionArgs);
+                if (rowsUpdated != 0) {
+
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+
+                }
+                break;
+
+            case FAVOURITE_NEWSFEED_READ:
+
+                rowsUpdated = db.update(NewsContract.NewsFeed.TABLE_NAME,values,selection,selectionArgs);
+                if (rowsUpdated != 0) {
+
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+
+                }
+                break;
+
+            case FAVOURITE_NEWSFEED_WRITE:
+
+                rowsUpdated = db.update(NewsContract.NewsFeed.TABLE_NAME,values,selection,selectionArgs);
+                if (rowsUpdated != 0) {
+
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+
+                }
+                break;
+
+            case NEWSFEED_WITH_ARTICLEID:
 
                 String filter = NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ? ";
                 String[] articleID = new String[1];
@@ -272,12 +441,12 @@ public class NewsProvider extends ContentProvider {
                 rowsUpdated = db.update(NewsContract.NewsFeed.TABLE_NAME, values, filter, articleID);
                 break;
 
-            case NEWS_ARTICLE:
+            case NEWSARTICLE:
 
                 rowsUpdated = db.update(NewsContract.NewsArticle.TABLE_NAME,values,selection,selectionArgs);
                 break;
 
-            case NEWS_ARTICLE_WITH_ARTICLEID:
+            case NEWSARTICLE_WITH_ARTICLEID:
 
                 String filter_article = NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ? ";
                 String[] articleID_article = new String[1];
@@ -302,14 +471,18 @@ public class NewsProvider extends ContentProvider {
     public static UriMatcher buildUriMatcher(){
 
         UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
-        uriMatcher.addURI(NewsContract.CONTENT_AUTHORITY,NewsContract.PATH_NEWSFEED,NEWS_FEED);
+        uriMatcher.addURI(NewsContract.CONTENT_AUTHORITY,NewsContract.PATH_NEWSFEED_READ,NEWSFEED_READ);
+        uriMatcher.addURI(NewsContract.CONTENT_AUTHORITY,NewsContract.PATH_NEWSFEED_WRITE,NEWSFEED_WRITE);
+        uriMatcher.addURI(NewsContract.CONTENT_AUTHORITY,NewsContract.PATH_FAVOURITE_NEWSFEED_READ,FAVOURITE_NEWSFEED_READ);
+        uriMatcher.addURI(NewsContract.CONTENT_AUTHORITY,NewsContract.PATH_FAVOURITE_NEWSFEED_WRITE,FAVOURITE_NEWSFEED_WRITE);
         uriMatcher.addURI(NewsContract.CONTENT_AUTHORITY,
-                NewsContract.PATH_NEWSFEED + "/" + NewsContract.NewsFeed.COLUMN_ARTICLEID + "/*",
-                NEWS_FEED_WITH_ARTICLEID);
-        uriMatcher.addURI(NewsContract.CONTENT_AUTHORITY,NewsContract.PATH_NEWSARTICLE,NEWS_ARTICLE);
+                NewsContract.PATH_NEWSFEED_READ + "/" + NewsContract.NewsFeed.COLUMN_ARTICLEID + "/*",
+                NEWSFEED_WITH_ARTICLEID);
+        uriMatcher.addURI(NewsContract.CONTENT_AUTHORITY,NewsContract.PATH_NEWSARTICLE, NEWSARTICLE);
         uriMatcher.addURI(NewsContract.CONTENT_AUTHORITY,
                 NewsContract.PATH_NEWSARTICLE + "/" + NewsContract.NewsArticle.COLUMN_ARTICLEID + "/*",
-                NEWS_ARTICLE_WITH_ARTICLEID);
+                NEWSARTICLE_WITH_ARTICLEID);
+
         return uriMatcher;
 
     }
@@ -323,7 +496,7 @@ public class NewsProvider extends ContentProvider {
 
         switch (matchResult){
 
-            case NEWS_FEED:
+            case NEWSFEED_READ :
 
                 db.beginTransaction();
                 rowsInserted = 0;
@@ -348,9 +521,97 @@ public class NewsProvider extends ContentProvider {
 
                 }
                 getContext().getContentResolver().notifyChange(uri, null);
+                getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
                 return rowsInserted;
 
-            case NEWS_ARTICLE:
+            case NEWSFEED_WRITE :
+
+                db.beginTransaction();
+                rowsInserted = 0;
+                try {
+
+                    for (ContentValues value : values) {
+
+                        long _id = db.insert(NewsContract.NewsFeed.TABLE_NAME, null, value);
+                        if (_id != -1) {
+
+                            rowsInserted++;
+
+                        }
+
+                    }
+
+                    db.setTransactionSuccessful();
+
+                } finally {
+
+                    db.endTransaction();
+
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+                return rowsInserted;
+
+
+            case FAVOURITE_NEWSFEED_READ :
+
+                db.beginTransaction();
+                rowsInserted = 0;
+                try {
+
+                    for (ContentValues value : values) {
+
+                        long _id = db.insert(NewsContract.NewsFeed.TABLE_NAME, null, value);
+                        if (_id != -1) {
+
+                            rowsInserted++;
+
+                        }
+
+                    }
+
+                    db.setTransactionSuccessful();
+
+                } finally {
+
+                    db.endTransaction();
+
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+                return rowsInserted;
+
+
+            case FAVOURITE_NEWSFEED_WRITE:
+
+                db.beginTransaction();
+                rowsInserted = 0;
+                try {
+
+                    for (ContentValues value : values) {
+
+                        long _id = db.insert(NewsContract.NewsFeed.TABLE_NAME, null, value);
+                        if (_id != -1) {
+
+                            rowsInserted++;
+
+                        }
+
+                    }
+
+                    db.setTransactionSuccessful();
+
+                } finally {
+
+                    db.endTransaction();
+
+                }
+                getContext().getContentResolver().notifyChange(uri, null);
+                getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+                return rowsInserted;
+
+
+            case NEWSARTICLE:
 
                 db.beginTransaction();
                 rowsInserted = 0;
@@ -380,7 +641,6 @@ public class NewsProvider extends ContentProvider {
             default:
 
                 return super.bulkInsert(uri, values);
-
 
         }
 

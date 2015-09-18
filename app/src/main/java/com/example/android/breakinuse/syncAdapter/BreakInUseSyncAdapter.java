@@ -13,18 +13,14 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
 
-import com.example.android.breakinuse.R;
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.utilities.Utility;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -136,7 +132,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
             responsePage[0] = new JSONObject(responseString.toString());
             reader.close();
 
-        } catch (IOException | JSONException e) {
+        } catch (Exception e) {
 
             e.printStackTrace();
 
@@ -148,7 +144,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
                     reader.close();
 
-                } catch (IOException e) {
+                } catch (Exception e) {
 
                     e.printStackTrace();
                     return;
@@ -167,7 +163,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 }
 
-            } catch (JSONException e) {
+            } catch (Exception e) {
 
                 e.printStackTrace();
                 return;
@@ -177,7 +173,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 pageCount = getPageCount(responsePage[0]);
 
-            } catch (JSONException e) {
+            } catch (Exception e) {
 
                 e.printStackTrace();
                 return;
@@ -226,7 +222,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                     responsePage[index-1] = new JSONObject(responseString.toString());
                     reader.close();
 
-                } catch (IOException | JSONException e) {
+                } catch (Exception e) {
 
                     e.printStackTrace();
 
@@ -238,7 +234,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
                             reader.close();
 
-                        } catch (IOException e) {
+                        } catch (Exception e) {
 
                             e.printStackTrace();
                             return;
@@ -254,7 +250,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 insertNewsFeedItemsInNewsFeedTableFromJSON(responsePage);
 
-            } catch (JSONException | NullPointerException e) {
+            } catch (Exception e) {
 
                 e.printStackTrace();
                 return;
@@ -267,7 +263,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 insertNewsFeedItemsInNewsFeedTableFromJSON(responsePage);
 
-            } catch (JSONException | NullPointerException e) {
+            } catch (Exception e) {
 
                 e.printStackTrace();
                 return;
@@ -285,16 +281,16 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
         /*----DELETING OLD ARTICLES FROM NewsFeed TABLE----*/
         /*----DELETING OLD ARTICLES FROM NewsFeed TABLE----*/
 
-        mContentResolver.delete(NewsContract.NewsFeed.CONTENT_URI,
-                NewsContract.NewsFeed.COLUMN_PUBLISHDATE + " != ?",
-                new String[]{Utility.getCurrentDate()});
+        mContentResolver.delete(NewsContract.NewsFeed.NEWSFEED_READURI,
+                    NewsContract.NewsFeed.COLUMN_PUBLISHDATE + " != ?",
+                    new String[]{Utility.getCurrentDate()});
 
         /*----FETCHING DATA FOR TO-BE-SAVED ARTICLES & INSERTING IN NewsArticle TABLE----*/
         /*----FETCHING DATA FOR TO-BE-SAVED ARTICLES & INSERTING IN NewsArticle TABLE----*/
         /*----FETCHING DATA FOR TO-BE-SAVED ARTICLES & INSERTING IN NewsArticle TABLE----*/
         /*----FETCHING DATA FOR TO-BE-SAVED ARTICLES & INSERTING IN NewsArticle TABLE----*/
 
-        Cursor cursor = mContentResolver.query(NewsContract.NewsArticle.CONTENT_URI,
+        Cursor cursor = mContentResolver.query(NewsContract.NewsArticle.NEWSARTICLE_URI,
                             null,
                             NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG + " = ?",
                             new String[]{"0"},
@@ -343,7 +339,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                     reader.close();
                     responseString.delete(0, responseString.length());
 
-                } catch (IOException | JSONException e) {
+                } catch (Exception e) {
 
                     e.printStackTrace();
 
@@ -355,7 +351,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
                             reader.close();
 
-                        } catch (IOException e) {
+                        } catch (Exception e) {
 
                             e.printStackTrace();
                             return;
@@ -372,7 +368,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 updateSavedNewsArticlesFromJSON(newsArticleArrayList);
 
-            } catch (JSONException | NullPointerException e) {
+            } catch (Exception e) {
 
                 e.printStackTrace();
                 return;
@@ -383,19 +379,19 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
     }
 
-    private boolean isResponseStatusOk(JSONObject responsePage) throws JSONException {
+    private boolean isResponseStatusOk(JSONObject responsePage) throws Exception {
 
         return responsePage.getJSONObject("response").getString("status").equals("ok");
 
     }
 
-    private int getPageCount(JSONObject responsePage) throws JSONException{
+    private int getPageCount(JSONObject responsePage) throws Exception{
 
         return responsePage.getJSONObject("response").getInt("pages");
 
     }
 
-    private int insertNewsFeedItemsInNewsFeedTableFromJSON(JSONObject[] responsePage) throws JSONException, NullPointerException {
+    private int insertNewsFeedItemsInNewsFeedTableFromJSON(JSONObject[] responsePage) throws Exception {
 
         int pageCount = responsePage[0].getJSONObject("response").getInt("pages");
         int pageIndex, webTitleIndex, arrayIndex, responseCount;
@@ -439,18 +435,18 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
             }
         }
 
-        return mContentResolver.bulkInsert(NewsContract.NewsFeed.CONTENT_URI, newsFeedContentValues);
+        return mContentResolver.bulkInsert(NewsContract.NewsFeed.NEWSFEED_READURI, newsFeedContentValues);
 
     }
 
     private int updateSavedNewsArticlesFromJSON(ArrayList<Utility.NewsArticleWithNewsFeedID> newsArticleArrayList)
-                                throws JSONException, NullPointerException{
+                                throws Exception{
 
-        int index = 0;
         int articleCount = newsArticleArrayList.size();
-        int rowsUpdated = 0, rowUpdateFlag = 0;
+        int index = 0,rowsUpdated = 0, rowUpdateFlag = 0, tagStartPos = 0, tagEndPos = 0;
         ContentValues[] contentValues = new ContentValues[articleCount];
         JSONObject responsePage,newsArticle;
+        StringBuilder htmlBody = new StringBuilder();
 
         for (index = 0; index < articleCount; ++index){
 
@@ -469,11 +465,18 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_SECTIONID,newsArticle.getString("sectionId"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_HEADLINE,newsArticle.getJSONObject("fields").getString("headline"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,newsArticle.getJSONObject("fields").getString("trailText"));
-            contentValues[index].put(NewsContract.NewsArticle.COLUMN_HTML_BODY,newsArticle.getJSONObject("fields").getString("body"));
+            htmlBody = new StringBuilder(newsArticle.getJSONObject("fields").getString("body"));
+            while ((tagStartPos = htmlBody.indexOf("<figure")) != -1){
+
+                tagEndPos = htmlBody.indexOf("</figure>");
+                htmlBody.delete(tagStartPos,tagEndPos+9);
+
+            }
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_HTML_BODY,htmlBody.toString());
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,newsArticle.getJSONObject("fields").getString("byline"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"1");
 
-            rowUpdateFlag = mContentResolver.update(NewsContract.NewsArticle.CONTENT_URI,
+            rowUpdateFlag = mContentResolver.update(NewsContract.NewsArticle.NEWSARTICLE_URI,
                                                         contentValues[index],
                                                         NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ?",
                                                         new String[]{newsArticle.getString("id")});
@@ -495,7 +498,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
     public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
 
         Account account = getSyncAccount(context);
-        String authority = context.getString(R.string.content_authority);
+        String authority = "com.example.android.breakinuse";
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 
             // we can enable inexact timers in our periodic sync
@@ -524,7 +527,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
         /*
          * Without calling setSyncAutomatically, our periodic sync will not be enabled.
          */
-        ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
+        ContentResolver.setSyncAutomatically(newAccount, "com.example.android.breakinuse", true);
 
         /*
          * Finally, let's do a sync to get things started
@@ -545,7 +548,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
         bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
         ContentResolver.requestSync(getSyncAccount(context),
-                context.getString(R.string.content_authority), bundle);
+                "com.example.android.breakinuse", bundle);
 
     }
 
@@ -557,7 +560,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
         // Create the account type and default account
         Account newAccount = new Account(
-                context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+                "BreakInUse", "breakinuse.example.com");
 
         // If the password doesn't exist, the account doesn't exist
         if ( null == accountManager.getPassword(newAccount) ) {

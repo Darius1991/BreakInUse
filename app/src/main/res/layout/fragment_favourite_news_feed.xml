@@ -13,10 +13,10 @@
         android:gravity = "center"/>
 
     <TextView
-        android:id = "@+id/newsFeed_textView"
+        android:id = "@+id/favouriteNewsFeed_textView"
         android:layout_width = "match_parent"
         android:layout_height = "match_parent"
-        android:text = "@string/newsFeed_textView_text"
+        android:text = "@string/favouriteNewsFeed_textView_text"
         android:gravity = "center" />
 
 </LinearLayout>
