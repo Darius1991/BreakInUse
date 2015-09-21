@@ -10,6 +10,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,7 +19,7 @@ import android.widget.TextView;
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.recyclerViewAdapter.NewsFeedAdapter;
 
-public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>{
+public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private NewsFeedAdapter mNewsFeedAdapter;
     private static final int LOADER_ID_ALL = 0;
@@ -26,6 +27,7 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
     private RecyclerView mRecyclerView;
     private Context mContext;
     private TextView mNewsFeedTextView;
+    private boolean mShouldLoadMore;
 
     @Nullable
     @Override
@@ -34,13 +36,41 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
         View rootView = inflater.inflate(R.layout.fragment_news_feed, container, false);
         mNewsFeedTextView = (TextView) rootView.findViewById(R.id.newsFeed_textView);
         mContext = getActivity();
+        mShouldLoadMore = true;
 
+        mNewsFeedAdapter = new NewsFeedAdapter(mContext,
+                mContext.getContentResolver().query(NewsContract.NewsFeed.NEWSFEED_READURI,null,null,null,null));
         getLoaderManager().initLoader(LOADER_ID_ALL, null, this);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.favouriteNewsFeed_recyclerView);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setAdapter(mNewsFeedAdapter);
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (mShouldLoadMore) {
+
+                    if ( (layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.getItemCount()) {
+
+                        mShouldLoadMore = false;
+
+                        //TODO handledatainsertionfornext page;
+                        Log.v(TAG, "Last Item Wow !");
+
+                    }
+
+                }
+
+            }
+
+        });
 
         return rootView;
 
@@ -78,7 +108,13 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
         if ((data != null) && (data.moveToFirst())){
 
             mRecyclerView.setVisibility(View.VISIBLE);
+            mNewsFeedAdapter.swapCursor(data);
             mNewsFeedTextView.setVisibility(View.GONE);
+            if (!mShouldLoadMore){
+
+                mShouldLoadMore = true;
+
+            }
 
         } else {
 
@@ -86,19 +122,16 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
             mRecyclerView.setVisibility(View.GONE);
 
         }
-        mNewsFeedAdapter = new NewsFeedAdapter(getActivity(),data);
-        mRecyclerView.setAdapter(mNewsFeedAdapter);
+
+//        mNewsFeedAdapter = new NewsFeedAdapter(getActivity(),data);
+//        mRecyclerView.setAdapter(mNewsFeedAdapter);
 
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-        if (mNewsFeedAdapter != null){
-
-            mNewsFeedAdapter.swapCursor(null);
-
-        }
+        mNewsFeedAdapter.swapCursor(null);
 
     }
 

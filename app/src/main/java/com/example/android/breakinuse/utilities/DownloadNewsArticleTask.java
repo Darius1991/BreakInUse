@@ -70,7 +70,7 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
                     .authority(API_AUTHORITY)
                     .appendPath(API_CONTENT_END_POINT)
                     .appendQueryParameter(API_KEY_QUERY_PARAM, API_KEY)
-                    .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline")
+                    .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline,main,thumbnail")
                     .appendQueryParameter(ORDER_QUERY_PARAM, "relevance")
                     .appendQueryParameter(ID_QUERY_PARAM, articleID)
                     .build();
@@ -147,12 +147,27 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
             responsePage = (newsArticleArrayList.get(index)).newsArticle;
             newsArticle = responsePage.getJSONObject("response").getJSONArray("results").getJSONObject(0);
 
-            contentValues[index].put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,(newsArticleArrayList.get(index)).newsFeedID);
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,
+                    (newsArticleArrayList.get(index)).newsFeedID);
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_WEBURL,newsArticle.getString("webUrl"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_ARTICLEID,newsArticle.getString("id"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_SECTIONID,newsArticle.getString("sectionId"));
-            contentValues[index].put(NewsContract.NewsArticle.COLUMN_HEADLINE,newsArticle.getJSONObject("fields").getString("headline"));
-            contentValues[index].put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,newsArticle.getJSONObject("fields").getString("trailText"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_HEADLINE,
+                    newsArticle.getJSONObject("fields").getString("headline"));
+            try {
+
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                        newsArticle.getJSONObject("fields").getString("thumbnail"));
+
+            } catch (Exception e){
+
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                        "http://vignette3.wikia.nocookie.net/wiisportsresortwalkthrough/images/6/60/No_Image_Available.png");
+
+            }
+//                    Utility.getImageURLFromMainHTML(newsArticle.getJSONObject("fields").getString("main")));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,
+                    newsArticle.getJSONObject("fields").getString("trailText"));
             htmlBody = new StringBuilder(newsArticle.getJSONObject("fields").getString("body"));
             while ((tagStartPos = htmlBody.indexOf("<figure")) != -1){
 
@@ -161,7 +176,8 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
 
             }
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_HTML_BODY,htmlBody.toString());
-            contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,newsArticle.getJSONObject("fields").getString("byline"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,
+                    newsArticle.getJSONObject("fields").getString("byline"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"1");
 
             rowUpdateFlag = mContext.getContentResolver().update(NewsContract.NewsArticle.NEWSARTICLE_URI,

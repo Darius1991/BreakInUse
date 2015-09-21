@@ -13,7 +13,9 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
+import com.example.android.breakinuse.R;
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.utilities.Utility;
 
@@ -79,6 +81,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
         final String PAGESIZE_QUERY_PARAM = "page-size";
         final String PAGE_QUERY_PARAM = "page";
 
+
         Set<String> defaultFavouriteTopicsSet = Utility.getDefaultFavouriteTopicsSet(mContext);
 
         for (String iterator : defaultFavouriteTopicsSet) {
@@ -111,11 +114,12 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                     .authority(API_AUTHORITY)
                     .appendPath(API_CONTENT_END_POINT)
                     .appendQueryParameter(API_KEY_QUERY_PARAM, API_KEY)
-                    .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText")
+                    .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline,main,thumbnail")
                     .appendQueryParameter(PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
                     .appendQueryParameter(ORDER_QUERY_PARAM, "relevance")
                     .appendQueryParameter(FROMDATE_QUERY_PARAM, fromDate)
-                    .appendQueryParameter(SECTION_QUERY_PARAM,mTopicsQuery.toString())
+//                    .appendQueryParameter(ID_QUERY_PARAM,"sport/blog/2015/sep/20/five-talking-points-england-rugby-world-cup-fiji")
+                    .appendQueryParameter(SECTION_QUERY_PARAM, mTopicsQuery.toString())
                     .build();
 
             url = new URL(builder.toString());
@@ -200,7 +204,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                 try {
 
                     builder.appendQueryParameter(API_KEY_QUERY_PARAM, API_KEY)
-                            .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText")
+                            .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline,main,thumbnail")
                             .appendQueryParameter(PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
                             .appendQueryParameter(PAGE_QUERY_PARAM, String.valueOf(index))
                             .appendQueryParameter(ORDER_QUERY_PARAM, "relevance")
@@ -315,7 +319,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                 try {
 
                     builder.appendQueryParameter(API_KEY_QUERY_PARAM, API_KEY)
-                            .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline")
+                            .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline,main,thumbnail")
                             .appendQueryParameter(PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
                             .appendQueryParameter(ORDER_QUERY_PARAM, "relevance")
                             .appendQueryParameter(ID_QUERY_PARAM, cursor.getString(articleIDColumnIndex))
@@ -419,12 +423,25 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_WEBTITLE,
                         newsFeedItemJSONObject.getString("webTitle"));
+                Log.d(TAG, newsFeedItemJSONObject.getString("webTitle"));
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_WEBURL,
                         newsFeedItemJSONObject.getString("webUrl"));
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_APIURL,
                         newsFeedItemJSONObject.getString("apiUrl"));
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
                         newsFeedItemJSONObject.getJSONObject("fields").getString("trailText"));
+                try {
+
+                    newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                            newsFeedItemJSONObject.getJSONObject("fields").getString("thumbnail"));
+
+                } catch (Exception e){
+
+                    newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                            "http://vignette3.wikia.nocookie.net/wiisportsresortwalkthrough/images/6/60/No_Image_Available.png");
+
+                }
+//                        Utility.getImageURLFromMainHTML(newsFeedItemJSONObject.getJSONObject("fields").getString("main")));
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_ARTICLEID,
                         newsFeedItemJSONObject.getString("id"));
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_SECTIONID,
@@ -459,12 +476,27 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
             responsePage = (newsArticleArrayList.get(index)).newsArticle;
             newsArticle = responsePage.getJSONObject("response").getJSONArray("results").getJSONObject(0);
 
-            contentValues[index].put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,(newsArticleArrayList.get(index)).newsFeedID);
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,
+                    (newsArticleArrayList.get(index)).newsFeedID);
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_WEBURL,newsArticle.getString("webUrl"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_ARTICLEID,newsArticle.getString("id"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_SECTIONID,newsArticle.getString("sectionId"));
-            contentValues[index].put(NewsContract.NewsArticle.COLUMN_HEADLINE,newsArticle.getJSONObject("fields").getString("headline"));
-            contentValues[index].put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,newsArticle.getJSONObject("fields").getString("trailText"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_HEADLINE,
+                    newsArticle.getJSONObject("fields").getString("headline"));
+            try {
+
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                        newsArticle.getJSONObject("fields").getString("thumbnail"));
+
+            } catch (Exception e){
+
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                        "http://vignette3.wikia.nocookie.net/wiisportsresortwalkthrough/images/6/60/No_Image_Available.png");
+
+            }
+//                    Utility.getImageURLFromMainHTML(newsArticle.getJSONObject("fields").getString("main")));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,
+                    newsArticle.getJSONObject("fields").getString("trailText"));
             htmlBody = new StringBuilder(newsArticle.getJSONObject("fields").getString("body"));
             while ((tagStartPos = htmlBody.indexOf("<figure")) != -1){
 
@@ -492,15 +524,16 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
     }
 
+
+
     /**
      * Helper method to schedule the sync adapter periodic execution
      */
     public static void configurePeriodicSync(Context context, int syncInterval, int flexTime) {
 
         Account account = getSyncAccount(context);
-        String authority = "com.example.android.breakinuse";
+        String authority = context.getString(R.string.content_authority);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-
             // we can enable inexact timers in our periodic sync
             SyncRequest request = new SyncRequest.Builder().
                     syncPeriodic(syncInterval, flexTime).
@@ -517,6 +550,92 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
     }
 
+    /**
+     * Helper method to have the sync adapter sync immediately
+     * @param context The context used to access the account service
+     */
+    public static void syncImmediately(Context context) {
+
+        Bundle bundle = new Bundle();
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
+        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
+        ContentResolver.requestSync(getSyncAccount(context),
+                context.getString(R.string.content_authority), bundle);
+
+    }
+
+    /**
+     * Helper method to get the fake account to be used with SyncAdapter, or make a new one
+     * if the fake account doesn't exist yet.  If we make a new account, we call the
+     * onAccountCreated method so we can initialize things.
+     *
+     * @param context The context used to access the account service
+     * @return a fake account.
+     */
+    public static Account getSyncAccount(Context context) {
+        // Get an instance of the Android account manager
+        AccountManager accountManager =
+                (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
+
+        // Create the account type and default account
+        Account newAccount = new Account(
+                context.getString(R.string.app_name), context.getString(R.string.sync_account_type));
+
+        try{
+
+            // If the password doesn't exist, the account doesn't exist
+            if ( null == accountManager.getPassword(newAccount) ) {
+
+        /*
+         * Add the account and account type, no password or user data
+         * If successful, return the Account object, otherwise report an error.
+         */
+                if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
+
+                    return null;
+
+                }
+            /*
+             * If you don't set android:syncable="true" in
+             * in your <provider> element in the manifest,
+             * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
+             * here.
+             */
+
+                onAccountCreated(newAccount, context);
+            }
+
+            return newAccount;
+
+        }catch (Exception e){
+
+            // If the password doesn't exist, the account doesn't exist
+            if ( null == accountManager.getPassword(newAccount) ) {
+
+        /*
+         * Add the account and account type, no password or user data
+         * If successful, return the Account object, otherwise report an error.
+         */
+                if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
+
+                    return null;
+
+                }
+            /*
+             * If you don't set android:syncable="true" in
+             * in your <provider> element in the manifest,
+             * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
+             * here.
+             */
+
+                onAccountCreated(newAccount, context);
+            }
+
+            return newAccount;
+
+        }
+
+    }
 
     private static void onAccountCreated(Account newAccount, Context context) {
         /*
@@ -527,61 +646,17 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
         /*
          * Without calling setSyncAutomatically, our periodic sync will not be enabled.
          */
-        ContentResolver.setSyncAutomatically(newAccount, "com.example.android.breakinuse", true);
+        ContentResolver.setSyncAutomatically(newAccount, context.getString(R.string.content_authority), true);
 
         /*
          * Finally, let's do a sync to get things started
          */
         syncImmediately(context);
-
     }
 
     public static void initializeSyncAdapter(Context context) {
 
         getSyncAccount(context);
-
-    }
-
-    public static void syncImmediately(Context context) {
-
-        Bundle bundle = new Bundle();
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_EXPEDITED, true);
-        bundle.putBoolean(ContentResolver.SYNC_EXTRAS_MANUAL, true);
-        ContentResolver.requestSync(getSyncAccount(context),
-                "com.example.android.breakinuse", bundle);
-
-    }
-
-    public static Account getSyncAccount(Context context) {
-
-        // Get an instance of the Android account manager
-        AccountManager accountManager =
-                (AccountManager) context.getSystemService(Context.ACCOUNT_SERVICE);
-
-        // Create the account type and default account
-        Account newAccount = new Account(
-                "BreakInUse", "breakinuse.example.com");
-
-        // If the password doesn't exist, the account doesn't exist
-        if ( null == accountManager.getPassword(newAccount) ) {
-
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-            if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
-                return null;
-            }
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-
-            onAccountCreated(newAccount, context);
-        }
-        return newAccount;
 
     }
 

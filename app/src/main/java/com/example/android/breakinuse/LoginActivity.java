@@ -55,8 +55,10 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     protected void onStop() {
+
         super.onStop();
         mGoogleApiClient.disconnect();
+
     }
 
     @Override
@@ -135,10 +137,20 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
+        if (id == android.R.id.home){
+
+            super.onBackPressed();
             return true;
+
+        }
+
+        if (id == R.id.action_settings) {
+
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
         }
         return super.onOptionsItemSelected(item);
     }
@@ -207,6 +219,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
             findViewById(R.id.sign_in_button_google).setVisibility(View.VISIBLE);
 
         }
+
     }
 
     @Override
