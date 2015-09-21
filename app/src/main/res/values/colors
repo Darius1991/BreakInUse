@@ -1,0 +1,8 @@
+<resources>
+
+    <color name = "color_windowBackground">#FFFFFF</color>
+    <color name = "color_background">#FFFBDC</color>
+    <color name = "color_primary">#F44336</color>
+    <color name = "color_primaryDark">#D32F2F</color>
+
+</resources>

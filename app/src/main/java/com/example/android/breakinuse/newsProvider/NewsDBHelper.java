@@ -26,6 +26,7 @@ public class NewsDBHelper extends SQLiteOpenHelper {
                                                     + NewsContract.NewsFeed.COLUMN_WEBURL + " TEXT NOT NULL,"
                                                     + NewsContract.NewsFeed.COLUMN_WEBTITLE + " TEXT NOT NULL,"
                                                     + NewsContract.NewsFeed.COLUMN_TRAILTEXT + " TEXT NOT NULL,"
+                                                    + NewsContract.NewsFeed.COLUMN_IMAGEURL + " TEXT NOT NULL,"
                                                     + NewsContract.NewsFeed.COLUMN_SAVEDFLAG + " TEXT NOT NULL,"
                                                     + NewsContract.NewsFeed.COLUMN_PUBLISHDATE + " TEXT NOT NULL,"
                                                     + "UNIQUE (" + NewsContract.NewsFeed.COLUMN_ARTICLEID
@@ -40,6 +41,7 @@ public class NewsDBHelper extends SQLiteOpenHelper {
                                                         + NewsContract.NewsArticle.COLUMN_SECTIONID + " TEXT NOT NULL,"
                                                         + NewsContract.NewsArticle.COLUMN_HEADLINE + " TEXT NOT NULL,"
                                                         + NewsContract.NewsArticle.COLUMN_TRAILTEXT + " TEXT NOT NULL,"
+                                                        + NewsContract.NewsArticle.COLUMN_IMAGEURL + " TEXT NOT NULL,"
                                                         + NewsContract.NewsArticle.COLUMN_HTML_BODY + " TEXT NOT NULL,"
                                                         + NewsContract.NewsArticle.COLUMN_BYLINE + " TEXT NOT NULL,"
                                                         + NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG + " TEXT NOT NULL,"

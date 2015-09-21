@@ -35,12 +35,20 @@ public class SavedNewsFeedFragment extends Fragment implements LoaderManager.Loa
         mSavedNewsFeedTextView = (TextView) rootView.findViewById(R.id.savedNewsFeed_textView);
         mContext = getActivity();
 
+
+        mSavedNewsFeedAdapter = new SavedNewsFeedAdapter(mContext,
+                mContext.getContentResolver().query(NewsContract.NewsArticle.NEWSARTICLE_URI,
+                                                        null,
+                                                        null,
+                                                        null,
+                                                        NewsContract.NewsArticle._ID + " DESC"));
         getLoaderManager().initLoader(LOADER_ID_SAVED_NEWS_ARTICLES, null, this);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.savedNewsFeed_recyclerView);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setAdapter(mSavedNewsFeedAdapter);
 
         return rootView;
 
@@ -62,7 +70,11 @@ public class SavedNewsFeedFragment extends Fragment implements LoaderManager.Loa
 
             case LOADER_ID_SAVED_NEWS_ARTICLES:
 
-                cursorLoader = new CursorLoader(mContext,NewsContract.NewsArticle.NEWSARTICLE_URI,null,null,null,null);
+                cursorLoader = new CursorLoader(mContext,NewsContract.NewsArticle.NEWSARTICLE_URI,
+                                                    null,
+                                                    null,
+                                                    null,
+                                                    NewsContract.NewsArticle._ID + " DESC");
                 break;
 
             default:
@@ -82,6 +94,8 @@ public class SavedNewsFeedFragment extends Fragment implements LoaderManager.Loa
 
             mSavedNewsFeedTextView.setVisibility(View.GONE);
             mRecyclerView.setVisibility(View.VISIBLE);
+            mSavedNewsFeedAdapter.swapCursor(data);
+
 
         } else {
 
@@ -90,19 +104,15 @@ public class SavedNewsFeedFragment extends Fragment implements LoaderManager.Loa
 
         }
 
-        mSavedNewsFeedAdapter = new SavedNewsFeedAdapter(mContext,data);
-        mRecyclerView.setAdapter(mSavedNewsFeedAdapter);
+//        mSavedNewsFeedAdapter = new SavedNewsFeedAdapter(mContext,data);
+//        mRecyclerView.setAdapter(mSavedNewsFeedAdapter);
 
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-        if (mSavedNewsFeedAdapter != null){
-
-            mSavedNewsFeedAdapter.swapCursor(null);
-
-        }
+        mSavedNewsFeedAdapter.swapCursor(null);
 
     }
 

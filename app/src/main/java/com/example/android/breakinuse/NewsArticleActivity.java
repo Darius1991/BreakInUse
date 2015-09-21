@@ -6,6 +6,9 @@ import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.example.android.breakinuse.utilities.Utility;
 
 public class NewsArticleActivity extends AppCompatActivity {
 
@@ -52,9 +55,15 @@ public class NewsArticleActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_news_article_activity, menu);
-        return true;
+        getMenuInflater().inflate(R.menu.menu_news_feed_activity, menu);
+        MenuItem menuItem = menu.findItem(R.id.action_user_accounts);
 
+        if (Utility.isUserLoggedIn(this)){
+
+            menuItem.setTitle("Log Out");
+
+        }
+        return true;
     }
 
     @Override
@@ -66,16 +75,46 @@ public class NewsArticleActivity extends AppCompatActivity {
 
         if (id == android.R.id.home){
 
-            Intent intent = NavUtils.getParentActivityIntent(this);
-            intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP|Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            NavUtils.navigateUpTo(this, intent);
+            super.onBackPressed();
             return true;
 
         }
-
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_user_accounts){
+
+            if (!Utility.isUserLoggedIn(this)){
+
+                Intent intent = new Intent(this,LoginActivity.class);
+                startActivity(intent);
+
+            } else {
+
+                if(Utility.logOut(this)){
+
+                    item.setTitle("User Accounts");
+                }
+
+            }
+
+        } else if (id == R.id.refresh){
+
+            if (!Utility.isNetworkAvailable(this)){
+
+                Utility.makeToast(this,
+                        "We are not able to detect an internet connection.",
+                        Toast.LENGTH_SHORT);
+
+            } else {
+
+                Utility.updateNewsFeed(this);
+
+            }
+
+        } else if (id == R.id.action_settings) {
+
+            Intent intent = new Intent(this, SettingsActivity.class);
+            startActivity(intent);
+
         }
 
         return super.onOptionsItemSelected(item);

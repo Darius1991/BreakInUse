@@ -10,6 +10,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,6 +30,7 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
     private RecyclerView mRecyclerView;
     private Context mContext;
     private TextView mFavouriteNewsFeedTextView;
+    private boolean mShouldLoadMore;
 
     @Nullable
     @Override
@@ -37,13 +39,73 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
         View rootView = inflater.inflate(R.layout.fragment_favourite_news_feed, container, false);
         mFavouriteNewsFeedTextView = (TextView)rootView.findViewById(R.id.favouriteNewsFeed_textView);
         mContext = getActivity();
+        mShouldLoadMore = true;
 
+        Set<String> favouriteTopicsSet = Utility.getFavouriteTopicsSet(mContext);
+        if (!favouriteTopicsSet.isEmpty()){
+
+            String[] selectionArgs = new String[favouriteTopicsSet.size()];
+            StringBuilder selection = new StringBuilder();
+
+            int index = 0;
+            for (String iterator : favouriteTopicsSet){
+
+                selectionArgs[index++] = iterator;
+                selection.append("?");
+                selection.append(",");
+
+            }
+            selection = new StringBuilder(selection.substring(0,selection.length()-1));
+            mFavouriteNewsFeedAdapter =  new FavouriteNewsFeedAdapter(mContext,
+                    mContext.getContentResolver().query(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI,
+                            null,
+                            NewsContract.NewsFeed.COLUMN_SECTIONID + " IN (" + selection.toString() + ")",
+                            selectionArgs,
+                            null));
+
+
+
+        } else {
+
+            mFavouriteNewsFeedAdapter = new FavouriteNewsFeedAdapter(mContext,
+                    mContext.getContentResolver().query(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI,
+                        null,
+                        NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ? ",
+                        new String[]{"DummyFavouriteNewsFeedArticleID"},
+                        null));
+
+        }
         getLoaderManager().initLoader(LOADER_ID_FAVOURITES, null, this);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.favouriteNewsFeed_recyclerView);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setAdapter(mFavouriteNewsFeedAdapter);
+
+        mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+
+                super.onScrolled(recyclerView, dx, dy);
+
+                if (mShouldLoadMore) {
+
+                    if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.getItemCount()) {
+
+                        mShouldLoadMore = false;
+
+                        //TODO handledatainsertionfornext page;
+                        Log.v(TAG, "Last Item Wow !");
+
+                    }
+
+                }
+
+            }
+
+        });
 
         return rootView;
 
@@ -112,6 +174,12 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
             mFavouriteNewsFeedTextView.setVisibility(View.GONE);
             mRecyclerView.setVisibility(View.VISIBLE);
+            mFavouriteNewsFeedAdapter.swapCursor(data);
+            if (!mShouldLoadMore){
+
+                mShouldLoadMore = true;
+
+            }
 
         } else {
 
@@ -120,20 +188,15 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
         }
 
-        mFavouriteNewsFeedAdapter = new FavouriteNewsFeedAdapter(getActivity(),data);
-        mRecyclerView.setAdapter(mFavouriteNewsFeedAdapter);
+//        mFavouriteNewsFeedAdapter = new FavouriteNewsFeedAdapter(getActivity(),data);
+//        mRecyclerView.setAdapter(mFavouriteNewsFeedAdapter);
 
     }
 
     @Override
     public void onLoaderReset(Loader<Cursor> loader) {
 
-        if (mFavouriteNewsFeedAdapter != null){
-
-            mFavouriteNewsFeedAdapter.swapCursor(null);
-
-        }
-
+        mFavouriteNewsFeedAdapter.swapCursor(null);
     }
 
     @Override

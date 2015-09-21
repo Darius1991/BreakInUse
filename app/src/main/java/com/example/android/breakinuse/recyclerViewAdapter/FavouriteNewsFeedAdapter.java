@@ -4,11 +4,12 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.support.v4.widget.CursorAdapter;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -17,6 +18,7 @@ import com.example.android.breakinuse.R;
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.utilities.DownloadNewsArticleTask;
 import com.example.android.breakinuse.utilities.Utility;
+import com.squareup.picasso.Picasso;
 
 public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<FavouriteNewsFeedAdapter.ViewHolder>{
 
@@ -42,20 +44,24 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
     }
 
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, Cursor cursor) {
+    public void onBindViewHolder(ViewHolder viewholder, Cursor cursor) {
 
         if ((cursor != null) && ( cursor.getCount() > 0 ) && (cursor.getPosition() < cursor.getCount())){
 
-            viewHolder.mTextView_headlines.setText(cursor.getString(5));
-            viewHolder.mTextView_trailText.setText(cursor.getString(6));
-            String savedFlag = cursor.getString(7);
+            viewholder.mTextView_headlines.setText(cursor.getString(5));
+            viewholder.mTextView_trailText.setText(cursor.getString(6));
+            Picasso.with(mContext)
+                    .load(cursor.getString(7))
+                    .resize(300,150)
+                    .into(viewholder.mImageView_newsFeedItemImage);
+            String savedFlag = cursor.getString(8);
             if (savedFlag.equals("0")){
 
-                viewHolder.mTextView_saveText.setText(viewHolder.mTextView_saveText_saveButtonText);
+                viewholder.mTextView_saveText.setText(viewholder.mTextView_saveText_saveButtonText);
 
             } else {
 
-                viewHolder.mTextView_saveText.setText(viewHolder.mTextView_saveText_deleteButtonText);
+                viewholder.mTextView_saveText.setText(viewholder.mTextView_saveText_deleteButtonText);
 
             }
 
@@ -68,6 +74,8 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
         public TextView mTextView_headlines;
         public TextView mTextView_trailText;
         public TextView mTextView_saveText;
+        public ImageView mImageView_newsFeedItemImage;
+        public CardView mCardView;
         public String mTextView_saveText_saveButtonText;
         public String mTextView_saveText_deleteButtonText;
 
@@ -76,8 +84,11 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
             super(itemView);
             mTextView_headlines = (TextView) itemView.findViewById(R.id.newsFeedItem_headlines_textView);
             mTextView_trailText = (TextView) itemView.findViewById(R.id.newsFeedItem_trailText_textView);
-            mTextView_saveText = (TextView) itemView.findViewById(R.id.newsFeedItem_save_textView);;
-            mTextView_headlines.setClickable(true);
+            mTextView_saveText = (TextView) itemView.findViewById(R.id.newsFeedItem_save_textView);
+            mImageView_newsFeedItemImage = (ImageView) itemView.findViewById(R.id.newsFeedItem_imageView);
+            mCardView = (CardView) itemView.findViewById(R.id.newsFeed_cardView);
+            mImageView_newsFeedItemImage.setOnClickListener(this);
+            mImageView_newsFeedItemImage.setClickable(true);
             mTextView_headlines.setOnClickListener(this);
             mTextView_trailText.setClickable(true);
             mTextView_trailText.setOnClickListener(this);
@@ -140,8 +151,9 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
                             contentValues.put(NewsContract.NewsFeed.COLUMN_WEBURL,cursor.getString(4));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_WEBTITLE,cursor.getString(5));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,cursor.getString(6));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,cursor.getString(7));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,cursor.getString(8));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,cursor.getString(9));
                             mContext.getContentResolver().update(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_WRITEURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
@@ -169,6 +181,7 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
                             contentValues.put(NewsContract.NewsArticle.COLUMN_SECTIONID,cursor.getString(4));
                             contentValues.put(NewsContract.NewsArticle.COLUMN_HEADLINE,cursor.getString(5));
                             contentValues.put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,cursor.getString(6));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_IMAGEURL,cursor.getString(7));
                             contentValues.put(NewsContract.NewsArticle.COLUMN_HTML_BODY, "0");
                             contentValues.put(NewsContract.NewsArticle.COLUMN_BYLINE, "0");
                             contentValues.put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG, "0");
@@ -187,8 +200,9 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
                             contentValues.put(NewsContract.NewsFeed.COLUMN_WEBURL,cursor.getString(4));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_WEBTITLE,cursor.getString(5));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,cursor.getString(6));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,cursor.getString(7));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "1");
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,cursor.getString(8));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,cursor.getString(9));
                             mContext.getContentResolver().update(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_WRITEURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",

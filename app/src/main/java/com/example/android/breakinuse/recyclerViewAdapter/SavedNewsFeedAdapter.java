@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.support.v4.widget.CursorAdapter;
+import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -46,6 +47,7 @@ public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFee
             viewholder.mTextView_headlines.setText(cursor.getString(5));
             viewholder.mTextView_trailText.setText(cursor.getString(6));
 
+
         }
 
     }
@@ -55,6 +57,7 @@ public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFee
         public TextView mTextView_headlines;
         public TextView mTextView_trailText;
         public TextView mTextView_deleteButton;
+        public CardView mCardView;
 
         public ViewHolder(View itemView) {
 
@@ -62,6 +65,7 @@ public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFee
             mTextView_headlines = (TextView)itemView.findViewById(R.id.savedNewsFeedItem_headlines_textView);
             mTextView_trailText = (TextView)itemView.findViewById(R.id.savedNewsFeedItem_trailText_textView);
             mTextView_deleteButton = (TextView)itemView.findViewById(R.id.savedNewsFeedItem_delete_textView);
+            mCardView = (CardView) itemView.findViewById(R.id.savedNewsFeed_cardView);
             mTextView_headlines.setClickable(true);
             mTextView_headlines.setOnClickListener(this);
             mTextView_trailText.setClickable(true);

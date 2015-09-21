@@ -257,52 +257,33 @@ public class Utility {
 
     }
 
-//    public static void insertNewsFeedDummyData(Context context){
-//
-//        ContentValues newsFeedTestValues_set1 = new ContentValues();
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_ARTICLEID, "DummyNewsFeedArticleID");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_SECTIONID, "DummyNewsFeedSectionID");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_APIURL, "DummyNewsFeedAPIURL");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_WEBURL, "http://www.theguardian.com/");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_WEBTITLE, "No NewsFeed to display");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
-//                "No NewsFeed to display. Please check your internet connection and refresh after connecting.");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE, Utility.getYesterdayDate());
-//        context.getContentResolver().insert(NewsContract.NewsFeed.NEWSFEED_WRITEURI, newsFeedTestValues_set1);
-//
-//    }
-//
-//    public static void insertFavouriteNewsFeedDummyData(Context context){
-//
-//        ContentValues newsFeedTestValues_set1 = new ContentValues();
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_ARTICLEID, "DummyFavouriteNewsFeedArticleID");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_SECTIONID, "DummyFavouriteNewsFeedSectionID");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_APIURL, "DummyFavouriteNewsFeedAPIURL");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_WEBURL, "http://www.theguardian.com/");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_WEBTITLE, "No FavouriteFeed to display");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
-//                "No FavouriteFeed to display. No matching articles may be available or you need to refresh after connecting to internet.");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
-//        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE, Utility.getYesterdayDate());
-//        context.getContentResolver().insert(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_WRITEURI, newsFeedTestValues_set1);
-//
-//    }
-//
-//    public static void insertSavedNewsFeedDummyData(Context context){
-//
-//        ContentValues contentValues = new ContentValues();
-//        contentValues.put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,1000);
-//        contentValues.put(NewsContract.NewsArticle.COLUMN_WEBURL,"https://www.guardian.com/");
-//        contentValues.put(NewsContract.NewsArticle.COLUMN_ARTICLEID,"DummySavedNewsArticleID");
-//        contentValues.put(NewsContract.NewsArticle.COLUMN_SECTIONID,"DummySavedNewsSectionID");
-//        contentValues.put(NewsContract.NewsArticle.COLUMN_HEADLINE,"No Article saved currently");
-//        contentValues.put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,"There is no article saved currently. Save an article to read later.");
-//        contentValues.put(NewsContract.NewsArticle.COLUMN_HTML_BODY,"DummyHTMLBody");
-//        contentValues.put(NewsContract.NewsArticle.COLUMN_BYLINE,"DummyByline");
-//        contentValues.put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"1");
-//        context.getContentResolver().insert(NewsContract.NewsArticle.NEWSARTICLE_URI, contentValues);
-//
-//    }
+    public static String getImageURLFromMainHTML(String imageHTMLSource){
+
+        StringBuilder imageSource = new StringBuilder(imageHTMLSource);
+        int startIndex = imageSource.indexOf("http");
+        int endIndex = imageSource.indexOf(".jpg");
+        if (startIndex == -1){
+
+            return "http://vignette3.wikia.nocookie.net/wiisportsresortwalkthrough/images/6/60/No_Image_Available.png";
+
+        }
+        if (endIndex == -1){
+
+            endIndex = imageSource.indexOf(".jpeg");
+            if (endIndex == -1){
+
+                return "http://vignette3.wikia.nocookie.net/wiisportsresortwalkthrough/images/6/60/No_Image_Available.png";
+
+            } else {
+
+                imageSource = new StringBuilder(imageSource.substring(startIndex,endIndex+5));
+
+            }
+
+        }
+
+        return imageSource.toString();
+
+    }
 
 }

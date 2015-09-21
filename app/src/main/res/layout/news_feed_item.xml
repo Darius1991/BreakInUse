@@ -4,20 +4,31 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent"
+    android:layout_marginTop = "8dp"
+    android:layout_marginBottom = "8dp"
+    android:layout_marginRight = "5dp"
+    android:layout_marginLeft = "5dp">
 
     <android.support.v7.widget.CardView
-        android:id="@+id/home_cardView"
+        xmlns:card_view="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/newsFeed_cardView"
         android:layout_width = "match_parent"
         android:layout_height = "wrap_content"
-        android:paddingTop = "15dp"
-        android:paddingBottom = "15dp" >
+        card_view:cardUseCompatPadding="true"
+        card_view:cardElevation="4dp"
+        card_view:cardCornerRadius="3dp" >
 
         <LinearLayout
             android:id = "@+id/newsFeedItem_linearLayout"
             android:layout_width = "match_parent"
             android:layout_height = "wrap_content"
             android:orientation = "vertical" >
+
+            <ImageView
+                android:id = "@+id/newsFeedItem_imageView"
+                android:layout_width="fill_parent"
+                android:layout_height="150dp"/>
 
             <TextView
                 android:id="@+id/newsFeedItem_headlines_textView"
