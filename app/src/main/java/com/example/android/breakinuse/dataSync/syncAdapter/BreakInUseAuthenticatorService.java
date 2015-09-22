@@ -1,4 +1,4 @@
-package com.example.android.breakinuse.syncAdapter;
+package com.example.android.breakinuse.dataSync.syncAdapter;
 
 import android.app.Service;
 import android.content.Intent;

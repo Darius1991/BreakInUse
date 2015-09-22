@@ -1,5 +1,6 @@
 package com.example.android.breakinuse;
 
+import android.app.Activity;
 import android.database.Cursor;
 import android.support.v4.app.Fragment;
 import android.content.Context;
@@ -15,9 +16,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.recyclerViewAdapter.NewsFeedAdapter;
+import com.example.android.breakinuse.dataSync.DownloadNewsFeedTask;
+import com.example.android.breakinuse.utilities.Utility;
 
 public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -47,6 +51,7 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mNewsFeedAdapter);
+        final Activity currentActivity = getActivity();
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -59,10 +64,20 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
 
                     if ( (layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.getItemCount()) {
 
-                        mShouldLoadMore = false;
+                        if (!Utility.isNetworkAvailable(mContext)){
 
-                        //TODO handledatainsertionfornext page;
-                        Log.v(TAG, "Last Item Wow !");
+                            Utility.makeToast(mContext,
+                                    "We are not able to detect an internet connection. Please resolve this befor trying again.",
+                                    Toast.LENGTH_SHORT);
+                            mShouldLoadMore = true;
+
+                        } else {
+
+                            mShouldLoadMore = false;
+                            new DownloadNewsFeedTask(mContext,currentActivity).execute();
+                            Log.d(TAG, "Last Item Wow !");
+
+                        }
 
                     }
 

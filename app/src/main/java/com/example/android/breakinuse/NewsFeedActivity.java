@@ -15,7 +15,7 @@ import android.view.MenuItem;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
-import com.example.android.breakinuse.syncAdapter.BreakInUseSyncAdapter;
+import com.example.android.breakinuse.dataSync.syncAdapter.BreakInUseSyncAdapter;
 import com.example.android.breakinuse.utilities.Utility;
 
 public class NewsFeedActivity extends AppCompatActivity {

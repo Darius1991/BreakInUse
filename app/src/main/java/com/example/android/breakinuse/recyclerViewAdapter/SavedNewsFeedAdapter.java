@@ -20,13 +20,13 @@ import com.example.android.breakinuse.utilities.Utility;
 public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFeedAdapter.ViewHolder> {
 
     private Context mContext;
-    private Cursor mOriginalCursor;
+//    private Cursor mOriginalCursor;
 
     public SavedNewsFeedAdapter(Context tempContext, Cursor tempCursor) {
 
         super(tempContext, tempCursor);
         mContext = tempContext;
-        mOriginalCursor = tempCursor;
+//        mOriginalCursor = tempCursor;
 
     }
 
@@ -78,7 +78,7 @@ public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFee
         @Override
         public void onClick(View v) {
 
-            Cursor tempCursor = mOriginalCursor;
+            Cursor tempCursor = getCursor();
             if (v != mTextView_deleteButton){
 
                 if ((tempCursor != null ) && (tempCursor.moveToFirst())){
