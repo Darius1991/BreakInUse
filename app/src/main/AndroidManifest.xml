@@ -90,7 +90,7 @@
             android:exported = "false"/>
 
         <service
-            android:name="com.example.android.breakinuse.syncAdapter.BreakInUseAuthenticatorService">
+            android:name=".dataSync.syncAdapter.BreakInUseAuthenticatorService">
 
             <intent-filter>
 
@@ -105,7 +105,7 @@
         </service>
 
         <service
-            android:name=".syncAdapter.BreakInUseSyncService"
+            android:name=".dataSync.syncAdapter.BreakInUseSyncService"
             android:exported="true" >
 
             <intent-filter>

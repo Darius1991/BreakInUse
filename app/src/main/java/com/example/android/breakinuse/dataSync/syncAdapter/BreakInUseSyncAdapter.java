@@ -1,4 +1,4 @@
-package com.example.android.breakinuse.syncAdapter;
+package com.example.android.breakinuse.dataSync.syncAdapter;
 
 import android.accounts.Account;
 import android.accounts.AccountManager;
@@ -80,7 +80,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
         final String ORDER_QUERY_PARAM = "order-by";
         final String PAGESIZE_QUERY_PARAM = "page-size";
         final String PAGE_QUERY_PARAM = "page";
-
+        final int PAGE_SIZE = 20;
 
         Set<String> defaultFavouriteTopicsSet = Utility.getDefaultFavouriteTopicsSet(mContext);
 
@@ -97,7 +97,6 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
         }
         mTopicsQuery = new StringBuilder(mTopicsQuery.substring(0,(mTopicsQuery.length()-1)));
 
-        final int PAGE_SIZE = 20;
         StringBuilder responseString =  new StringBuilder();
         String holder;
         Uri.Builder builder = new Uri.Builder();
@@ -117,8 +116,8 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                     .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline,main,thumbnail")
                     .appendQueryParameter(PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
                     .appendQueryParameter(ORDER_QUERY_PARAM, "relevance")
+                    .appendQueryParameter(PAGE_QUERY_PARAM,String.valueOf(1))
                     .appendQueryParameter(FROMDATE_QUERY_PARAM, fromDate)
-//                    .appendQueryParameter(ID_QUERY_PARAM,"sport/blog/2015/sep/20/five-talking-points-england-rugby-world-cup-fiji")
                     .appendQueryParameter(SECTION_QUERY_PARAM, mTopicsQuery.toString())
                     .build();
 
@@ -190,92 +189,13 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
         }
 
-        if (pageCount > 1){
+        try {
 
-            JSONObject[] tempArray = new JSONObject[pageCount];
-            tempArray[0] = responsePage[0];
-            responsePage = tempArray;
+            insertNewsFeedItemsInNewsFeedTableFromJSON(responsePage);
 
-            for (int index=2; index <= pageCount; ++index){
+        } catch (Exception e) {
 
-                responseString.delete(0, responseString.length());
-                builder.clearQuery();
-
-                try {
-
-                    builder.appendQueryParameter(API_KEY_QUERY_PARAM, API_KEY)
-                            .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline,main,thumbnail")
-                            .appendQueryParameter(PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
-                            .appendQueryParameter(PAGE_QUERY_PARAM, String.valueOf(index))
-                            .appendQueryParameter(ORDER_QUERY_PARAM, "relevance")
-                            .appendQueryParameter(FROMDATE_QUERY_PARAM,fromDate)
-                            .appendQueryParameter(SECTION_QUERY_PARAM,mTopicsQuery.toString())
-                            .build();
-
-                    url = new URL(builder.toString());
-                    urlConnection = url.openConnection();
-                    reader = new BufferedReader(new InputStreamReader
-                            (urlConnection.getInputStream()));
-
-                    while (( holder = reader.readLine()) != null){
-
-                        responseString.append(holder);
-
-                    }
-
-                    responsePage[index-1] = new JSONObject(responseString.toString());
-                    reader.close();
-
-                } catch (Exception e) {
-
-                    e.printStackTrace();
-
-                } finally {
-
-                    if (reader !=null){
-
-                        try {
-
-                            reader.close();
-
-                        } catch (Exception e) {
-
-                            e.printStackTrace();
-                            return;
-
-                        }
-                    }
-                }
-            }
-
-            responseString.delete(0, responseString.length());
-
-            try {
-
-                insertNewsFeedItemsInNewsFeedTableFromJSON(responsePage);
-
-            } catch (Exception e) {
-
-                e.printStackTrace();
-                return;
-
-            }
-
-        } else if (pageCount  == 1){
-
-            try {
-
-                insertNewsFeedItemsInNewsFeedTableFromJSON(responsePage);
-
-            } catch (Exception e) {
-
-                e.printStackTrace();
-                return;
-
-            }
-
-        } else {
-
+            e.printStackTrace();
             return;
 
         }
@@ -397,7 +317,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private int insertNewsFeedItemsInNewsFeedTableFromJSON(JSONObject[] responsePage) throws Exception {
 
-        int pageCount = responsePage[0].getJSONObject("response").getInt("pages");
+        int pageCount = 1; /*responsePage[0].getJSONObject("response").getInt("pages");*/
         int pageIndex, webTitleIndex, arrayIndex, responseCount;
         responseCount = responsePage[0].getJSONObject("response").getInt("total");
         ContentValues[] newsFeedContentValues = new ContentValues[responseCount];

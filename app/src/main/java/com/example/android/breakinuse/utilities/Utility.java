@@ -1,6 +1,5 @@
 package com.example.android.breakinuse.utilities;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
@@ -10,8 +9,7 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.example.android.breakinuse.R;
-import com.example.android.breakinuse.newsProvider.NewsContract;
-import com.example.android.breakinuse.syncAdapter.BreakInUseSyncAdapter;
+import com.example.android.breakinuse.dataSync.syncAdapter.BreakInUseSyncAdapter;
 import com.facebook.AccessToken;
 import com.facebook.login.LoginManager;
 import com.google.android.gms.common.Scopes;

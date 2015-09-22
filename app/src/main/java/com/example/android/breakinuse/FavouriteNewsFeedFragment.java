@@ -1,5 +1,6 @@
 package com.example.android.breakinuse;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -15,9 +16,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.recyclerViewAdapter.FavouriteNewsFeedAdapter;
+import com.example.android.breakinuse.dataSync.DownloadNewsFeedTask;
 import com.example.android.breakinuse.utilities.Utility;
 
 import java.util.Set;
@@ -82,6 +85,7 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mFavouriteNewsFeedAdapter);
+        final Activity currentActivity = getActivity();
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -94,10 +98,20 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
                     if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.getItemCount()) {
 
-                        mShouldLoadMore = false;
+                        if (!Utility.isNetworkAvailable(mContext)){
 
-                        //TODO handledatainsertionfornext page;
-                        Log.v(TAG, "Last Item Wow !");
+                            Utility.makeToast(mContext,
+                                    "We are not able to detect an internet connection. Please resolve this befor trying again.",
+                                    Toast.LENGTH_SHORT);
+                            mShouldLoadMore = true;
+
+                        } else {
+
+                            mShouldLoadMore = false;
+                            new DownloadNewsFeedTask(mContext,currentActivity).execute();
+                            Log.d(TAG, "Last Item Wow !");
+
+                        }
 
                     }
 

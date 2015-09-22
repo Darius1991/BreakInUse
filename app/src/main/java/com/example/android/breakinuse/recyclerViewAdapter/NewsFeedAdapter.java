@@ -16,21 +16,21 @@ import android.widget.Toast;
 import com.example.android.breakinuse.NewsArticleActivity;
 import com.example.android.breakinuse.R;
 import com.example.android.breakinuse.newsProvider.NewsContract;
-import com.example.android.breakinuse.utilities.DownloadNewsArticleTask;
+import com.example.android.breakinuse.dataSync.DownloadNewsArticleTask;
 import com.example.android.breakinuse.utilities.Utility;
 import com.squareup.picasso.Picasso;
 
 public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.ViewHolder> {
 
     private Context mContext;
-    private Cursor mOriginalCursor;
+//    private Cursor mOriginalCursor;
     private static final String TAG = NewsFeedAdapter.class.getName();
 
     public NewsFeedAdapter(Context context, Cursor cursor) {
 
         super(context, cursor);
         mContext = context;
-        mOriginalCursor = cursor;
+//        mOriginalCursor = cursor;
 
     }
 
@@ -86,14 +86,16 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
             mTextView_saveText = (TextView) itemView.findViewById(R.id.newsFeedItem_save_textView);
             mImageView_newsFeedItemImage = (ImageView) itemView.findViewById(R.id.newsFeedItem_imageView);
             mCardView = (CardView) itemView.findViewById(R.id.newsFeed_cardView);
-            mImageView_newsFeedItemImage.setOnClickListener(this);
+
             mImageView_newsFeedItemImage.setClickable(true);
+            mImageView_newsFeedItemImage.setOnClickListener(this);
             mTextView_headlines.setClickable(true);
             mTextView_headlines.setOnClickListener(this);
             mTextView_trailText.setClickable(true);
             mTextView_trailText.setOnClickListener(this);
             mTextView_saveText.setClickable(true);
             mTextView_saveText.setOnClickListener(this);
+
             mTextView_saveText_saveButtonText =  mContext.getString(R.string.newsFeedItem_textView_saveText);
             mTextView_saveText_deleteButtonText = mContext.getString(R.string.newsFeedItem_textView_deleteText);
 
@@ -104,7 +106,7 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
 
             if (v != mTextView_saveText){
 
-                Cursor tempCursor = mOriginalCursor;
+                Cursor tempCursor = getCursor();
                 if ((tempCursor != null ) && (tempCursor.moveToFirst())){
 
                     tempCursor.moveToPosition(getAdapterPosition());
@@ -131,7 +133,7 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
 
                 if((mTextView_saveText.getText()).equals(mTextView_saveText_deleteButtonText)){
 
-                    Cursor cursor = mOriginalCursor;
+                    Cursor cursor = getCursor();
                     if (cursor != null){
 
                         if(cursor.moveToPosition(getAdapterPosition())){
@@ -165,7 +167,7 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
 
                 } else {
 
-                    Cursor cursor = mOriginalCursor;
+                    Cursor cursor = getCursor();
                     if (cursor != null){
 
                         if(cursor.moveToPosition(getAdapterPosition())){

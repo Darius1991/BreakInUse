@@ -1,4 +1,4 @@
-package com.example.android.breakinuse.utilities;
+package com.example.android.breakinuse.dataSync;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.AsyncTask;
 
 import com.example.android.breakinuse.newsProvider.NewsContract;
+import com.example.android.breakinuse.utilities.Utility;
 
 import org.json.JSONObject;
 
