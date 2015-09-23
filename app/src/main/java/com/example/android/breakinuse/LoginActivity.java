@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Patterns;
@@ -68,6 +69,13 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
         FacebookSdk.sdkInitialize(getApplicationContext());
         setContentView(R.layout.activity_login);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.loginActivity_toolBar);
+        setSupportActionBar(toolbar);
+        if (getSupportActionBar() != null){
+
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        }
 
         findViewById(R.id.sign_in_button_google).setOnClickListener(this);
         findViewById(R.id.sign_in_button_facebook).setOnClickListener(this);

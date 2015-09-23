@@ -23,14 +23,12 @@ import com.squareup.picasso.Picasso;
 public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<FavouriteNewsFeedAdapter.ViewHolder>{
 
     private Context mContext;
-//    private Cursor mOriginalCursor;
     private static final String TAG = NewsFeedAdapter.class.getName();
 
     public FavouriteNewsFeedAdapter(Context context, Cursor cursor) {
 
         super(context,cursor);
         mContext = context;
-//        mOriginalCursor = cursor;
 
     }
 

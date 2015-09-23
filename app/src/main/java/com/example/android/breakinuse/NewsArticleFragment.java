@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -54,6 +55,14 @@ public class NewsArticleFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_news_article,container,false);
         mWebView = (WebView)rootView.findViewById(R.id.news_article_webView);
         mContext = getActivity();
+
+        Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.newsArticleFragment_toolBar);
+        ((NewsArticleActivity)mContext).setSupportActionBar(toolbar);
+        if (((NewsArticleActivity)mContext).getSupportActionBar() != null){
+
+            ((NewsArticleActivity)mContext).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        }
 
         Bundle bundle = getArguments();
         String articleLoadMethod = bundle.getString("ArticleLoadMethod");

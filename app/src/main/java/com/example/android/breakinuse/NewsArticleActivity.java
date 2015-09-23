@@ -2,11 +2,9 @@ package com.example.android.breakinuse;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v4.app.NavUtils;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.example.android.breakinuse.utilities.Utility;
 
@@ -21,7 +19,6 @@ public class NewsArticleActivity extends AppCompatActivity {
         NewsArticleFragment newsArticleFragment = new NewsArticleFragment();
 
         String articleLoadMethod = getIntent().getStringExtra("ArticleLoadMethod");
-
         if (articleLoadMethod.equals("HTMLBody")){
 
             Bundle articleIDBundle =  new Bundle();
@@ -55,7 +52,7 @@ public class NewsArticleActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_news_feed_activity, menu);
+        getMenuInflater().inflate(R.menu.menu_news_article_activity, menu);
         MenuItem menuItem = menu.findItem(R.id.action_user_accounts);
 
         if (Utility.isUserLoggedIn(this)){
@@ -93,20 +90,6 @@ public class NewsArticleActivity extends AppCompatActivity {
 
                     item.setTitle("User Accounts");
                 }
-
-            }
-
-        } else if (id == R.id.refresh){
-
-            if (!Utility.isNetworkAvailable(this)){
-
-                Utility.makeToast(this,
-                        "We are not able to detect an internet connection.",
-                        Toast.LENGTH_SHORT);
-
-            } else {
-
-                Utility.updateNewsFeed(this);
 
             }
 

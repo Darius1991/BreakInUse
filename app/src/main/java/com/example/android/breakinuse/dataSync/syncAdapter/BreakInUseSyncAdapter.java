@@ -529,31 +529,15 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
         }catch (Exception e){
 
-            // If the password doesn't exist, the account doesn't exist
-            if ( null == accountManager.getPassword(newAccount) ) {
+            e.printStackTrace();
 
-        /*
-         * Add the account and account type, no password or user data
-         * If successful, return the Account object, otherwise report an error.
-         */
-                if (!accountManager.addAccountExplicitly(newAccount, "", null)) {
 
-                    return null;
-
-                }
-            /*
-             * If you don't set android:syncable="true" in
-             * in your <provider> element in the manifest,
-             * then call ContentResolver.setIsSyncable(account, AUTHORITY, 1)
-             * here.
-             */
-
-                onAccountCreated(newAccount, context);
-            }
-
-            return newAccount;
 
         }
+
+        return newAccount;
+
+
 
     }
 
