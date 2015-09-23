@@ -31,6 +31,7 @@ public class SyncSettings {
             public void done(List<ParseObject> list, ParseException e) {
 
                 if (e == null) {
+
                     if (list.size() > 0) {
 
                         ParseObject settings = list.get(0);
@@ -44,11 +45,17 @@ public class SyncSettings {
                         settings.saveInBackground();
                         settings.addAllUnique("favouriteTopics", favouriteTopicsSet);
                         settings.saveInBackground();
+
                     }
+
                 } else {
+
                     // TODO HandleError
+
                 }
+
             }
+
         });
 
     }
@@ -64,6 +71,7 @@ public class SyncSettings {
         settings.addAll("favouriteTopics", favouriteTopicsSet);
         settings.saveInBackground();
         launchHomeActivity(context);
+
     }
 
     public void downloadSettingsFromCloud(final Context context, String userEmailID){
@@ -93,17 +101,24 @@ public class SyncSettings {
                         editor.apply();
                         launchHomeActivity(context);
                     }
+
                 } else {
+
                     // TODO HandleError
+
                 }
-            }
+
+                 }
         });
+
     }
 
     private void launchHomeActivity(Context context){
+
         Intent intent = new Intent(context,NewsFeedActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         context.startActivity(intent);
+
     }
 
 }

@@ -5,6 +5,12 @@
     tools:context="com.example.android.breakinuse.NewsArticleActivity">
 
     <item
+        android:id="@+id/action_user_accounts"
+        android:title="@string/action_user_accounts"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/action_settings"
         android:title="@string/action_settings"
         android:orderInCategory="100"

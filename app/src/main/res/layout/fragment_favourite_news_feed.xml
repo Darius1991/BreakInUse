@@ -8,7 +8,7 @@
     <android.support.v7.widget.RecyclerView
         android:id = "@+id/favouriteNewsFeed_recyclerView"
         android:layout_width = "match_parent"
-        android:layout_height = "match_parent"
+        android:layout_height = "wrap_content"
         android:scrollbars="vertical"
         android:gravity = "center"/>
 
@@ -18,5 +18,15 @@
         android:layout_height = "match_parent"
         android:text = "@string/favouriteNewsFeed_textView_text"
         android:gravity = "center" />
+
+    <LinearLayout
+        style="@style/GenericProgressBackground"
+        android:id="@+id/favouriteNewsFeed_loadingPanel" >
+
+        <ProgressBar
+            android:id = "@+id/favouriteNewsFeed_loadMoreIndicator"
+            style="@style/GenericProgressIndicator"/>
+
+    </LinearLayout>
 
 </LinearLayout>

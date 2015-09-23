@@ -1,6 +1,6 @@
 package com.example.android.breakinuse;
 
-import android.app.Activity;
+
 import android.database.Cursor;
 import android.support.v4.app.Fragment;
 import android.content.Context;
@@ -9,12 +9,14 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -32,6 +34,7 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
     private Context mContext;
     private TextView mNewsFeedTextView;
     private boolean mShouldLoadMore;
+    private ProgressBar mLoadMoreIndicator;
 
     @Nullable
     @Override
@@ -39,6 +42,8 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
 
         View rootView = inflater.inflate(R.layout.fragment_news_feed, container, false);
         mNewsFeedTextView = (TextView) rootView.findViewById(R.id.newsFeed_textView);
+        mLoadMoreIndicator = (ProgressBar) rootView.findViewById(R.id.newsFeed_loadMoreIndicator);
+        mLoadMoreIndicator.setVisibility(View.GONE);
         mContext = getActivity();
         mShouldLoadMore = true;
 
@@ -47,11 +52,10 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
         getLoaderManager().initLoader(LOADER_ID_ALL, null, this);
 
         final LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
-        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.favouriteNewsFeed_recyclerView);
+        mRecyclerView = (RecyclerView)rootView.findViewById(R.id.newsFeed_recyclerView);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mNewsFeedAdapter);
-        final Activity currentActivity = getActivity();
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -74,7 +78,8 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
                         } else {
 
                             mShouldLoadMore = false;
-                            new DownloadNewsFeedTask(mContext,currentActivity).execute();
+                            new DownloadNewsFeedTask(mContext,mLoadMoreIndicator).execute();
+                            mLoadMoreIndicator.setVisibility(View.VISIBLE);
                             Log.d(TAG, "Last Item Wow !");
 
                         }
@@ -137,9 +142,6 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
             mRecyclerView.setVisibility(View.GONE);
 
         }
-
-//        mNewsFeedAdapter = new NewsFeedAdapter(getActivity(),data);
-//        mRecyclerView.setAdapter(mNewsFeedAdapter);
 
     }
 

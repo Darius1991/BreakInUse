@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.SparseArray;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -29,12 +30,14 @@ public class NewsFeedActivity extends AppCompatActivity {
         setContentView(R.layout.activity_news_feed);
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 
-        NewsFeedPagerAdapter newsFeedPagerAdapter = new NewsFeedPagerAdapter(getSupportFragmentManager());
+        Toolbar toolbar = (Toolbar) findViewById(R.id.newsFeedActivity_toolBar);
+        setSupportActionBar(toolbar);
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.newsFeed_viewPager);
+        NewsFeedPagerAdapter newsFeedPagerAdapter = new NewsFeedPagerAdapter(getSupportFragmentManager());
+        ViewPager viewPager = (ViewPager) findViewById(R.id.newsFeedActivity_viewPager);
         viewPager.setAdapter(newsFeedPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.sliding_tabs);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.snewsFeedActivity_tabLayout);
         tabLayout.setupWithViewPager(viewPager);
 
         BreakInUseSyncAdapter.initializeSyncAdapter(this);

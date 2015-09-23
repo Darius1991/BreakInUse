@@ -1,6 +1,6 @@
 package com.example.android.breakinuse;
 
-import android.app.Activity;
+
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -9,12 +9,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,6 +36,7 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
     private Context mContext;
     private TextView mFavouriteNewsFeedTextView;
     private boolean mShouldLoadMore;
+    private ProgressBar mLoadMoreIndicator;
 
     @Nullable
     @Override
@@ -41,6 +44,8 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
         View rootView = inflater.inflate(R.layout.fragment_favourite_news_feed, container, false);
         mFavouriteNewsFeedTextView = (TextView)rootView.findViewById(R.id.favouriteNewsFeed_textView);
+        mLoadMoreIndicator = (ProgressBar) rootView.findViewById(R.id.favouriteNewsFeed_loadMoreIndicator);
+        mLoadMoreIndicator.setVisibility(View.GONE);
         mContext = getActivity();
         mShouldLoadMore = true;
 
@@ -85,7 +90,6 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mFavouriteNewsFeedAdapter);
-        final Activity currentActivity = getActivity();
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -108,7 +112,8 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
                         } else {
 
                             mShouldLoadMore = false;
-                            new DownloadNewsFeedTask(mContext,currentActivity).execute();
+                            new DownloadNewsFeedTask(mContext,mLoadMoreIndicator).execute();
+                            mLoadMoreIndicator.setVisibility(View.VISIBLE);
                             Log.d(TAG, "Last Item Wow !");
 
                         }
@@ -201,9 +206,6 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
             mRecyclerView.setVisibility(View.GONE);
 
         }
-
-//        mFavouriteNewsFeedAdapter = new FavouriteNewsFeedAdapter(getActivity(),data);
-//        mRecyclerView.setAdapter(mFavouriteNewsFeedAdapter);
 
     }
 

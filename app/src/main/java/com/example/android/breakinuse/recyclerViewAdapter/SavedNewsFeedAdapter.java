@@ -20,13 +20,11 @@ import com.example.android.breakinuse.utilities.Utility;
 public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFeedAdapter.ViewHolder> {
 
     private Context mContext;
-//    private Cursor mOriginalCursor;
 
     public SavedNewsFeedAdapter(Context tempContext, Cursor tempCursor) {
 
         super(tempContext, tempCursor);
         mContext = tempContext;
-//        mOriginalCursor = tempCursor;
 
     }
 
@@ -66,6 +64,7 @@ public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFee
             mTextView_trailText = (TextView)itemView.findViewById(R.id.savedNewsFeedItem_trailText_textView);
             mTextView_deleteButton = (TextView)itemView.findViewById(R.id.savedNewsFeedItem_delete_textView);
             mCardView = (CardView) itemView.findViewById(R.id.savedNewsFeed_cardView);
+
             mTextView_headlines.setClickable(true);
             mTextView_headlines.setOnClickListener(this);
             mTextView_trailText.setClickable(true);

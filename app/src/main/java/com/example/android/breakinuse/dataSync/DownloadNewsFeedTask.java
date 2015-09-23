@@ -1,14 +1,16 @@
 package com.example.android.breakinuse.dataSync;
 
-import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.example.android.breakinuse.NewsFeedActivity;
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.utilities.Utility;
 
@@ -25,14 +27,14 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
 
     private Cursor mCursor;
     private Context mContext;
-    private Activity mParentActivity;
     private final int PAGE_SIZE = 20;
     private static final String TAG = DownloadNewsFeedTask.class.getName();
+    private ProgressBar mLoadMoreIndicator;
 
-    public DownloadNewsFeedTask(Context context, Activity fragment){
+    public DownloadNewsFeedTask(Context context, ProgressBar loadMoreIndicator){
 
         mContext = context;
-        mParentActivity = fragment;
+        mLoadMoreIndicator = loadMoreIndicator;
 
     }
 
@@ -179,7 +181,7 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
 
                 if (articleCount <= dbNewsFeedItemCount){
 
-                    mParentActivity.runOnUiThread(new Runnable() {
+                    ((NewsFeedActivity)mContext).runOnUiThread(new Runnable() {
 
                         public void run() {
 
@@ -419,6 +421,7 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
     protected void onPostExecute(Void aVoid) {
 
         super.onPostExecute(aVoid);
+        mLoadMoreIndicator.setVisibility(View.GONE);
         if (mCursor != null){
 
             mCursor.close();
@@ -499,6 +502,5 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
         return mContext.getContentResolver().bulkInsert(NewsContract.NewsFeed.NEWSFEED_READURI, newsFeedContentValues);
 
     }
-
 
 }

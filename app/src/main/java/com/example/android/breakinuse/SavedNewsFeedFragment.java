@@ -8,15 +8,20 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.android.breakinuse.dataSync.DownloadNewsFeedTask;
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.recyclerViewAdapter.SavedNewsFeedAdapter;
+import com.example.android.breakinuse.utilities.Utility;
 
 public class SavedNewsFeedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
@@ -35,7 +40,6 @@ public class SavedNewsFeedFragment extends Fragment implements LoaderManager.Loa
         mSavedNewsFeedTextView = (TextView) rootView.findViewById(R.id.savedNewsFeed_textView);
         mContext = getActivity();
 
-
         mSavedNewsFeedAdapter = new SavedNewsFeedAdapter(mContext,
                 mContext.getContentResolver().query(NewsContract.NewsArticle.NEWSARTICLE_URI,
                                                         null,
@@ -44,7 +48,7 @@ public class SavedNewsFeedFragment extends Fragment implements LoaderManager.Loa
                                                         NewsContract.NewsArticle._ID + " DESC"));
         getLoaderManager().initLoader(LOADER_ID_SAVED_NEWS_ARTICLES, null, this);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
+        final LinearLayoutManager layoutManager = new LinearLayoutManager(mContext);
         mRecyclerView = (RecyclerView)rootView.findViewById(R.id.savedNewsFeed_recyclerView);
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
@@ -103,9 +107,6 @@ public class SavedNewsFeedFragment extends Fragment implements LoaderManager.Loa
             mRecyclerView.setVisibility(View.GONE);
 
         }
-
-//        mSavedNewsFeedAdapter = new SavedNewsFeedAdapter(mContext,data);
-//        mRecyclerView.setAdapter(mSavedNewsFeedAdapter);
 
     }
 
