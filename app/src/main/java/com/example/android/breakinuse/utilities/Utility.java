@@ -10,12 +10,6 @@ import android.widget.Toast;
 
 import com.example.android.breakinuse.R;
 import com.example.android.breakinuse.dataSync.syncAdapter.BreakInUseSyncAdapter;
-import com.facebook.AccessToken;
-import com.facebook.login.LoginManager;
-import com.google.android.gms.common.Scopes;
-import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.common.api.Scope;
-import com.google.android.gms.plus.Plus;
 import com.parse.ParseUser;
 
 import org.json.JSONObject;
@@ -51,10 +45,6 @@ public class Utility {
         final String LOGGEDIN_FACEBOOK = "Logged in through FB";
         final String LOGGEDIN_EMAIL = "Logged in through Email";
         final String LOGGEDOUT = "Logged Out";
-        GoogleApiClient googleApiClient = new GoogleApiClient.Builder(context)
-                                .addApi(Plus.API)
-                                .addScope(new Scope(Scopes.PROFILE))
-                                .build();
 
         switch (LOGIN_METHOD){
 
@@ -80,55 +70,25 @@ public class Utility {
 
             case LOGGEDIN_GOOGLE:
 
-                googleApiClient.connect();
-                if (googleApiClient.isConnected()){
+                if (ParseUser.getCurrentUser() != null){
 
-                    Plus.AccountApi.clearDefaultAccount(googleApiClient);
-
-                    if (ParseUser.getCurrentUser() != null){
-
-                        ParseUser.logOut();
-
-                    }
-                    saveLoginMethodPreference(context, LOGGEDOUT);
-                    makeToast(context, "You are now signed out.", Toast.LENGTH_SHORT);
-
-                } else {
-
-                    if (ParseUser.getCurrentUser() != null){
-
-                        ParseUser.logOut();
-
-                    }
-                    saveLoginMethodPreference(context, LOGGEDOUT);
-                    makeToast(context,"You are now signed out.",Toast.LENGTH_SHORT);
+                    ParseUser.logOut();
 
                 }
+                saveLoginMethodPreference(context, LOGGEDOUT);
+                makeToast(context, "You are now signed out.", Toast.LENGTH_SHORT);
+
                 break;
 
             case LOGGEDIN_FACEBOOK:
-                if (AccessToken.getCurrentAccessToken() != null){
 
-                    LoginManager.getInstance().logOut();
-                    if (ParseUser.getCurrentUser() != null){
+                if (ParseUser.getCurrentUser() != null){
 
-                        ParseUser.logOut();
-
-                    }
-                    saveLoginMethodPreference(context, LOGGEDOUT);
-                    makeToast(context, "You are now signed out.", Toast.LENGTH_SHORT);
-
-                } else {
-
-                    if (ParseUser.getCurrentUser() != null){
-
-                        ParseUser.logOut();
-
-                    }
-                    saveLoginMethodPreference(context, LOGGEDOUT);
-                    makeToast(context,"You are now signed out.",Toast.LENGTH_SHORT);
+                    ParseUser.logOut();
 
                 }
+                saveLoginMethodPreference(context, LOGGEDOUT);
+                makeToast(context, "You are now signed out.", Toast.LENGTH_SHORT);
                 break;
 
             case LOGGEDOUT:

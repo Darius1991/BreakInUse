@@ -15,8 +15,8 @@ import android.widget.Toast;
 
 import com.example.android.breakinuse.NewsArticleActivity;
 import com.example.android.breakinuse.R;
-import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.dataSync.DownloadNewsArticleTask;
+import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.utilities.Utility;
 import com.squareup.picasso.Picasso;
 
@@ -27,7 +27,7 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
 
     public FavouriteNewsFeedAdapter(Context context, Cursor cursor) {
 
-        super(context,cursor);
+        super(context, cursor);
         mContext = context;
 
     }
@@ -48,10 +48,13 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
 
             viewholder.mTextView_headlines.setText(cursor.getString(5));
             viewholder.mTextView_trailText.setText(cursor.getString(6));
+
             Picasso.with(mContext)
-                    .load(cursor.getString(7))
-                    .resize(300,150)
+                    .load(cursor.getString(10))
+                    .fit()
+                    .centerCrop()
                     .into(viewholder.mImageView_newsFeedItemImage);
+
             String savedFlag = cursor.getString(8);
             if (savedFlag.equals("0")){
 
@@ -155,6 +158,7 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
                             contentValues.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,cursor.getString(7));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
                             contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,cursor.getString(9));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,cursor.getString(10));
                             mContext.getContentResolver().update(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_WRITEURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
@@ -176,16 +180,17 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
                                     cursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID));
 
                             ContentValues contentValues = new ContentValues();
-                            contentValues.put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,cursor.getInt(1));
-                            contentValues.put(NewsContract.NewsArticle.COLUMN_WEBURL,cursor.getString(2));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,cursor.getInt(0));
                             contentValues.put(NewsContract.NewsArticle.COLUMN_ARTICLEID,articleID);
-                            contentValues.put(NewsContract.NewsArticle.COLUMN_SECTIONID,cursor.getString(4));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_SECTIONID,cursor.getString(2));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_WEBURL,cursor.getString(4));
                             contentValues.put(NewsContract.NewsArticle.COLUMN_HEADLINE,cursor.getString(5));
                             contentValues.put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,cursor.getString(6));
                             contentValues.put(NewsContract.NewsArticle.COLUMN_IMAGEURL,cursor.getString(7));
                             contentValues.put(NewsContract.NewsArticle.COLUMN_HTML_BODY, "0");
                             contentValues.put(NewsContract.NewsArticle.COLUMN_BYLINE, "0");
                             contentValues.put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG, "0");
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,cursor.getString(10));
                             mContext.getContentResolver().insert(NewsContract.NewsArticle.NEWSARTICLE_URI, contentValues);
 
                             if (Utility.isNetworkAvailable(mContext)){
@@ -204,6 +209,7 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
                             contentValues.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,cursor.getString(7));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "1");
                             contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,cursor.getString(9));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,cursor.getString(10));
                             mContext.getContentResolver().update(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_WRITEURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",

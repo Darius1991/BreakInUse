@@ -307,16 +307,17 @@ public class NewsArticleFragment extends Fragment {
                         newsArticle.getJSONObject("fields").getString("trailText"));
                 try {
 
-                    contentValues[index].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                    contentValues[index].put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,
                             newsArticle.getJSONObject("fields").getString("thumbnail"));
 
                 } catch (Exception e){
 
-                    contentValues[index].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                    contentValues[index].put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,
                             "http://vignette3.wikia.nocookie.net/wiisportsresortwalkthrough/images/6/60/No_Image_Available.png");
 
                 }
-//                        Utility.getImageURLFromMainHTML(newsArticle.getJSONObject("fields").getString("main")));
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                        Utility.getImageURLFromMainHTML(newsArticle.getJSONObject("fields").getString("main")));
                 htmlBody = new StringBuilder(newsArticle.getJSONObject("fields").getString("body"));
                 while ((tagStartPos = htmlBody.indexOf("<figure")) != -1){
 

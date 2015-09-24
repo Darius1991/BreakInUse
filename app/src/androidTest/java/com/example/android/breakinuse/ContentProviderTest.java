@@ -163,6 +163,8 @@ public class ContentProviderTest extends AndroidTestCase {
         newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE, Utility.getYesterdayDate());
         newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,
                 "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
+        newsFeedTestValues_set1.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,
+                "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
 
         Uri uri = contentResolver.insert(NewsContract.NewsFeed.NEWSFEED_WRITEURI, newsFeedTestValues_set1);
         long newsFeedRowID = Long.valueOf(uri.getPathSegments().get(1));
@@ -230,6 +232,8 @@ public class ContentProviderTest extends AndroidTestCase {
         newsArticleTestValues_set1.put(NewsContract.NewsArticle.COLUMN_BYLINE,"Amy Lawrence");
         newsArticleTestValues_set1.put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
                 "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
+        newsArticleTestValues_set1.put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,
+                "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
 
         uri = contentResolver.insert(NewsContract.NewsArticle.NEWSARTICLE_URI, newsArticleTestValues_set1);
         long newsArticleRowID = Long.valueOf(uri.getPathSegments().get(1));
@@ -290,6 +294,8 @@ public class ContentProviderTest extends AndroidTestCase {
         newsFeedTestValues_set2.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,Utility.getCurrentDate());
         newsFeedTestValues_set2.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,
                 "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
+        newsFeedTestValues_set2.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,
+                "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
 
         int rowsUpdated = contentResolver.update(newsFeedURI_articleID_set1,newsFeedTestValues_set2,null,null);
         Log.d(TAG,String.valueOf(rowsUpdated));
@@ -331,6 +337,8 @@ public class ContentProviderTest extends AndroidTestCase {
         newsArticleTestValues_set2.put(NewsContract.NewsArticle.COLUMN_BYLINE,
                 "Jamie Grierson, Ben Quinn and agencies");
         newsArticleTestValues_set2.put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
+        newsArticleTestValues_set2.put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,
                 "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
 
         rowsUpdated = contentResolver.update(NewsContract.NewsArticle.NEWSARTICLE_URI,newsArticleTestValues_set2,

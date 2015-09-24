@@ -41,5 +41,7 @@
     <string name="favouriteNewsFeed_textView_text">No FavouriteFeed to display. No matching articles may be available or you need to refresh after connecting to internet.</string>
     <string name="savedNewsFeedItem_textView_deleteText">Saved - Tap here to delete</string>
     <string name="textView_forgotPassword">Forgot password ? Click Here</string>
+    <string name="forgotPassword_breakInUse_text">Forgot your password ? Click here!</string>
+    <string name="resetPassword_button_text">Reset Password!</string>
 
 </resources>

@@ -16,8 +16,7 @@
         android:layout_width = "match_parent"
         android:layout_height = "wrap_content"
         card_view:cardUseCompatPadding="true"
-        card_view:cardElevation="4dp"
-        card_view:cardCornerRadius="3dp">
+        card_view:cardElevation="4dp" >
 
         <LinearLayout
             android:id = "@+id/savedNewsFeedItem_linearLayout"
@@ -29,12 +28,20 @@
                 android:id="@+id/savedNewsFeedItem_headlines_textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginTop = "5dp"
+                android:layout_marginBottom = "5dp"
+                android:layout_marginLeft = "5dp"
+                android:layout_marginRight = "5dp"
+                android:textColor = "@color/color_cardViewText"
                 android:textSize = "18sp" />
 
             <TextView
                 android:id="@+id/savedNewsFeedItem_trailText_textView"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom = "5dp"
+                android:layout_marginLeft = "5dp"
+                android:layout_marginRight = "5dp"
                 android:textSize = "14sp" />
 
             <ImageView

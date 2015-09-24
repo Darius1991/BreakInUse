@@ -29,6 +29,7 @@ public class NewsDBHelper extends SQLiteOpenHelper {
                                                     + NewsContract.NewsFeed.COLUMN_IMAGEURL + " TEXT NOT NULL,"
                                                     + NewsContract.NewsFeed.COLUMN_SAVEDFLAG + " TEXT NOT NULL,"
                                                     + NewsContract.NewsFeed.COLUMN_PUBLISHDATE + " TEXT NOT NULL,"
+                                                    + NewsContract.NewsFeed.COLUMN_THUMBNAILURL + " TEXT NOT NULL,"
                                                     + "UNIQUE (" + NewsContract.NewsFeed.COLUMN_ARTICLEID
                                                     + ") ON CONFLICT IGNORE);";
 
@@ -45,6 +46,7 @@ public class NewsDBHelper extends SQLiteOpenHelper {
                                                         + NewsContract.NewsArticle.COLUMN_HTML_BODY + " TEXT NOT NULL,"
                                                         + NewsContract.NewsArticle.COLUMN_BYLINE + " TEXT NOT NULL,"
                                                         + NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG + " TEXT NOT NULL,"
+                                                        + NewsContract.NewsArticle.COLUMN_THUMBNAILURL + " TEXT NOT NULL,"
                                                         + "FOREIGN KEY (" + NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY
                                                         + ") REFERENCES "
                                                         + NewsContract.NewsFeed.TABLE_NAME + " ("
