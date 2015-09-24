@@ -36,6 +36,7 @@ public class NewsContract {
         public static final String COLUMN_BYLINE = "Byline";
         public static final String COLUMN_IMAGEURL = "ImageURL";
         public static final String COLUMN_DOWNLOADFLAG = "isDownloadedInTable";
+        public static final String COLUMN_THUMBNAILURL = "ThumbnailURL";
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
                                                     + "/" + CONTENT_AUTHORITY
                                                     + "/" + PATH_NEWSARTICLE;
@@ -97,6 +98,7 @@ public class NewsContract {
         public static final String COLUMN_TRAILTEXT = "TrailText";
         public final static String COLUMN_SAVEDFLAG = "isSavedInNewsArticleTable";
         public final static String COLUMN_PUBLISHDATE = "articlePublishDate";
+        public static final String COLUMN_THUMBNAILURL = "ThumbnailURL";
         public static final String CONTENT_TYPE = ContentResolver.CURSOR_DIR_BASE_TYPE
                                                     + "/" + CONTENT_AUTHORITY
                                                     + "/" + PATH_NEWSFEED_READ;

@@ -1,15 +1,13 @@
 package com.example.android.breakinuse;
 
-
-import android.database.Cursor;
-import android.support.v4.app.Fragment;
 import android.content.Context;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,9 +18,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.breakinuse.dataSync.DownloadNewsFeedTask;
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.recyclerViewAdapter.NewsFeedAdapter;
-import com.example.android.breakinuse.dataSync.DownloadNewsFeedTask;
 import com.example.android.breakinuse.utilities.Utility;
 
 public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {

@@ -479,16 +479,17 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
                         newsFeedItemJSONObject.getJSONObject("fields").getString("trailText"));
                 try {
 
-                    newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                    newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,
                             newsFeedItemJSONObject.getJSONObject("fields").getString("thumbnail"));
 
                 } catch (Exception e){
 
-                    newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                    newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,
                             "http://vignette3.wikia.nocookie.net/wiisportsresortwalkthrough/images/6/60/No_Image_Available.png");
 
                 }
-//                        Utility.getImageURLFromMainHTML(newsFeedItemJSONObject.getJSONObject("fields").getString("main")));
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                        Utility.getImageURLFromMainHTML(newsFeedItemJSONObject.getJSONObject("fields").getString("main")));
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_ARTICLEID,
                         newsFeedItemJSONObject.getString("id"));
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_SECTIONID,
