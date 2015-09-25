@@ -151,6 +151,7 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,
                     (newsArticleArrayList.get(index)).newsFeedID);
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_WEBURL,newsArticle.getString("webUrl"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_APIURL,newsArticle.getString("apiUrl"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_ARTICLEID,newsArticle.getString("id"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_SECTIONID,newsArticle.getString("sectionId"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_HEADLINE,

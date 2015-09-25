@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
-import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -20,9 +19,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.breakinuse.dataSync.DownloadNewsFeedTask;
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.recyclerViewAdapter.FavouriteNewsFeedAdapter;
-import com.example.android.breakinuse.dataSync.DownloadNewsFeedTask;
 import com.example.android.breakinuse.utilities.Utility;
 
 import java.util.Set;
@@ -37,6 +36,7 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
     private TextView mFavouriteNewsFeedTextView;
     private boolean mShouldLoadMore;
     private ProgressBar mLoadMoreIndicator;
+    private boolean isCurrentlySelected;
 
     @Nullable
     @Override
@@ -48,6 +48,7 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
         mLoadMoreIndicator.setVisibility(View.GONE);
         mContext = getActivity();
         mShouldLoadMore = true;
+        isCurrentlySelected = false;
 
         Set<String> favouriteTopicsSet = Utility.getFavouriteTopicsSet(mContext);
         if (!favouriteTopicsSet.isEmpty()){
@@ -98,23 +99,27 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
                 super.onScrolled(recyclerView, dx, dy);
 
-                if (mShouldLoadMore) {
+                if (isCurrentlySelected){
 
-                    if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.getItemCount()) {
+                    if (mShouldLoadMore) {
 
-                        if (!Utility.isNetworkAvailable(mContext)){
+                        if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.getItemCount()) {
 
-                            Utility.makeToast(mContext,
-                                    "We are not able to detect an internet connection. Please resolve this befor trying again.",
-                                    Toast.LENGTH_SHORT);
-                            mShouldLoadMore = true;
+                            if (!Utility.isNetworkAvailable(mContext)){
 
-                        } else {
+                                Utility.makeToast(mContext,
+                                        "We are not able to detect an internet connection. Please resolve this befor trying again.",
+                                        Toast.LENGTH_SHORT);
+                                mShouldLoadMore = true;
 
-                            mShouldLoadMore = false;
-                            new DownloadNewsFeedTask(mContext,mLoadMoreIndicator).execute();
-                            mLoadMoreIndicator.setVisibility(View.VISIBLE);
-                            Log.d(TAG, "Last Item Wow !");
+                            } else {
+
+                                mShouldLoadMore = false;
+                                new DownloadNewsFeedTask(mContext,mLoadMoreIndicator).execute();
+                                mLoadMoreIndicator.setVisibility(View.VISIBLE);
+                                Log.d(TAG, "Last Item Wow !");
+
+                            }
 
                         }
 
@@ -220,6 +225,14 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
         super.onResume();
         getLoaderManager().restartLoader(LOADER_ID_FAVOURITES, null, this);
+
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+
+        super.setUserVisibleHint(isVisibleToUser);
+        isCurrentlySelected = isVisibleToUser;
 
     }
 

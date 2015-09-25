@@ -477,6 +477,8 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
                         newsFeedItemJSONObject.getString("apiUrl"));
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
                         newsFeedItemJSONObject.getJSONObject("fields").getString("trailText"));
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_BYLINE,
+                        newsFeedItemJSONObject.getJSONObject("fields").getString("byline"));
                 try {
 
                     newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,

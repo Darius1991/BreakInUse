@@ -22,6 +22,8 @@ import com.example.android.breakinuse.utilities.Utility;
 public class NewsFeedActivity extends AppCompatActivity {
 
     private static final String TAG = NewsFeedActivity.class.getName();
+    private ViewPager mViewPager;
+    private NewsFeedPagerAdapter mNewsFeedPagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,12 +35,12 @@ public class NewsFeedActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.newsFeedActivity_toolBar);
         setSupportActionBar(toolbar);
 
-        NewsFeedPagerAdapter newsFeedPagerAdapter = new NewsFeedPagerAdapter(getSupportFragmentManager());
-        ViewPager viewPager = (ViewPager) findViewById(R.id.newsFeedActivity_viewPager);
-        viewPager.setAdapter(newsFeedPagerAdapter);
+        mNewsFeedPagerAdapter = new NewsFeedPagerAdapter(getSupportFragmentManager());
+        mViewPager = (ViewPager) findViewById(R.id.newsFeedActivity_viewPager);
+        mViewPager.setAdapter(mNewsFeedPagerAdapter);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.snewsFeedActivity_tabLayout);
-        tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setupWithViewPager(mViewPager);
 
         BreakInUseSyncAdapter.initializeSyncAdapter(this);
 
@@ -113,7 +115,7 @@ public class NewsFeedActivity extends AppCompatActivity {
 
     public static class NewsFeedPagerAdapter extends FragmentPagerAdapter {
 
-        private String tabTitles[] = new String[] { "All", "Favourites", "Saved" };
+        private String tabTitles[] = new String[] { "All","Followed","Favourites" };
         private static SparseArray<Fragment> mRegisteredArray = new SparseArray<>();
 
         public NewsFeedPagerAdapter(FragmentManager fm) {
@@ -124,8 +126,6 @@ public class NewsFeedActivity extends AppCompatActivity {
 
         @Override
         public Fragment getItem(int i) {
-
-            Bundle newsTypeBundle = new Bundle();
 
             switch (i) {
 
@@ -187,4 +187,5 @@ public class NewsFeedActivity extends AppCompatActivity {
         }
 
     }
+
 }

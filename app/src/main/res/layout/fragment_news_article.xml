@@ -36,4 +36,11 @@
 
     </android.support.v4.widget.NestedScrollView>
 
+        <ProgressBar
+            android:id = "@+id/newsArticle_loadMoreIndicator"
+            style="@style/ArticleGenericProgressIndicator"/>
+
+
+
+
 </android.support.design.widget.CoordinatorLayout>
