@@ -5,6 +5,7 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -21,6 +22,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.ProgressBar;
 
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.utilities.Utility;
@@ -40,6 +42,7 @@ public class NewsArticleFragment extends Fragment {
     private Context mContext;
     private WebView mWebView;
     private Cursor mCursor;
+    private ProgressBar mLoadMoreIndicator;
 
     public NewsArticleFragment(){
 
@@ -52,9 +55,11 @@ public class NewsArticleFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        View rootView = inflater.inflate(R.layout.fragment_news_article,container,false);
-        mWebView = (WebView)rootView.findViewById(R.id.news_article_webView);
         mContext = getActivity();
+        View rootView = inflater.inflate(R.layout.fragment_news_article, container, false);
+        mWebView = (WebView) rootView.findViewById(R.id.news_article_webView);
+        mLoadMoreIndicator = (ProgressBar) rootView.findViewById(R.id.newsArticle_loadMoreIndicator);
+        mLoadMoreIndicator.setVisibility(View.GONE);
 
         Toolbar toolbar = (Toolbar) rootView.findViewById(R.id.newsArticleFragment_toolBar);
         ((NewsArticleActivity)mContext).setSupportActionBar(toolbar);
@@ -70,7 +75,25 @@ public class NewsArticleFragment extends Fragment {
 
             if (articleLoadMethod.equals("webURL")){
 
-                mWebView.setWebViewClient(new WebViewClient());
+                mWebView.setWebViewClient(new WebViewClient(){
+
+                    @Override
+                    public void onPageStarted(WebView view, String url, Bitmap favicon) {
+
+                        super.onPageStarted(view, url, favicon);
+                        mLoadMoreIndicator.setVisibility(View.VISIBLE);
+
+                    }
+
+                    @Override
+                    public void onPageFinished(WebView view, String url) {
+
+                        super.onPageFinished(view, url);
+                        mLoadMoreIndicator.setVisibility(View.GONE);
+
+                    }
+
+                });
                 mWebView.loadUrl(bundle.getString("webURL"));
 
             } else if (articleLoadMethod.equals("HTMLBody")){
@@ -299,6 +322,7 @@ public class NewsArticleFragment extends Fragment {
                 contentValues[index].put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,
                         (newsArticleArrayList.get(index)).newsFeedID);
                 contentValues[index].put(NewsContract.NewsArticle.COLUMN_WEBURL,newsArticle.getString("webUrl"));
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_APIURL,newsArticle.getString("apiUrl"));
                 contentValues[index].put(NewsContract.NewsArticle.COLUMN_ARTICLEID,newsArticle.getString("id"));
                 contentValues[index].put(NewsContract.NewsArticle.COLUMN_SECTIONID,newsArticle.getString("sectionId"));
                 contentValues[index].put(NewsContract.NewsArticle.COLUMN_HEADLINE,

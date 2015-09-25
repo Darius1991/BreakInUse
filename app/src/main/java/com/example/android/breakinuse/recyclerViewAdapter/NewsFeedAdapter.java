@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,6 +47,9 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
 
             viewholder.mTextView_headlines.setText(cursor.getString(5));
             viewholder.mTextView_trailText.setText(cursor.getString(6));
+            viewholder.mTextView_author.setText(cursor.getString(11));
+            viewholder.mTextView_sectionID.setText(cursor.getString(2));
+            viewholder.mTextView_saveText.setVisibility(View.GONE);
 
             Picasso.with(mContext)
                     .load(cursor.getString(10))
@@ -59,10 +61,12 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
             if (savedFlag.equals("0")){
 
                 viewholder.mTextView_saveText.setText(viewholder.mTextView_saveText_saveButtonText);
+                viewholder.mImageView_saveButton.setImageResource(viewholder.mImageView_saveButton_saveImage);
 
             } else {
 
                 viewholder.mTextView_saveText.setText(viewholder.mTextView_saveText_deleteButtonText);
+                viewholder.mImageView_saveButton.setImageResource(viewholder.mImageView_saveButton_deleteImage);
 
             }
 
@@ -76,9 +80,16 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
         public TextView mTextView_trailText;
         public TextView mTextView_saveText;
         public ImageView mImageView_newsFeedItemImage;
-        public CardView mCardView;
         public String mTextView_saveText_saveButtonText;
         public String mTextView_saveText_deleteButtonText;
+
+        public ImageView mImageView_saveButton;
+        public ImageView mImageView_shareButton;
+        public TextView mTextView_author;
+        public TextView mTextView_sectionID;
+
+        public int mImageView_saveButton_saveImage;
+        public int mImageView_saveButton_deleteImage;
 
         public ViewHolder(View itemView) {
 
@@ -87,7 +98,23 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
             mTextView_trailText = (TextView) itemView.findViewById(R.id.newsFeedItem_trailText_textView);
             mTextView_saveText = (TextView) itemView.findViewById(R.id.newsFeedItem_save_textView);
             mImageView_newsFeedItemImage = (ImageView) itemView.findViewById(R.id.newsFeedItem_imageView);
-            mCardView = (CardView) itemView.findViewById(R.id.newsFeed_cardView);
+
+            mImageView_saveButton = (ImageView) itemView.findViewById(R.id.newsFeedItem_saveButton);
+            mImageView_shareButton = (ImageView) itemView.findViewById(R.id.newsFeedItem_shareButton);
+            mTextView_author = (TextView) itemView.findViewById(R.id.newsFeedItem_author);
+            mTextView_sectionID = (TextView) itemView.findViewById(R.id.newsFeedItem_sectionID);
+
+            mImageView_saveButton_saveImage = mContext
+                                                .getResources()
+                                                .getIdentifier("ic_bookmark_border_black_24dp",
+                                                        "drawable",
+                                                        mContext.getPackageName());
+
+            mImageView_saveButton_deleteImage = mContext
+                                                .getResources()
+                                                .getIdentifier("ic_bookmark_black_24dp",
+                                                        "drawable",
+                                                        mContext.getPackageName());
 
             mImageView_newsFeedItemImage.setClickable(true);
             mImageView_newsFeedItemImage.setOnClickListener(this);
@@ -95,8 +122,10 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
             mTextView_headlines.setOnClickListener(this);
             mTextView_trailText.setClickable(true);
             mTextView_trailText.setOnClickListener(this);
-            mTextView_saveText.setClickable(true);
-            mTextView_saveText.setOnClickListener(this);
+            mImageView_saveButton.setClickable(true);
+            mImageView_saveButton.setOnClickListener(this);
+            mImageView_shareButton.setClickable(true);
+            mImageView_shareButton.setOnClickListener(this);
 
             mTextView_saveText_saveButtonText =  mContext.getString(R.string.newsFeedItem_textView_saveText);
             mTextView_saveText_deleteButtonText = mContext.getString(R.string.newsFeedItem_textView_deleteText);
@@ -106,9 +135,9 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
         @Override
         public void onClick(View v) {
 
-            if (v != mTextView_saveText){
+            Cursor tempCursor = getCursor();
+            if ((v == mTextView_headlines) || (v == mTextView_trailText) || (v == mImageView_newsFeedItemImage)){
 
-                Cursor tempCursor = getCursor();
                 if ((tempCursor != null ) && (tempCursor.moveToFirst())){
 
                     tempCursor.moveToPosition(getAdapterPosition());
@@ -131,17 +160,16 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
 
                 }
 
-            } else {
+            } else if (v == mImageView_saveButton){
 
                 if((mTextView_saveText.getText()).equals(mTextView_saveText_deleteButtonText)){
 
-                    Cursor cursor = getCursor();
-                    if (cursor != null){
+                    if (tempCursor != null){
 
-                        if(cursor.moveToPosition(getAdapterPosition())){
+                        if(tempCursor.moveToPosition(getAdapterPosition())){
 
-                            String articleID = cursor.getString(
-                                    cursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID));
+                            String articleID = tempCursor.getString(
+                                    tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID));
                             mContext.getContentResolver()
                                     .delete(NewsContract.NewsArticle.NEWSARTICLE_URI,
                                             NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ?",
@@ -149,20 +177,22 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
 
                             ContentValues contentValues = new ContentValues();
                             contentValues.put(NewsContract.NewsFeed.COLUMN_ARTICLEID,articleID);
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_SECTIONID,cursor.getString(2));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_APIURL,cursor.getString(3));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBURL,cursor.getString(4));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBTITLE,cursor.getString(5));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,cursor.getString(6));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,cursor.getString(7));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_SECTIONID,tempCursor.getString(2));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_APIURL,tempCursor.getString(3));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBURL,tempCursor.getString(4));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBTITLE,tempCursor.getString(5));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,tempCursor.getString(6));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,tempCursor.getString(7));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,cursor.getString(9));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,cursor.getString(10));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,tempCursor.getString(9));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,tempCursor.getString(10));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_BYLINE,tempCursor.getString(11));
                             mContext.getContentResolver().update(NewsContract.NewsFeed.NEWSFEED_READURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
                                     new String[]{articleID});
                             mTextView_saveText.setText(mTextView_saveText_saveButtonText);
+                            mImageView_saveButton.setImageResource(mImageView_saveButton_saveImage);
 
                         }
 
@@ -170,26 +200,27 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
 
                 } else {
 
-                    Cursor cursor = getCursor();
-                    if (cursor != null){
+                    if (tempCursor != null){
 
-                        if(cursor.moveToPosition(getAdapterPosition())){
+                        if(tempCursor.moveToPosition(getAdapterPosition())){
 
-                            String articleID = cursor.getString(
-                                    cursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID));
+                            String articleID = tempCursor.getString(
+                                    tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID));
 
                             ContentValues contentValues = new ContentValues();
-                            contentValues.put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,cursor.getInt(0));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,tempCursor.getInt(0));
                             contentValues.put(NewsContract.NewsArticle.COLUMN_ARTICLEID,articleID);
-                            contentValues.put(NewsContract.NewsArticle.COLUMN_SECTIONID,cursor.getString(2));
-                            contentValues.put(NewsContract.NewsArticle.COLUMN_WEBURL,cursor.getString(4));
-                            contentValues.put(NewsContract.NewsArticle.COLUMN_HEADLINE,cursor.getString(5));
-                            contentValues.put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,cursor.getString(6));
-                            contentValues.put(NewsContract.NewsArticle.COLUMN_IMAGEURL,cursor.getString(7));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_SECTIONID,tempCursor.getString(2));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_WEBURL,tempCursor.getString(4));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_HEADLINE,tempCursor.getString(5));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_TRAILTEXT,tempCursor.getString(6));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_IMAGEURL,tempCursor.getString(7));
                             contentValues.put(NewsContract.NewsArticle.COLUMN_HTML_BODY, "0");
-                            contentValues.put(NewsContract.NewsArticle.COLUMN_BYLINE, "0");
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_BYLINE, tempCursor.getString(11));
                             contentValues.put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG, "0");
-                            contentValues.put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,cursor.getString(10));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,tempCursor.getString(10));
+                            contentValues.put(NewsContract.NewsArticle.COLUMN_APIURL,tempCursor.getString(3));
+
                             mContext.getContentResolver().insert(NewsContract.NewsArticle.NEWSARTICLE_URI, contentValues);
 
                             if (Utility.isNetworkAvailable(mContext)){
@@ -200,23 +231,42 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
 
                             contentValues.clear();
                             contentValues.put(NewsContract.NewsFeed.COLUMN_ARTICLEID, articleID);
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_SECTIONID,cursor.getString(2));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_APIURL,cursor.getString(3));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBURL,cursor.getString(4));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBTITLE,cursor.getString(5));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,cursor.getString(6));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,cursor.getString(7));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_SECTIONID,tempCursor.getString(2));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_APIURL,tempCursor.getString(3));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBURL,tempCursor.getString(4));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBTITLE,tempCursor.getString(5));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,tempCursor.getString(6));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,tempCursor.getString(7));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "1");
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,cursor.getString(9));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,cursor.getString(10));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,tempCursor.getString(9));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL, tempCursor.getString(10));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_BYLINE, tempCursor.getString(11));
                             mContext.getContentResolver().update(NewsContract.NewsFeed.NEWSFEED_READURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
                                     new String[]{articleID});
 
                             mTextView_saveText.setText(mTextView_saveText_deleteButtonText);
+                            mImageView_saveButton.setImageResource(mImageView_saveButton_deleteImage);
+                            Utility.makeToast(mContext, "Article saved to favourites", Toast.LENGTH_SHORT);
 
                         }
+
+                    }
+
+                }
+
+            }  else {
+
+                if ((tempCursor != null ) && (tempCursor.moveToFirst())){
+
+                    if (tempCursor.moveToPosition(getAdapterPosition())){
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, "Read this article - " + tempCursor.getString(2));
+                        sendIntent.setType("text/plain");
+                        mContext.startActivity(Intent.createChooser(sendIntent, mContext.getResources().getText(R.string.shareDialogBoxText)));
 
                     }
 

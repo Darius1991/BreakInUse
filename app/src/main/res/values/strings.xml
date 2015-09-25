@@ -44,5 +44,6 @@
     <string name="forgotPassword_breakInUse_text">Forgot your password ? Click here!</string>
     <string name="resetPassword_button_text">Reset Password!</string>
     <string name="shareDialogBoxText">Share with</string>
+    <string name="newsArticleFragment_saveButton_title">Save</string>
 
 </resources>

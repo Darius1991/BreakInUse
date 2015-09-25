@@ -147,7 +147,8 @@ public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFee
                             contentValues.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,tempCursor.getString(7));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
                             contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,tempCursor.getString(9));
-                            contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,tempCursor.getString(10));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL, tempCursor.getString(10));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_BYLINE, tempCursor.getString(11));
                             mContext.getContentResolver().update(NewsContract.NewsFeed.NEWSFEED_READURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",

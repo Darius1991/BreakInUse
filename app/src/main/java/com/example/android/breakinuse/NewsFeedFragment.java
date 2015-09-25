@@ -33,6 +33,7 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
     private TextView mNewsFeedTextView;
     private boolean mShouldLoadMore;
     private ProgressBar mLoadMoreIndicator;
+    private boolean isCurrentlySelected;
 
     @Nullable
     @Override
@@ -44,6 +45,7 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
         mLoadMoreIndicator.setVisibility(View.GONE);
         mContext = getActivity();
         mShouldLoadMore = true;
+        isCurrentlySelected = false;
 
         mNewsFeedAdapter = new NewsFeedAdapter(mContext,
                 mContext.getContentResolver().query(NewsContract.NewsFeed.NEWSFEED_READURI,null,null,null,null));
@@ -62,23 +64,27 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
 
                 super.onScrolled(recyclerView, dx, dy);
 
-                if (mShouldLoadMore) {
+                if (isCurrentlySelected){
 
-                    if ( (layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.getItemCount()) {
+                    if (mShouldLoadMore) {
 
-                        if (!Utility.isNetworkAvailable(mContext)){
+                        if ( (layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.getItemCount()) {
 
-                            Utility.makeToast(mContext,
-                                    "We are not able to detect an internet connection. Please resolve this befor trying again.",
-                                    Toast.LENGTH_SHORT);
-                            mShouldLoadMore = true;
+                            if (!Utility.isNetworkAvailable(mContext)){
 
-                        } else {
+                                Utility.makeToast(mContext,
+                                        "We are not able to detect an internet connection. Please resolve this befor trying again.",
+                                        Toast.LENGTH_SHORT);
+                                mShouldLoadMore = true;
 
-                            mShouldLoadMore = false;
-                            new DownloadNewsFeedTask(mContext,mLoadMoreIndicator).execute();
-                            mLoadMoreIndicator.setVisibility(View.VISIBLE);
-                            Log.d(TAG, "Last Item Wow !");
+                            } else {
+
+                                mShouldLoadMore = false;
+                                new DownloadNewsFeedTask(mContext,mLoadMoreIndicator).execute();
+                                mLoadMoreIndicator.setVisibility(View.VISIBLE);
+                                Log.d(TAG, "Last Item Wow !");
+
+                            }
 
                         }
 
@@ -155,6 +161,14 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
 
         super.onResume();
         getLoaderManager().restartLoader(LOADER_ID_ALL, null, this);
+
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+
+        super.setUserVisibleHint(isVisibleToUser);
+        isCurrentlySelected = isVisibleToUser;
 
     }
 

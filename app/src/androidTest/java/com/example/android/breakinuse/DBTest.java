@@ -60,6 +60,7 @@ public class DBTest extends AndroidTestCase {
         newsFeedColumnSet.add(NewsContract.NewsFeed.COLUMN_PUBLISHDATE);
         newsFeedColumnSet.add(NewsContract.NewsFeed.COLUMN_IMAGEURL);
         newsFeedColumnSet.add(NewsContract.NewsFeed.COLUMN_THUMBNAILURL);
+        newsFeedColumnSet.add(NewsContract.NewsFeed.COLUMN_BYLINE);
 
         int columnNameIndex = cursor.getColumnIndex("name");
         String columnName;
@@ -87,6 +88,7 @@ public class DBTest extends AndroidTestCase {
         newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_BYLINE);
         newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_IMAGEURL);
         newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_THUMBNAILURL);
+        newsArticleColumnSet.add(NewsContract.NewsArticle.COLUMN_APIURL);
 
         columnNameIndex = cursor.getColumnIndex("name");
         do {
@@ -123,6 +125,8 @@ public class DBTest extends AndroidTestCase {
         newsFeedTestValues.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,
                 "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
         newsFeedTestValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,
+                "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
+        newsFeedTestValues.put(NewsContract.NewsFeed.COLUMN_BYLINE,
                 "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
 
         long newsFeedRowID = db.insert(NewsContract.NewsFeed.TABLE_NAME, null, newsFeedTestValues);
@@ -169,6 +173,8 @@ public class DBTest extends AndroidTestCase {
         newsArticleTestValues.put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
                 "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
         newsArticleTestValues.put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,
+                "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
+        newsArticleTestValues.put(NewsContract.NewsArticle.COLUMN_APIURL,
                 "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
 
 

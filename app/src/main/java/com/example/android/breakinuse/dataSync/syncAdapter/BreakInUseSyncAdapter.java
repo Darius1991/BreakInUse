@@ -115,7 +115,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                     .appendQueryParameter(API_KEY_QUERY_PARAM, API_KEY)
                     .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline,main,thumbnail")
                     .appendQueryParameter(PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
-                    .appendQueryParameter(ORDER_QUERY_PARAM, "relevance")
+                    .appendQueryParameter(ORDER_QUERY_PARAM, "newest")
                     .appendQueryParameter(PAGE_QUERY_PARAM,String.valueOf(1))
                     .appendQueryParameter(FROMDATE_QUERY_PARAM, fromDate)
                     .appendQueryParameter(SECTION_QUERY_PARAM, mTopicsQuery.toString())
@@ -241,7 +241,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                     builder.appendQueryParameter(API_KEY_QUERY_PARAM, API_KEY)
                             .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline,main,thumbnail")
                             .appendQueryParameter(PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
-                            .appendQueryParameter(ORDER_QUERY_PARAM, "relevance")
+                            .appendQueryParameter(ORDER_QUERY_PARAM, "newest")
                             .appendQueryParameter(ID_QUERY_PARAM, cursor.getString(articleIDColumnIndex))
                             .build();
 
@@ -319,7 +319,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
         int pageCount = 1; /*responsePage[0].getJSONObject("response").getInt("pages");*/
         int pageIndex, webTitleIndex, arrayIndex, responseCount;
-        responseCount = responsePage[0].getJSONObject("response").getInt("total");
+        responseCount = 20;/*responsePage[0].getJSONObject("response").getInt("total");*/
         ContentValues[] newsFeedContentValues = new ContentValues[responseCount];
         String currentDate = Utility.getCurrentDate();
         JSONArray newsFeedItemJSONArray;
@@ -350,6 +350,8 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                         newsFeedItemJSONObject.getString("apiUrl"));
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
                         newsFeedItemJSONObject.getJSONObject("fields").getString("trailText"));
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_BYLINE,
+                        newsFeedItemJSONObject.getJSONObject("fields").getString("byline"));
                 try {
 
                     newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,
@@ -400,6 +402,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY,
                     (newsArticleArrayList.get(index)).newsFeedID);
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_WEBURL,newsArticle.getString("webUrl"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_APIURL,newsArticle.getString("apiUrl"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_ARTICLEID,newsArticle.getString("id"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_SECTIONID,newsArticle.getString("sectionId"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_HEADLINE,
@@ -427,7 +430,8 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
             }
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_HTML_BODY,htmlBody.toString());
-            contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,newsArticle.getJSONObject("fields").getString("byline"));
+            contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,
+                    newsArticle.getJSONObject("fields").getString("byline"));
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"1");
 
             rowUpdateFlag = mContentResolver.update(NewsContract.NewsArticle.NEWSARTICLE_URI,
