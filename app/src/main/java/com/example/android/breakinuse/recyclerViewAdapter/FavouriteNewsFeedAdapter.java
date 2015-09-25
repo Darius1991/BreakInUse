@@ -159,7 +159,7 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
                             contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
                             contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,cursor.getString(9));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,cursor.getString(10));
-                            mContext.getContentResolver().update(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_WRITEURI,
+                            mContext.getContentResolver().update(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
                                     new String[]{articleID});
@@ -210,7 +210,7 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
                             contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "1");
                             contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,cursor.getString(9));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,cursor.getString(10));
-                            mContext.getContentResolver().update(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_WRITEURI,
+                            mContext.getContentResolver().update(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
                                     new String[]{articleID});

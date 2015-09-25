@@ -44,23 +44,71 @@
                 android:layout_marginRight = "5dp"
                 android:textSize = "14sp" />
 
-            <ImageView
-                android:src="@android:drawable/divider_horizontal_dark"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:paddingLeft="5dp"
-                android:paddingRight="5dp"
-                android:paddingBottom="2dp"
-                android:paddingTop="2dp" />
+            <LinearLayout
+                android:layout_width = "match_parent"
+                android:layout_height = "wrap_content"
+                android:orientation = "horizontal"
+                android:layout_marginTop = "15dp"
+                android:layout_marginRight = "5dp"
+                android:weightSum="4"
+                android:layout_marginBottom = "5dp"
+                android:layout_marginLeft = "5dp" >
 
-            <TextView
-                android:id="@+id/savedNewsFeedItem_delete_textView"
-                android:text = "@string/savedNewsFeedItem_textView_deleteText"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:textSize = "14sp"
-                android:gravity = "center" />
+                <LinearLayout
+                    android:layout_width = "match_parent"
+                    android:layout_height = "wrap_content"
+                    android:layout_weight = "1"
+                    android:orientation = "vertical">
+
+                    <TextView
+                        android:id = "@+id/savedNewsFeedItem_sectionID"
+                        android:layout_width = "match_parent"
+                        android:layout_height = "wrap_content"
+                        android:text = "AAAAAAAAAAAAAAAAAA"
+                        android:gravity = "center_horizontal" />
+
+
+                    <TextView
+                        android:id = "@+id/savedNewsFeedItem_author"
+                        android:layout_width = "match_parent"
+                        android:layout_height = "wrap_content"
+                        android:text = "BBBBBBBBBBBBBBBBB"
+                        android:gravity = "center_horizontal" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width = "match_parent"
+                    android:layout_height = "wrap_content"
+                    android:layout_weight = "3"
+                    android:orientation = "horizontal"
+                    android:layout_gravity = "center_vertical">
+
+                    <ImageView
+                        android:id = "@+id/savedNewsFeedItem_shareButton"
+                        android:src="@drawable/ic_share_black_24dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight = "1"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp" />
+
+                    <ImageView
+                        android:id = "@+id/savedNewsFeedItem_deleteButton"
+                        android:src="@drawable/ic_delete_black_24dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent"
+                        android:layout_weight = "1"
+                        android:paddingLeft="5dp"
+                        android:paddingRight="5dp"
+                        android:paddingBottom="2dp"
+                        android:paddingTop="2dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
 
         </LinearLayout>
 

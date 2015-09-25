@@ -4,25 +4,20 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.graphics.Point;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
-import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
-import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.android.breakinuse.NewsArticleActivity;
 import com.example.android.breakinuse.R;
-import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.dataSync.DownloadNewsArticleTask;
+import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.utilities.Utility;
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.ViewHolder> {
@@ -163,7 +158,7 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
                             contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
                             contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,cursor.getString(9));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,cursor.getString(10));
-                            mContext.getContentResolver().update(NewsContract.NewsFeed.NEWSFEED_WRITEURI,
+                            mContext.getContentResolver().update(NewsContract.NewsFeed.NEWSFEED_READURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
                                     new String[]{articleID});
@@ -214,7 +209,7 @@ public class NewsFeedAdapter extends CursorRecyclerViewAdapter<NewsFeedAdapter.V
                             contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "1");
                             contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,cursor.getString(9));
                             contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,cursor.getString(10));
-                            mContext.getContentResolver().update(NewsContract.NewsFeed.NEWSFEED_WRITEURI,
+                            mContext.getContentResolver().update(NewsContract.NewsFeed.NEWSFEED_READURI,
                                     contentValues,
                                     NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
                                     new String[]{articleID});
