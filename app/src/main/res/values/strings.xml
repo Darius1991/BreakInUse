@@ -43,5 +43,6 @@
     <string name="textView_forgotPassword">Forgot password ? Click Here</string>
     <string name="forgotPassword_breakInUse_text">Forgot your password ? Click here!</string>
     <string name="resetPassword_button_text">Reset Password!</string>
+    <string name="shareDialogBoxText">Share with</string>
 
 </resources>

@@ -1,14 +1,15 @@
 package com.example.android.breakinuse.recyclerViewAdapter;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.support.v4.widget.CursorAdapter;
 import android.support.v7.widget.CardView;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -44,7 +45,8 @@ public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFee
 
             viewholder.mTextView_headlines.setText(cursor.getString(5));
             viewholder.mTextView_trailText.setText(cursor.getString(6));
-
+            viewholder.mTextView_sectionID.setText(cursor.getString(4));
+            viewholder.mTextView_author.setText(cursor.getString(9));
 
         }
 
@@ -54,23 +56,32 @@ public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFee
 
         public TextView mTextView_headlines;
         public TextView mTextView_trailText;
-        public TextView mTextView_deleteButton;
+        public ImageView mImageView_deleteButton;
         public CardView mCardView;
+        public ImageView mImageView_shareButton;
+        public TextView mTextView_author;
+        public TextView mTextView_sectionID;
 
         public ViewHolder(View itemView) {
 
             super(itemView);
             mTextView_headlines = (TextView)itemView.findViewById(R.id.savedNewsFeedItem_headlines_textView);
             mTextView_trailText = (TextView)itemView.findViewById(R.id.savedNewsFeedItem_trailText_textView);
-            mTextView_deleteButton = (TextView)itemView.findViewById(R.id.savedNewsFeedItem_delete_textView);
+            mImageView_deleteButton = (ImageView)itemView.findViewById(R.id.savedNewsFeedItem_deleteButton);
             mCardView = (CardView) itemView.findViewById(R.id.savedNewsFeed_cardView);
+            mImageView_shareButton = (ImageView) itemView.findViewById(R.id.savedNewsFeedItem_shareButton);
+            mTextView_author = (TextView) itemView.findViewById(R.id.savedNewsFeedItem_author);
+            mTextView_sectionID = (TextView) itemView.findViewById(R.id.savedNewsFeedItem_sectionID);
 
             mTextView_headlines.setClickable(true);
             mTextView_headlines.setOnClickListener(this);
             mTextView_trailText.setClickable(true);
             mTextView_trailText.setOnClickListener(this);
-            mTextView_deleteButton.setClickable(true);
-            mTextView_deleteButton.setOnClickListener(this);
+            mImageView_deleteButton.setClickable(true);
+            mImageView_deleteButton.setOnClickListener(this);
+            mImageView_shareButton.setClickable(true);
+            mImageView_shareButton.setOnClickListener(this);
+
 
         }
 
@@ -78,7 +89,7 @@ public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFee
         public void onClick(View v) {
 
             Cursor tempCursor = getCursor();
-            if (v != mTextView_deleteButton){
+            if ((v == mTextView_headlines) || (v == mTextView_trailText)) {
 
                 if ((tempCursor != null ) && (tempCursor.moveToFirst())){
 
@@ -108,7 +119,7 @@ public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFee
 
                 }
 
-            } else {
+            } else if (v == mImageView_deleteButton) {
 
                 if ((tempCursor != null ) && (tempCursor.moveToFirst())){
 
@@ -118,9 +129,51 @@ public class SavedNewsFeedAdapter extends CursorRecyclerViewAdapter<SavedNewsFee
                                                                 NewsContract.NewsArticle.COLUMN_ARTICLEID + " =? ",
                                                                 new String[]{tempCursor.getString(tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID))});
 
+                        tempCursor = mContext.getContentResolver().query(NewsContract.NewsFeed.NEWSFEED_READURI,
+                                        null,
+                                        NewsContract.NewsArticle.COLUMN_ARTICLEID + " =? ",
+                                        new String[]{tempCursor.getString(tempCursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID))},
+                                        null);
+
+                        if ((tempCursor != null) && (tempCursor.moveToFirst())){
+
+                            ContentValues contentValues = new ContentValues();
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_ARTICLEID,tempCursor.getString(1));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_SECTIONID,tempCursor.getString(2));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_APIURL,tempCursor.getString(3));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBURL,tempCursor.getString(4));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_WEBTITLE,tempCursor.getString(5));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,tempCursor.getString(6));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_IMAGEURL,tempCursor.getString(7));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE,tempCursor.getString(9));
+                            contentValues.put(NewsContract.NewsFeed.COLUMN_THUMBNAILURL,tempCursor.getString(10));
+                            mContext.getContentResolver().update(NewsContract.NewsFeed.NEWSFEED_READURI,
+                                    contentValues,
+                                    NewsContract.NewsFeed.COLUMN_ARTICLEID + " = ?",
+                                    new String[]{tempCursor.getString(1)});
+
+                            Utility.makeToast(mContext,"Article deleted", Toast.LENGTH_SHORT);
+
+                        }
 
                     }
 
+                }
+
+            } else if (v == mImageView_shareButton){
+
+                if ((tempCursor != null ) && (tempCursor.moveToFirst())){
+
+                    if (tempCursor.moveToPosition(getAdapterPosition())){
+
+                        Intent sendIntent = new Intent();
+                        sendIntent.setAction(Intent.ACTION_SEND);
+                        sendIntent.putExtra(Intent.EXTRA_TEXT, "Read this article - " + tempCursor.getString(2));
+                        sendIntent.setType("text/plain");
+                        mContext.startActivity(Intent.createChooser(sendIntent, mContext.getResources().getText(R.string.shareDialogBoxText)));
+
+                    }
                 }
 
             }
