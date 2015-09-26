@@ -48,9 +48,82 @@ public class FavouriteNewsFeedAdapter extends CursorRecyclerViewAdapter<Favourit
 
             viewholder.mTextView_headlines.setText(cursor.getString(5));
             viewholder.mTextView_trailText.setText(cursor.getString(6));
-            viewholder.mTextView_author.setText(cursor.getString(11));
-            viewholder.mTextView_sectionID.setText(cursor.getString(2));
+            viewholder.mTextView_author.setText("By - "+cursor.getString(11));
             viewholder.mTextView_saveText.setVisibility(View.GONE);
+
+            switch (cursor.getString(2)){
+
+                case "world":
+
+                    viewholder.mTextView_sectionID.setText("World News");
+                    break;
+
+                case "politics":
+
+                    viewholder.mTextView_sectionID.setText("Politics");
+                    break;
+
+                case "sport":
+
+                    viewholder.mTextView_sectionID.setText("Sports");
+                    break;
+
+                case "football":
+
+                    viewholder.mTextView_sectionID.setText("Football");
+                    break;
+
+                case "culture":
+
+                    viewholder.mTextView_sectionID.setText("Culture");
+                    break;
+
+                case "business":
+
+                    viewholder.mTextView_sectionID.setText("Business");
+                    break;
+
+                case "lifeandstyle":
+
+                    viewholder.mTextView_sectionID.setText("Lifestyle");
+                    break;
+
+                case "fashion":
+
+                    viewholder.mTextView_sectionID.setText("Fashion");
+                    break;
+
+                case "environment":
+
+                    viewholder.mTextView_sectionID.setText("Environment");
+                    break;
+
+                case "technology":
+
+                    viewholder.mTextView_sectionID.setText("Tech");
+                    break;
+
+                case "books":
+
+                    viewholder.mTextView_sectionID.setText("Books");
+                    break;
+
+                case "film":
+
+                    viewholder.mTextView_sectionID.setText("Movies");
+                    break;
+
+                case "travel":
+
+                    viewholder.mTextView_sectionID.setText("Travel");
+                    break;
+
+                default:
+
+                    viewholder.mTextView_sectionID.setText("News");
+                    break;
+
+            }
 
             Picasso.with(mContext)
                     .load(cursor.getString(10))

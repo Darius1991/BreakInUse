@@ -24,7 +24,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.Set;
 
-public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
+public class DownloadFavouriteNewsFeedTask extends AsyncTask<Void,Void,Void> {
 
     private Cursor mCursor;
     private Context mContext;
@@ -33,7 +33,7 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
     private ProgressBar mLoadMoreIndicator;
     private OnDownloadTaskFinishedListener mOnDownloadTaskFinishedListener;
 
-    public DownloadNewsFeedTask(Context context, ProgressBar loadMoreIndicator, Fragment fragment){
+    public DownloadFavouriteNewsFeedTask(Context context, ProgressBar loadMoreIndicator, Fragment fragment){
 
         mContext = context;
         mLoadMoreIndicator = loadMoreIndicator;
@@ -61,8 +61,14 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
         final String PAGE_QUERY_PARAM = "page";
 
         StringBuilder topicsQuery = new StringBuilder();
-        Set<String> defaultFavouriteTopicsSet = Utility.getDefaultFavouriteTopicsSet(mContext);
-        for (String iterator : defaultFavouriteTopicsSet) {
+        Set<String> favouriteTopicsSet = Utility.getFavouriteTopicsSet(mContext);
+        if (favouriteTopicsSet.isEmpty()){
+
+            mOnDownloadTaskFinishedListener.onDownloadTaskFinished("caughtException");
+            return null;
+
+        }
+        for (String iterator : favouriteTopicsSet) {
 
             if (iterator != null){
 
@@ -85,11 +91,24 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
         BufferedReader reader = null;
         int dbNewsFeedItemCount = 0;
 
+        String[] selectionArgs = new String[favouriteTopicsSet.size()];
+        StringBuilder selection = new StringBuilder();
+
+        int index = 0;
+        for (String iterator : favouriteTopicsSet){
+
+            selectionArgs[index++] = iterator;
+            selection.append("?");
+            selection.append(",");
+
+        }
+        selection = new StringBuilder(selection.substring(0,selection.length()-1));
+
         mCursor = mContext.getContentResolver().query(NewsContract.NewsFeed.NEWSFEED_READURI,
-                                                        null,
-                                                        null,
-                                                        null,
-                                                        null);
+                null,
+                NewsContract.NewsFeed.COLUMN_SECTIONID + " IN (" + selection.toString() +")",
+                selectionArgs,
+                null);
 
         if (mCursor != null){
 
@@ -337,7 +356,7 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
                         tempArray[0] = responsePage[0];
                         responsePage = tempArray;
 
-                        for (int index=1; index <= 2; ++index){
+                        for ( index=1; index <= 2; ++index){
 
                             responseString.delete(0, responseString.length());
                             builder.clearQuery();
@@ -417,9 +436,9 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
 
         } else {
 
-                Utility.updateNewsFeed(mContext);
+            Utility.updateNewsFeed(mContext);
             mOnDownloadTaskFinishedListener.onDownloadTaskFinished("caughtException");
-                return null;
+            return null;
 
         }
 
@@ -457,7 +476,7 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
 //        int pageCount = responsePage[0].getJSONObject("response").getInt("pages");
         int pageIndex, webTitleIndex, arrayIndex, responseCount;
         responseCount = 2*PAGE_SIZE; /*responsePage[0].getJSONObject("response").getInt("total");*/
-        ContentValues[] newsFeedContentValues = new ContentValues[2*responseCount];
+        ContentValues[] newsFeedContentValues = new ContentValues[responseCount];
         String currentDate = Utility.getCurrentDate();
         JSONArray newsFeedItemJSONArray;
         JSONObject newsFeedItemJSONObject;

@@ -32,7 +32,7 @@ public class NewsDBHelper extends SQLiteOpenHelper {
                                                     + NewsContract.NewsFeed.COLUMN_THUMBNAILURL + " TEXT NOT NULL,"
                                                     + NewsContract.NewsFeed.COLUMN_BYLINE + " TEXT NOT NULL,"
                                                     + "UNIQUE (" + NewsContract.NewsFeed.COLUMN_ARTICLEID
-                                                    + ") ON CONFLICT IGNORE);";
+                                                    + ") ON CONFLICT REPLACE);";
 
         final String SQL_CREATE_NEWSARTICLE_TABLE = "CREATE TABLE " + NewsContract.NewsArticle.TABLE_NAME
                                                         + " ("
@@ -54,7 +54,7 @@ public class NewsDBHelper extends SQLiteOpenHelper {
                                                         + NewsContract.NewsFeed.TABLE_NAME + " ("
                                                         + NewsContract.NewsFeed._ID + "),"
                                                         + "UNIQUE (" + NewsContract.NewsArticle.COLUMN_ARTICLEID
-                                                        + ") ON CONFLICT IGNORE);";
+                                                        + ") ON CONFLICT REPLACE);";
 
         db.execSQL(SQL_CREATE_NEWSFEED_TABLE);
         db.execSQL(SQL_CREATE_NEWSARTICLE_TABLE);

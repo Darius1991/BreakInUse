@@ -5,6 +5,7 @@ import com.parse.Parse;
 import com.parse.ParseCrashReporting;
 
 public class OnStartApplication extends Application {
+
     @Override
     public void onCreate() {
 
@@ -14,4 +15,5 @@ public class OnStartApplication extends Application {
         Parse.initialize(this);
 
     }
+
 }
