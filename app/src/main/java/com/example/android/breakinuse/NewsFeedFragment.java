@@ -23,7 +23,8 @@ import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.recyclerViewAdapter.NewsFeedAdapter;
 import com.example.android.breakinuse.utilities.Utility;
 
-public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+        com.example.android.breakinuse.dataSync.DownloadNewsFeedTask.OnDownloadTaskFinishedListener {
 
     private NewsFeedAdapter mNewsFeedAdapter;
     private static final int LOADER_ID_ALL = 0;
@@ -45,7 +46,6 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
         mLoadMoreIndicator.setVisibility(View.GONE);
         mContext = getActivity();
         mShouldLoadMore = true;
-        isCurrentlySelected = false;
 
         mNewsFeedAdapter = new NewsFeedAdapter(mContext,
                 mContext.getContentResolver().query(NewsContract.NewsFeed.NEWSFEED_READURI,null,null,null,null));
@@ -56,6 +56,7 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mNewsFeedAdapter);
+        final Fragment fragment = this;
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -80,7 +81,7 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
                             } else {
 
                                 mShouldLoadMore = false;
-                                new DownloadNewsFeedTask(mContext,mLoadMoreIndicator).execute();
+                                new DownloadNewsFeedTask(mContext,mLoadMoreIndicator,fragment).execute();
                                 mLoadMoreIndicator.setVisibility(View.VISIBLE);
                                 Log.d(TAG, "Last Item Wow !");
 
@@ -169,6 +170,17 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
 
         super.setUserVisibleHint(isVisibleToUser);
         isCurrentlySelected = isVisibleToUser;
+
+    }
+
+    @Override
+    public void onDownloadTaskFinished(String taskStatus) {
+
+        if (taskStatus.equals("caughtException")){
+
+            mShouldLoadMore = true;
+
+        }
 
     }
 

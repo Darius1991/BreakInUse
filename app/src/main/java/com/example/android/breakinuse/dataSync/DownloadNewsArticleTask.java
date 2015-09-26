@@ -22,7 +22,6 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
     private Context mContext;
     private Cursor mCursor;
 
-
     public DownloadNewsArticleTask(Context tempContext){
 
         mContext = tempContext;
@@ -179,8 +178,18 @@ public class DownloadNewsArticleTask extends AsyncTask<String,Void,Void> {
 
             }
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_HTML_BODY,htmlBody.toString());
-            contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,
-                    newsArticle.getJSONObject("fields").getString("byline"));
+
+            try {
+
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,
+                        newsArticle.getJSONObject("fields").getString("byline"));
+
+            }catch (Exception e){
+
+                e.printStackTrace();
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,"Author");
+
+            }
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"1");
 
             rowUpdateFlag = mContext.getContentResolver().update(NewsContract.NewsArticle.NEWSARTICLE_URI,

@@ -19,6 +19,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.android.breakinuse.dataSync.DownloadFavouriteNewsFeedTask;
 import com.example.android.breakinuse.dataSync.DownloadNewsFeedTask;
 import com.example.android.breakinuse.newsProvider.NewsContract;
 import com.example.android.breakinuse.recyclerViewAdapter.FavouriteNewsFeedAdapter;
@@ -26,7 +27,8 @@ import com.example.android.breakinuse.utilities.Utility;
 
 import java.util.Set;
 
-public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
+public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor>,
+        com.example.android.breakinuse.dataSync.DownloadFavouriteNewsFeedTask.OnDownloadTaskFinishedListener {
 
     private FavouriteNewsFeedAdapter mFavouriteNewsFeedAdapter;
     private static final int LOADER_ID_FAVOURITES = 1;
@@ -48,7 +50,6 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
         mLoadMoreIndicator.setVisibility(View.GONE);
         mContext = getActivity();
         mShouldLoadMore = true;
-        isCurrentlySelected = false;
 
         Set<String> favouriteTopicsSet = Utility.getFavouriteTopicsSet(mContext);
         if (!favouriteTopicsSet.isEmpty()){
@@ -91,6 +92,7 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
         mRecyclerView.setLayoutManager(layoutManager);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setAdapter(mFavouriteNewsFeedAdapter);
+        final Fragment fragment = this;
 
         mRecyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
 
@@ -115,7 +117,7 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
                             } else {
 
                                 mShouldLoadMore = false;
-                                new DownloadNewsFeedTask(mContext,mLoadMoreIndicator).execute();
+                                new DownloadFavouriteNewsFeedTask(mContext,mLoadMoreIndicator,fragment).execute();
                                 mLoadMoreIndicator.setVisibility(View.VISIBLE);
                                 Log.d(TAG, "Last Item Wow !");
 
@@ -166,8 +168,6 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
                             selectionArgs,
                             null);
 
-
-
                 } else {
 
                     cursorLoader = new CursorLoader(mContext,
@@ -196,6 +196,12 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
         if ((data != null) && (data.moveToFirst())){
 
+            if (data.getCount() < 3){
+
+                new DownloadFavouriteNewsFeedTask(mContext,mLoadMoreIndicator,this).execute();
+
+            }
+
             mFavouriteNewsFeedTextView.setVisibility(View.GONE);
             mRecyclerView.setVisibility(View.VISIBLE);
             mFavouriteNewsFeedAdapter.swapCursor(data);
@@ -207,6 +213,7 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
         } else {
 
+            new DownloadFavouriteNewsFeedTask(mContext,mLoadMoreIndicator,this).execute();
             mFavouriteNewsFeedTextView.setVisibility(View.VISIBLE);
             mRecyclerView.setVisibility(View.GONE);
 
@@ -236,4 +243,14 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
     }
 
+    @Override
+    public void onDownloadTaskFinished(String taskStatus) {
+
+        if (taskStatus.equals("caughtException")){
+
+            mShouldLoadMore = true;
+
+        }
+
+    }
 }

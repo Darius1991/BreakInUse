@@ -217,7 +217,7 @@ public class NewsProvider extends ContentProvider {
                 if (rowID != -1){
 
                     returnUri = NewsContract.NewsFeed.buildNewsFeedUri(rowID);
-                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null, false);
 
                 } else {
 
@@ -232,7 +232,7 @@ public class NewsProvider extends ContentProvider {
                 if (rowID != -1){
 
                     returnUri = NewsContract.NewsFeed.buildNewsFeedUri(rowID);
-                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null, false);
 
                 } else {
 
@@ -247,7 +247,7 @@ public class NewsProvider extends ContentProvider {
                 if (rowID != -1){
 
                     returnUri = NewsContract.NewsFeed.buildNewsFeedUri(rowID);
-                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null, false);
 
                 } else {
 
@@ -262,7 +262,7 @@ public class NewsProvider extends ContentProvider {
                 if (rowID != -1){
 
                     returnUri = NewsContract.NewsFeed.buildNewsFeedUri(rowID);
-                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null, false);
 
                 } else {
 
@@ -291,7 +291,7 @@ public class NewsProvider extends ContentProvider {
 
         }
 
-        getContext().getContentResolver().notifyChange(uri, null);
+        getContext().getContentResolver().notifyChange(uri, null, false);
         return returnUri;
     }
 
@@ -314,7 +314,7 @@ public class NewsProvider extends ContentProvider {
                 rowsDeleted = db.delete(NewsContract.NewsFeed.TABLE_NAME, selection, selectionArgs);
                 if (rowsDeleted != 0) {
 
-                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null, false);
 
                 }
                 break;
@@ -324,7 +324,7 @@ public class NewsProvider extends ContentProvider {
                 rowsDeleted = db.delete(NewsContract.NewsFeed.TABLE_NAME, selection, selectionArgs);
                 if (rowsDeleted != 0) {
 
-                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null, false);
 
                 }
                 break;
@@ -334,7 +334,7 @@ public class NewsProvider extends ContentProvider {
                 rowsDeleted = db.delete(NewsContract.NewsFeed.TABLE_NAME, selection, selectionArgs);
                 if (rowsDeleted != 0) {
 
-                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null, false);
 
                 }
                 break;
@@ -344,7 +344,7 @@ public class NewsProvider extends ContentProvider {
                 rowsDeleted = db.delete(NewsContract.NewsFeed.TABLE_NAME, selection, selectionArgs);
                 if (rowsDeleted != 0) {
 
-                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null, false);
 
                 }
                 break;
@@ -378,7 +378,7 @@ public class NewsProvider extends ContentProvider {
 
         if (rowsDeleted != 0) {
 
-            getContext().getContentResolver().notifyChange(uri, null);
+            getContext().getContentResolver().notifyChange(uri, null, false);
 
         }
         return rowsDeleted;
@@ -398,7 +398,7 @@ public class NewsProvider extends ContentProvider {
                 rowsUpdated = db.update(NewsContract.NewsFeed.TABLE_NAME,values,selection,selectionArgs);
                 if (rowsUpdated != 0) {
 
-                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null, false);
 
                 }
                 break;
@@ -408,7 +408,7 @@ public class NewsProvider extends ContentProvider {
                 rowsUpdated = db.update(NewsContract.NewsFeed.TABLE_NAME,values,selection,selectionArgs);
                 if (rowsUpdated != 0) {
 
-                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null, false);
 
                 }
                 break;
@@ -418,7 +418,7 @@ public class NewsProvider extends ContentProvider {
                 rowsUpdated = db.update(NewsContract.NewsFeed.TABLE_NAME,values,selection,selectionArgs);
                 if (rowsUpdated != 0) {
 
-                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null, false);
 
                 }
                 break;
@@ -428,7 +428,7 @@ public class NewsProvider extends ContentProvider {
                 rowsUpdated = db.update(NewsContract.NewsFeed.TABLE_NAME,values,selection,selectionArgs);
                 if (rowsUpdated != 0) {
 
-                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+                    getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null, false);
 
                 }
                 break;
@@ -462,7 +462,7 @@ public class NewsProvider extends ContentProvider {
 
         if (rowsUpdated != 0) {
 
-            getContext().getContentResolver().notifyChange(uri, null);
+            getContext().getContentResolver().notifyChange(uri, null, false);
 
         }
         return rowsUpdated;
@@ -520,8 +520,8 @@ public class NewsProvider extends ContentProvider {
                     db.endTransaction();
 
                 }
-                getContext().getContentResolver().notifyChange(uri, null);
-                getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+                getContext().getContentResolver().notifyChange(uri, null, false);
+                getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null, false);
                 return rowsInserted;
 
             case NEWSFEED_WRITE :
@@ -548,8 +548,8 @@ public class NewsProvider extends ContentProvider {
                     db.endTransaction();
 
                 }
-                getContext().getContentResolver().notifyChange(uri, null);
-                getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null);
+                getContext().getContentResolver().notifyChange(uri, null, false);
+                getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.FAVOURITE_NEWSFEED_READURI, null, false);
                 return rowsInserted;
 
 
@@ -577,8 +577,8 @@ public class NewsProvider extends ContentProvider {
                     db.endTransaction();
 
                 }
-                getContext().getContentResolver().notifyChange(uri, null);
-                getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+                getContext().getContentResolver().notifyChange(uri, null, false);
+                getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null, false);
                 return rowsInserted;
 
 
@@ -606,8 +606,8 @@ public class NewsProvider extends ContentProvider {
                     db.endTransaction();
 
                 }
-                getContext().getContentResolver().notifyChange(uri, null);
-                getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null);
+                getContext().getContentResolver().notifyChange(uri, null, false);
+                getContext().getContentResolver().notifyChange(NewsContract.NewsFeed.NEWSFEED_READURI, null, false);
                 return rowsInserted;
 
 
@@ -635,7 +635,7 @@ public class NewsProvider extends ContentProvider {
                     db.endTransaction();
 
                 }
-                getContext().getContentResolver().notifyChange(uri, null);
+                getContext().getContentResolver().notifyChange(uri, null, false);
                 return rowsInserted;
 
             default:

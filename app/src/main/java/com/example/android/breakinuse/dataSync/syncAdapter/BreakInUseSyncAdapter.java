@@ -35,9 +35,10 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
     private static final String TAG = BreakInUseSyncAdapter.class.getName();
     private Context mContext;
     private StringBuilder mTopicsQuery;
+    private ArrayList<String> mArticleIDList;
     private static final int SYNC_INTERVAL = 60 * 180;
     private static final int SYNC_FLEXTIME = SYNC_INTERVAL/3;
-
+    private static final int PAGE_SIZE = 20;
 
     public BreakInUseSyncAdapter(Context context, boolean autoInitialize) {
 
@@ -45,6 +46,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
         mContext = context;
         mContentResolver = mContext.getContentResolver();
         mTopicsQuery = new StringBuilder();
+        mArticleIDList = new ArrayList<>();
 
     }
 
@@ -54,11 +56,14 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
         mContext = context;
         mContentResolver = mContext.getContentResolver();
         mTopicsQuery = new StringBuilder();
+        mArticleIDList = new ArrayList<>();
 
     }
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
+
+        Log.d(TAG,"Running onPerformSync coolcoolcoolcool");
 
         /*----FETCHING newsFeedItems FROM GUARDIAN API & INSERTING IN NewsFeed TABLE----*/
         /*----FETCHING newsFeedItems FROM GUARDIAN API & INSERTING IN NewsFeed TABLE----*/
@@ -80,7 +85,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
         final String ORDER_QUERY_PARAM = "order-by";
         final String PAGESIZE_QUERY_PARAM = "page-size";
         final String PAGE_QUERY_PARAM = "page";
-        final int PAGE_SIZE = 20;
+        mArticleIDList = new ArrayList<>();
 
         Set<String> defaultFavouriteTopicsSet = Utility.getDefaultFavouriteTopicsSet(mContext);
 
@@ -92,7 +97,6 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                 mTopicsQuery.append("|");
 
             }
-
 
         }
         mTopicsQuery = new StringBuilder(mTopicsQuery.substring(0,(mTopicsQuery.length()-1)));
@@ -117,7 +121,6 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                     .appendQueryParameter(PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
                     .appendQueryParameter(ORDER_QUERY_PARAM, "newest")
                     .appendQueryParameter(PAGE_QUERY_PARAM,String.valueOf(1))
-                    .appendQueryParameter(FROMDATE_QUERY_PARAM, fromDate)
                     .appendQueryParameter(SECTION_QUERY_PARAM, mTopicsQuery.toString())
                     .build();
 
@@ -153,7 +156,9 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                     return;
 
                 }
+
             }
+
         }
 
         if (responseString.length() != 0){
@@ -165,16 +170,6 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                     return;
 
                 }
-
-            } catch (Exception e) {
-
-                e.printStackTrace();
-                return;
-
-            }
-            try {
-
-                pageCount = getPageCount(responsePage[0]);
 
             } catch (Exception e) {
 
@@ -205,9 +200,22 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
         /*----DELETING OLD ARTICLES FROM NewsFeed TABLE----*/
         /*----DELETING OLD ARTICLES FROM NewsFeed TABLE----*/
 
+        String[] articleIDArray = new String[mArticleIDList.size()];
+        StringBuilder selection = new StringBuilder();
+        int index = 0;
+
+        for (String iterator: mArticleIDList){
+
+            selection.append("?");
+            selection.append(",");
+            articleIDArray[index++] = iterator ;
+
+        }
+        selection = new StringBuilder(selection.substring(0,selection.length()-1));
+
         mContentResolver.delete(NewsContract.NewsFeed.NEWSFEED_READURI,
-                    NewsContract.NewsFeed.COLUMN_PUBLISHDATE + " != ?",
-                    new String[]{Utility.getCurrentDate()});
+                    NewsContract.NewsFeed.COLUMN_ARTICLEID + " NOT IN (" + selection.toString() + ")",
+                    articleIDArray);
 
         /*----FETCHING DATA FOR TO-BE-SAVED ARTICLES & INSERTING IN NewsArticle TABLE----*/
         /*----FETCHING DATA FOR TO-BE-SAVED ARTICLES & INSERTING IN NewsArticle TABLE----*/
@@ -222,7 +230,7 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
         responseString =  new StringBuilder();
         reader = null;
-        int index = 0;
+        index = 0;
         int downloadCount = 0;
         int articleIDColumnIndex = cursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_ARTICLEID);
         int newsFeedIDColumnIndex = cursor.getColumnIndex(NewsContract.NewsArticle.COLUMN_NEWSFEED_KEY);
@@ -241,7 +249,6 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
                     builder.appendQueryParameter(API_KEY_QUERY_PARAM, API_KEY)
                             .appendQueryParameter(FIELDS_QUERY_PARAM, "trailText,body,byline,headline,main,thumbnail")
                             .appendQueryParameter(PAGESIZE_QUERY_PARAM, String.valueOf(PAGE_SIZE))
-                            .appendQueryParameter(ORDER_QUERY_PARAM, "newest")
                             .appendQueryParameter(ID_QUERY_PARAM, cursor.getString(articleIDColumnIndex))
                             .build();
 
@@ -309,17 +316,17 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
     }
 
-    private int getPageCount(JSONObject responsePage) throws Exception{
-
-        return responsePage.getJSONObject("response").getInt("pages");
-
-    }
+//    private int getPageCount(JSONObject responsePage) throws Exception{
+//
+//        return responsePage.getJSONObject("response").getInt("pages");
+//
+//    }
 
     private int insertNewsFeedItemsInNewsFeedTableFromJSON(JSONObject[] responsePage) throws Exception {
 
-        int pageCount = 1; /*responsePage[0].getJSONObject("response").getInt("pages");*/
+//        int pageCount = responsePage[0].getJSONObject("response").getInt("pages");
         int pageIndex, webTitleIndex, arrayIndex, responseCount;
-        responseCount = 20;/*responsePage[0].getJSONObject("response").getInt("total");*/
+        responseCount = PAGE_SIZE; /*responsePage[0].getJSONObject("response").getInt("total")*/;
         ContentValues[] newsFeedContentValues = new ContentValues[responseCount];
         String currentDate = Utility.getCurrentDate();
         JSONArray newsFeedItemJSONArray;
@@ -331,51 +338,65 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
         }
 
-        for (pageIndex = 0; pageIndex <= pageCount-1; ++pageIndex){
+//        for (pageIndex = 0; pageIndex <= pageCount-1; ++pageIndex){
 
-            webTitleIndex = 0;
-            newsFeedItemJSONArray = responsePage[pageIndex].getJSONObject("response").getJSONArray("results");
+        pageIndex = 0;
+        webTitleIndex = 0;
+        newsFeedItemJSONArray = responsePage[pageIndex].getJSONObject("response").getJSONArray("results");
 
-            for ( ;webTitleIndex < newsFeedItemJSONArray.length() ; ++webTitleIndex){
+        for ( ;webTitleIndex < newsFeedItemJSONArray.length() ; ++webTitleIndex){
 
-                newsFeedItemJSONObject = newsFeedItemJSONArray.getJSONObject(webTitleIndex);
-                arrayIndex = webTitleIndex + ((pageIndex) * 20);
+            newsFeedItemJSONObject = newsFeedItemJSONArray.getJSONObject(webTitleIndex);
+            arrayIndex = webTitleIndex + ((pageIndex) * PAGE_SIZE);
 
-                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_WEBTITLE,
-                        newsFeedItemJSONObject.getString("webTitle"));
-                Log.d(TAG, newsFeedItemJSONObject.getString("webTitle"));
-                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_WEBURL,
-                        newsFeedItemJSONObject.getString("webUrl"));
-                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_APIURL,
-                        newsFeedItemJSONObject.getString("apiUrl"));
-                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
-                        newsFeedItemJSONObject.getJSONObject("fields").getString("trailText"));
+            newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_WEBTITLE,
+                    newsFeedItemJSONObject.getString("webTitle"));
+            Log.d(TAG, newsFeedItemJSONObject.getString("webTitle"));
+            newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_WEBURL,
+                    newsFeedItemJSONObject.getString("webUrl"));
+            newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_APIURL,
+                    newsFeedItemJSONObject.getString("apiUrl"));
+            newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_TRAILTEXT,
+                    newsFeedItemJSONObject.getJSONObject("fields").getString("trailText"));
+            try {
+
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_BYLINE,
                         newsFeedItemJSONObject.getJSONObject("fields").getString("byline"));
-                try {
-
-                    newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,
-                            newsFeedItemJSONObject.getJSONObject("fields").getString("thumbnail"));
-
-                } catch (Exception e){
-
-                    newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,
-                            "http://vignette3.wikia.nocookie.net/wiisportsresortwalkthrough/images/6/60/No_Image_Available.png");
-
-                }
-                newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
-                        Utility.getImageURLFromMainHTML(newsFeedItemJSONObject.getJSONObject("fields").getString("main")));
-                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_ARTICLEID,
-                        newsFeedItemJSONObject.getString("id"));
-                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_SECTIONID,
-                        newsFeedItemJSONObject.getString("sectionId"));
-                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
-                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE, currentDate);
 
             }
+            catch (Exception e){
+
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_BYLINE,"Author");
+
+            }
+
+            try {
+
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,
+                        newsFeedItemJSONObject.getJSONObject("fields").getString("thumbnail"));
+
+            } catch (Exception e){
+
+                newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_THUMBNAILURL,
+                        "http://vignette3.wikia.nocookie.net/wiisportsresortwalkthrough/images/6/60/No_Image_Available.png");
+
+            }
+            newsFeedContentValues[arrayIndex].put(NewsContract.NewsArticle.COLUMN_IMAGEURL,
+                    Utility.getImageURLFromMainHTML(newsFeedItemJSONObject.getJSONObject("fields").getString("main")));
+            newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_ARTICLEID,
+                    newsFeedItemJSONObject.getString("id"));
+            newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_SECTIONID,
+                    newsFeedItemJSONObject.getString("sectionId"));
+            newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_SAVEDFLAG, "0");
+            newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_PUBLISHDATE, currentDate);
+            mContentResolver.insert(NewsContract.NewsFeed.NEWSFEED_READURI, newsFeedContentValues[arrayIndex]);
+            mArticleIDList.add(newsFeedItemJSONObject.getString("id"));
+
         }
 
-        return mContentResolver.bulkInsert(NewsContract.NewsFeed.NEWSFEED_READURI, newsFeedContentValues);
+//        }
+
+        return mArticleIDList.size();
 
     }
 
@@ -430,8 +451,19 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
             }
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_HTML_BODY,htmlBody.toString());
-            contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,
-                    newsArticle.getJSONObject("fields").getString("byline"));
+            try {
+
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,
+                        newsArticle.getJSONObject("fields").getString("byline"));
+
+            } catch (Exception e){
+
+                e.printStackTrace();
+                contentValues[index].put(NewsContract.NewsArticle.COLUMN_BYLINE,"Author");
+
+            }
+
+
             contentValues[index].put(NewsContract.NewsArticle.COLUMN_DOWNLOADFLAG,"1");
 
             rowUpdateFlag = mContentResolver.update(NewsContract.NewsArticle.NEWSARTICLE_URI,
@@ -537,13 +569,9 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
             e.printStackTrace();
 
-
-
         }
 
         return newAccount;
-
-
 
     }
 
