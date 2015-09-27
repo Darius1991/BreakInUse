@@ -30,7 +30,8 @@
 
         <activity
             android:name=".NewsFeedActivity"
-            android:label="@string/title_activity_home" >
+            android:label="@string/title_activity_home"
+            android:screenOrientation = "portrait">
 
             <intent-filter>
 
@@ -44,7 +45,8 @@
         <activity
             android:name=".LoginActivity"
             android:label="@string/title_activity_login"
-            android:parentActivityName=".NewsFeedActivity" >
+            android:parentActivityName=".NewsFeedActivity"
+            android:screenOrientation = "portrait">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -55,7 +57,8 @@
         <activity
             android:name=".NewsArticleActivity"
             android:label="@string/title_activity_news_article"
-            android:parentActivityName=".NewsFeedActivity" >
+            android:parentActivityName=".NewsFeedActivity"
+            android:screenOrientation = "portrait">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
@@ -66,7 +69,8 @@
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
-            android:parentActivityName=".NewsFeedActivity" >
+            android:parentActivityName=".NewsFeedActivity"
+            android:screenOrientation = "portrait">
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"

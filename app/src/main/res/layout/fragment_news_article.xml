@@ -40,7 +40,4 @@
             android:id = "@+id/newsArticle_loadMoreIndicator"
             style="@style/ArticleGenericProgressIndicator"/>
 
-
-
-
 </android.support.design.widget.CoordinatorLayout>
