@@ -119,7 +119,6 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
                                 mShouldLoadMore = false;
                                 new DownloadFavouriteNewsFeedTask(mContext,mLoadMoreIndicator,fragment).execute();
                                 mLoadMoreIndicator.setVisibility(View.VISIBLE);
-                                Log.d(TAG, "Last Item Wow !");
 
                             }
 
