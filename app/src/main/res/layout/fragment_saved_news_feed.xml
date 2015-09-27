@@ -12,7 +12,9 @@
         android:scrollbars="vertical"
         android:gravity = "center"/>
 
-    <TextView
+    <com.example.android.breakinuse.widget.TypefaceTextView
+        xmlns:nameSpace="http://schemas.android.com/apk/res/com.example.android.breakinuse"
+        nameSpace:typeface = "RobotoCondensedRegular.ttf"
         android:id = "@+id/savedNewsFeed_textView"
         android:layout_width = "match_parent"
         android:layout_height = "match_parent"
@@ -22,6 +24,5 @@
         android:textColor = "@color/color_cardViewText"
         android:text = "@string/savedNewsFeed_textView_text"
         android:gravity = "center" />
-
 
 </LinearLayout>
