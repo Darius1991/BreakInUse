@@ -480,7 +480,6 @@ public class DownloadNewsFeedTask extends AsyncTask<Void,Void,Void> {
 
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_WEBTITLE,
                         newsFeedItemJSONObject.getString("webTitle"));
-                Log.d(TAG, newsFeedItemJSONObject.getString("webTitle"));
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_WEBURL,
                         newsFeedItemJSONObject.getString("webUrl"));
                 newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_APIURL,

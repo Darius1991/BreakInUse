@@ -63,7 +63,6 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
 
-        Log.d(TAG,"Running onPerformSync coolcoolcoolcool");
 
         /*----FETCHING newsFeedItems FROM GUARDIAN API & INSERTING IN NewsFeed TABLE----*/
         /*----FETCHING newsFeedItems FROM GUARDIAN API & INSERTING IN NewsFeed TABLE----*/
@@ -351,7 +350,6 @@ public class BreakInUseSyncAdapter extends AbstractThreadedSyncAdapter {
 
             newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_WEBTITLE,
                     newsFeedItemJSONObject.getString("webTitle"));
-            Log.d(TAG, newsFeedItemJSONObject.getString("webTitle"));
             newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_WEBURL,
                     newsFeedItemJSONObject.getString("webUrl"));
             newsFeedContentValues[arrayIndex].put(NewsContract.NewsFeed.COLUMN_APIURL,

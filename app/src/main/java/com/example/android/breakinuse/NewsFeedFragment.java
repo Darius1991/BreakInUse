@@ -83,7 +83,7 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
                                 mShouldLoadMore = false;
                                 new DownloadNewsFeedTask(mContext,mLoadMoreIndicator,fragment).execute();
                                 mLoadMoreIndicator.setVisibility(View.VISIBLE);
-                                Log.d(TAG, "Last Item Wow !");
+
 
                             }
 

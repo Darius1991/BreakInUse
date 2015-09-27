@@ -187,7 +187,6 @@ public class Utility {
 
         } catch (ParseException e) {
 
-            Log.d(TAG, "Yesterday's date being returned as null.");
             e.printStackTrace();
 
         }

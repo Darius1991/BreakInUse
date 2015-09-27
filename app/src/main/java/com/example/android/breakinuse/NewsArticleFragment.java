@@ -152,7 +152,7 @@ public class NewsArticleFragment extends Fragment {
 
         } else {
 
-            Log.d(TAG,"ShareActionProvider is null.");
+            //TODO handleError
 
         }
 

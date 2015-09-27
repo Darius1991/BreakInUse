@@ -304,7 +304,6 @@ public class ContentProviderTest extends AndroidTestCase {
                 "http://media.guim.co.uk/fece5c28990b3b8baa19229a88164a4c6d52c21c/0_31_3500_2101/1000.jpg\\");
 
         int rowsUpdated = contentResolver.update(newsFeedURI_articleID_set1,newsFeedTestValues_set2,null,null);
-        Log.d(TAG,String.valueOf(rowsUpdated));
         assertTrue("Error: The rows in the newsFeedTable weren't updated correctly.", rowsUpdated == 1 );
 
         cursor = contentResolver.query(NewsContract.NewsFeed.NEWSFEED_WRITEURI, null, null, null, null);
@@ -352,7 +351,6 @@ public class ContentProviderTest extends AndroidTestCase {
         rowsUpdated = contentResolver.update(NewsContract.NewsArticle.NEWSARTICLE_URI,newsArticleTestValues_set2,
                 NewsContract.NewsArticle.COLUMN_ARTICLEID + " = ?",
                 new String[]{"football/2015/aug/23/arsene-wenger-arsenal-liverpool"});
-        Log.d(TAG, String.valueOf(rowsUpdated));
         assertTrue("Error: The rows in the newArticleTable weren't updated correctly.", rowsUpdated == 1);
 
         cursor = contentResolver.query(NewsContract.NewsArticle.NEWSARTICLE_URI, null, null, null, null);
@@ -377,14 +375,12 @@ public class ContentProviderTest extends AndroidTestCase {
         //----------- Testing for NewsFeed Delete -------------
 
         int rowsDeleted = contentResolver.delete(NewsContract.NewsFeed.NEWSFEED_WRITEURI,null, null);
-        Log.d(TAG, String.valueOf(rowsDeleted));
         assertTrue("Error: The rows in the newsFeedTable weren't updated correctly.", rowsDeleted == 1);
 
         //----------- Testing for NewsArticle Delete--------------
         //----------- Testing for NewsArticle Delete -------------
 
         rowsDeleted = contentResolver.delete(NewsContract.NewsArticle.NEWSARTICLE_URI,null, null);
-        Log.d(TAG, String.valueOf(rowsDeleted));
         assertTrue("Error: The rows in the newsArticleTable weren't updated correctly.", rowsDeleted == 1);
 
         //----------- Testing for NewsFeed BulkInsert--------------
@@ -395,7 +391,6 @@ public class ContentProviderTest extends AndroidTestCase {
         cvArray[1] = newsFeedTestValues_set2;
 
         int rowsInserted = contentResolver.bulkInsert(NewsContract.NewsFeed.NEWSFEED_WRITEURI,cvArray);
-        Log.d(TAG, String.valueOf(rowsInserted));
         assertTrue("Error: The rows in the newsfeedTable weren't bulk-inserted correctly.", rowsInserted == 2);
 
         //----------- Testing for NewsArticle BulkInsert--------------
@@ -404,7 +399,6 @@ public class ContentProviderTest extends AndroidTestCase {
         cvArray[0] = newsArticleTestValues_set1;
         cvArray[1] = newsArticleTestValues_set2;
         rowsInserted = contentResolver.bulkInsert(NewsContract.NewsArticle.NEWSARTICLE_URI,cvArray);
-        Log.d(TAG, String.valueOf(rowsInserted));
         assertTrue("Error: The rows in the newsArticleTable weren't bulk-inserted correctly.", rowsInserted == 2);
 
         cursor.close();
