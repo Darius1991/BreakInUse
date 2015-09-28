@@ -3,9 +3,9 @@
 <manifest
 
     xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.android.breakinuse"
-    android:versionCode = "1"
-    android:versionName = "1.0">
+    package="com.breakinuse"
+    android:versionCode = "2"
+    android:versionName = "1.0.1">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
@@ -64,7 +64,7 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.android.breakinuse.NewsFeedActivity" />
+                android:value="com.breakinuse.NewsFeedActivity" />
 
         </activity>
 
@@ -76,13 +76,13 @@
 
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.android.breakinuse.NewsFeedActivity" />
+                android:value="com.breakinuse.NewsFeedActivity" />
 
         </activity>
 
         <provider
             android:name = ".newsProvider.NewsProvider"
-            android:authorities = "com.example.android.breakinuse"
+            android:authorities = "com.breakinuse"
             android:syncable = "true"
             android:exported = "false"/>
 
