@@ -3,8 +3,8 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
-        <item name = "android:colorPrimary">@color/color_primary</item>
-        <item name = "android:colorPrimaryDark">@color/color_primaryDark</item>
+        <item name = "colorPrimary">@color/color_primary</item>
+        <item name = "colorPrimaryDark">@color/color_primaryDark</item>
         <item name = "android:windowBackground">@color/color_windowBackground</item>
         <!--<item name = "android:background">@color/color_background</item>-->
 

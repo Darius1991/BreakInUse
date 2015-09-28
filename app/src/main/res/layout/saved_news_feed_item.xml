@@ -24,8 +24,8 @@
             android:layout_height = "wrap_content"
             android:orientation = "vertical" >
 
-            <com.example.android.breakinuse.widget.TypefaceTextView
-                xmlns:nameSpace="http://schemas.android.com/apk/res/com.example.android.breakinuse"
+            <com.breakinuse.widget.TypefaceTextView
+                xmlns:nameSpace="http://schemas.android.com/apk/res/com.breakinuse"
                 nameSpace:typeface = "RobotoCondensedRegular.ttf"
                 android:id="@+id/savedNewsFeedItem_headlines_textView"
                 android:layout_width="wrap_content"
@@ -37,8 +37,8 @@
                 android:textColor = "@color/color_cardViewText"
                 android:textSize = "18sp" />
 
-            <com.example.android.breakinuse.widget.TypefaceTextView
-                xmlns:nameSpace="http://schemas.android.com/apk/res/com.example.android.breakinuse"
+            <com.breakinuse.widget.TypefaceTextView
+                xmlns:nameSpace="http://schemas.android.com/apk/res/com.breakinuse"
                 nameSpace:typeface = "RobotoCondensedRegular.ttf"
                 android:id="@+id/savedNewsFeedItem_trailText_textView"
                 android:layout_width="wrap_content"
@@ -65,8 +65,8 @@
                     android:layout_weight = "1"
                     android:orientation = "vertical">
 
-                    <com.example.android.breakinuse.widget.TypefaceTextView
-                        xmlns:nameSpace="http://schemas.android.com/apk/res/com.example.android.breakinuse"
+                    <com.breakinuse.widget.TypefaceTextView
+                        xmlns:nameSpace="http://schemas.android.com/apk/res/com.breakinuse"
                         nameSpace:typeface = "RobotoCondensedRegular.ttf"
                         android:id = "@+id/savedNewsFeedItem_sectionID"
                         android:layout_width = "match_parent"
@@ -75,8 +75,8 @@
                         android:gravity = "center_horizontal" />
 
 
-                    <com.example.android.breakinuse.widget.TypefaceTextView
-                        xmlns:nameSpace="http://schemas.android.com/apk/res/com.example.android.breakinuse"
+                    <com.breakinuse.widget.TypefaceTextView
+                        xmlns:nameSpace="http://schemas.android.com/apk/res/com.breakinuse"
                         nameSpace:typeface = "RobotoCondensedRegular.ttf"
                         android:id = "@+id/savedNewsFeedItem_author"
                         android:layout_width = "match_parent"
