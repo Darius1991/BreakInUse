@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -37,6 +38,7 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
     private boolean mShouldLoadMore;
     private ProgressBar mLoadMoreIndicator;
     private boolean isCurrentlySelected;
+    private SwipeRefreshLayout mSwipeContainer;
 
     @Nullable
     @Override
@@ -130,6 +132,19 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
         });
 
+        mSwipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.favouriteNewsFeed_swipeContainer);
+        mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
+
+            @Override
+            public void onRefresh() {
+
+                new DownloadFavouriteNewsFeedTask(mContext,mLoadMoreIndicator,fragment).execute();
+
+            }
+
+        });
+        mSwipeContainer.setColorSchemeResources(android.R.color.holo_red_light);
+
         return rootView;
 
     }
@@ -207,12 +222,14 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
                 mShouldLoadMore = true;
 
             }
+            mSwipeContainer.setRefreshing(false);
 
         } else {
 
             new DownloadFavouriteNewsFeedTask(mContext,mLoadMoreIndicator,this).execute();
             mFavouriteNewsFeedTextView.setVisibility(View.VISIBLE);
             mRecyclerView.setVisibility(View.GONE);
+            mSwipeContainer.setRefreshing(false);
 
         }
 

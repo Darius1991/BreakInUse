@@ -5,12 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <android.support.v7.widget.RecyclerView
-        android:id = "@+id/newsFeed_recyclerView"
-        android:layout_width = "match_parent"
-        android:layout_height = "wrap_content"
-        android:scrollbars="vertical"
-        android:gravity = "center"/>
+    <android.support.v4.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/newsFeed_swipeContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <android.support.v7.widget.RecyclerView
+            android:id = "@+id/newsFeed_recyclerView"
+            android:layout_width = "match_parent"
+            android:layout_height = "wrap_content"
+            android:scrollbars="vertical"
+            android:gravity = "center"/>
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
     <com.breakinuse.widget.TypefaceTextView
         xmlns:nameSpace="http://schemas.android.com/apk/res/com.breakinuse"

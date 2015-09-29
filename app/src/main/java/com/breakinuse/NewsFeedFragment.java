@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -17,6 +18,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.breakinuse.dataSync.DownloadFavouriteNewsFeedTask;
 import com.breakinuse.dataSync.DownloadNewsFeedTask;
 import com.breakinuse.newsProvider.NewsContract;
 import com.breakinuse.recyclerViewAdapter.NewsFeedAdapter;
@@ -34,6 +36,7 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
     private boolean mShouldLoadMore;
     private ProgressBar mLoadMoreIndicator;
     private boolean isCurrentlySelected;
+    private SwipeRefreshLayout mSwipeContainer;
 
     @Nullable
     @Override
@@ -64,13 +67,13 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
 
                 super.onScrolled(recyclerView, dx, dy);
 
-                if (isCurrentlySelected){
+                if (isCurrentlySelected) {
 
                     if (mShouldLoadMore) {
 
-                        if ( (layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.getItemCount()) {
+                        if ((layoutManager.getChildCount() + layoutManager.findFirstVisibleItemPosition()) >= layoutManager.getItemCount()) {
 
-                            if (!Utility.isNetworkAvailable(mContext)){
+                            if (!Utility.isNetworkAvailable(mContext)) {
 
                                 Utility.makeToast(mContext,
                                         "We are not able to detect an internet connection. Please resolve this befor trying again.",
@@ -80,7 +83,7 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
                             } else {
 
                                 mShouldLoadMore = false;
-                                new DownloadNewsFeedTask(mContext,mLoadMoreIndicator,fragment).execute();
+                                new DownloadNewsFeedTask(mContext, mLoadMoreIndicator, fragment).execute();
                                 mLoadMoreIndicator.setVisibility(View.VISIBLE);
 
 
@@ -95,6 +98,19 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
             }
 
         });
+
+        mSwipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.newsFeed_swipeContainer);
+        mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+
+            @Override
+            public void onRefresh() {
+
+                Utility.updateNewsFeed(mContext);
+
+            }
+
+        });
+        mSwipeContainer.setColorSchemeResources(android.R.color.holo_red_light);
 
         return rootView;
 
@@ -139,11 +155,13 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
                 mShouldLoadMore = true;
 
             }
+            mSwipeContainer.setRefreshing(false);
 
         } else {
 
             mNewsFeedTextView.setVisibility(View.VISIBLE);
             mRecyclerView.setVisibility(View.GONE);
+            mSwipeContainer.setRefreshing(false);
 
         }
 
