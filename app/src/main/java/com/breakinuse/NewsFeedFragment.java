@@ -8,6 +8,7 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
+
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -17,8 +18,6 @@ import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.breakinuse.dataSync.DownloadFavouriteNewsFeedTask;
 import com.breakinuse.dataSync.DownloadNewsFeedTask;
 import com.breakinuse.newsProvider.NewsContract;
 import com.breakinuse.recyclerViewAdapter.NewsFeedAdapter;
@@ -83,7 +82,7 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
                             } else {
 
                                 mShouldLoadMore = false;
-                                new DownloadNewsFeedTask(mContext, mLoadMoreIndicator, fragment).execute();
+                                new DownloadNewsFeedTask(mContext,mLoadMoreIndicator,fragment).execute();
                                 mLoadMoreIndicator.setVisibility(View.VISIBLE);
 
 
@@ -98,6 +97,7 @@ public class NewsFeedFragment extends Fragment implements LoaderManager.LoaderCa
             }
 
         });
+
 
         mSwipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.newsFeed_swipeContainer);
         mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {

@@ -132,6 +132,7 @@ public class FavouriteNewsFeedFragment extends Fragment implements LoaderManager
 
         });
 
+
         mSwipeContainer = (SwipeRefreshLayout) rootView.findViewById(R.id.favouriteNewsFeed_swipeContainer);
         mSwipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener(){
 
