@@ -39,7 +39,7 @@ public class NewsFeedActivity extends AppCompatActivity {
         mViewPager = (ViewPager) findViewById(R.id.newsFeedActivity_viewPager);
         mViewPager.setAdapter(mNewsFeedPagerAdapter);
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.snewsFeedActivity_tabLayout);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.newsFeedActivity_tabLayout);
         tabLayout.setupWithViewPager(mViewPager);
 
         BreakInUseSyncAdapter.initializeSyncAdapter(this);
